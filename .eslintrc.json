@@ -1,0 +1,53 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:json/recommended"
+    ],
+    "overrides": [
+        {
+            "env": {
+                "node": true
+            },
+            "files": [".eslintrc.{js,cjs}"],
+            "parserOptions": {
+                "sourceType": "script"
+            }
+        }
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": ["@typescript-eslint"],
+    "rules": {
+        // off|| 0 - warn || 1 - error || 2
+        "indent": ["off", 4],
+        // "linebreak-style": [
+        //     "error",
+        //     "unix"
+        // ],
+        "quotes": ["warn", "double"],
+        "semi": ["warn", "always"],
+
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": [
+            "error",
+            {
+                "extendDefaults": true,
+                "types": {
+                    "{}": false
+                }
+            }
+        ],
+        // Resolved no-unused-vars Typescript such as declare enum type ...
+        "@typescript-eslint/no-unused-vars": "error"
+        // "no-console": "error" // Uncomment this line if you want to disallow console.log
+    },
+    "ignorePatterns": ["**/*.css", "**/*.scss"]
+}
