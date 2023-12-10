@@ -7,9 +7,8 @@
     "scripts": {
         "dev": "ts-node src/index.ts",
         "build": "tsc",
-        "lint": "eslint --quiet \"src/**/*.{ts,tsx,json}\"",
-        "eslint": "tsc --noEmit && yarn lint",
         "prettier": "prettier --write \"**/*.{ts,tsx,json,scss}\"",
+        "eslint": "tsc --noEmit && eslint --quiet \"src/**/*.{ts,tsx,json}\"",
         "lint-staged": "lint-staged",
         "serve": "node dist/index.js",
         "prepare": "husky install"
@@ -17,7 +16,7 @@
     "lint-staged": {
         "src/**/*.{ts,tsx,json,scss}": [
             "yarn prettier",
-            "yarn lint",
+            "yarn eslint",
             "git add ."
         ]
     },
