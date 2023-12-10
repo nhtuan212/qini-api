@@ -5,7 +5,7 @@
     "author": "Nguyen Hoang Tuan",
     "license": "MIT",
     "scripts": {
-        "dev": "ts-node src/index.ts",
+        "dev": "nodemon src/index.ts",
         "build": "tsc",
         "prettier": "prettier --write \"**/*.{ts,tsx,json,scss}\"",
         "eslint": "tsc --noEmit && eslint --quiet \"src/**/*.{ts,tsx,json}\"",
@@ -21,7 +21,8 @@
         ]
     },
     "dependencies": {
-        "dotenv": "^16.3.1"
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2"
     },
     "devDependencies": {
         "@types/express": "^4.17.21",
@@ -30,9 +31,9 @@
         "@typescript-eslint/parser": "^6.13.2",
         "eslint": "^8.55.0",
         "eslint-plugin-json": "^3.1.0",
-        "express": "^4.18.2",
         "husky": "^8.0.3",
         "lint-staged": "^15.2.0",
+        "nodemon": "^3.0.2",
         "prettier": "3.1.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
