@@ -8,7 +8,7 @@
         "./api/*.ts"
     ],
     "scripts": {
-        "dev": "nodemon src/index.ts",
+        "dev": "nodemon api/index.ts",
         "build": "tsc",
         "prisma-init": "npx prisma init",
         "prisma-pull": "npx prisma db pull",
