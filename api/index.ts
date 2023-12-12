@@ -1,6 +1,7 @@
 import express from "express";
 import { v4 } from "uuid";
 const app = express();
+import { router } from "../src/router";
 import { dbConnection } from "../src/service";
 
 app.get("/api", (req, res) => {
@@ -16,6 +17,8 @@ app.get("/api/item/:slug", (req, res) => {
 });
 
 app.use(express.static("public"));
+
+router(app);
 
 console.log("Database connected successfully!");
 
