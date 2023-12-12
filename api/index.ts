@@ -17,21 +17,12 @@ app.get("/api/item/:slug", (req, res) => {
 
 app.use(express.static("public"));
 
-const port = process.env.PORT || 8000;
-
-app.listen(port, () => {
-    dbConnection()
-        .then(() => {
-            console.log("Database connected successfully!");
-        })
-        .then(() => {
-            console.log(`Example app listening on port ${port}`);
-        })
-        .catch(err => {
-            throw err;
-        });
-
-    // console.log(`Example app listening on port ${port}`);
-});
+dbConnection()
+    .then(() => {
+        console.log("Database connected successfully!");
+    })
+    .catch(err => {
+        throw err;
+    });
 
 module.exports = app;
