@@ -8,6 +8,8 @@ const port = process.env.PORT || 8000;
 
 router(app);
 
+console.log("=> ", "Database connected successfully!");
+
 app.listen(port, () => {
     dbConnection()
         .then(() => {
