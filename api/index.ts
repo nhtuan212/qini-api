@@ -1,10 +1,9 @@
 import express from "express";
 import { v4 } from "uuid";
 const app = express();
-import { router } from "../src/router";
-import { dbConnection } from "../src/service";
+// import { router } from "../src/router";
 
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
     const path = `/api/item/${v4()}`;
     res.setHeader("Content-Type", "text/html");
     res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
@@ -18,16 +17,6 @@ app.get("/api/item/:slug", (req, res) => {
 
 app.use(express.static("public"));
 
-router(app);
-
-console.log("Database connected successfully!");
-
-// dbConnection()
-//     .then(() => {
-//         console.log("Database connected successfully!");
-//     })
-//     .catch(err => {
-//         throw err;
-//     });
+// router(app);
 
 module.exports = app;
