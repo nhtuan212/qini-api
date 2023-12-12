@@ -8,6 +8,8 @@ const port = process.env.PORT || 8000;
 
 router(app);
 
+app.use(express.static("public"));
+
 app.listen(port, () => {
     dbConnection()
         .then(() => {
