@@ -17,12 +17,14 @@ app.get("/api/item/:slug", (req, res) => {
 
 app.use(express.static("public"));
 
-dbConnection()
-    .then(() => {
-        console.log("Database connected successfully!");
-    })
-    .catch(err => {
-        throw err;
-    });
+console.log("Database connected successfully!");
+
+// dbConnection()
+//     .then(() => {
+//         console.log("Database connected successfully!");
+//     })
+//     .catch(err => {
+//         throw err;
+//     });
 
 module.exports = app;
