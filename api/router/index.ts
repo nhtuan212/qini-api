@@ -2,6 +2,11 @@ import { homePage } from "./homePage";
 // import { user, userSlug } from "./user";
 
 export const router = (app: any) => {
+    app.get("/", (req, res) => {
+        console.log("=> ", "Database connected successfully!");
+        res.send("Hello World!");
+    });
+
     app.use("/api", homePage);
     // app.use("/api/user", user);
     // app.use("/api/user/a", userSlug);
