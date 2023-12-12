@@ -10,7 +10,7 @@ router(app);
 
 dbConnection()
     .then(() => {
-        console.log("Database connected successfully!");
+        console.log("Database connected successfullyy!");
     })
     .then(() => {
         console.log(`Example app listening on port ${port}`);
