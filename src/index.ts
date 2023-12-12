@@ -1,13 +1,24 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import express from "express";
+import { router } from "./router";
+import { dbConnection } from "./service";
 
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("Hello, TypeScript Express!");
-});
+router(app);
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    dbConnection()
+        .then(() => {
+            console.log("Database connected successfully!");
+        })
+        .then(() => {
+            console.log(`Example app listening on port ${port}`);
+        })
+        .catch(err => {
+            throw err;
+        });
+
+    // console.log(`Example app listening on port ${port}`);
 });

@@ -7,6 +7,11 @@
     "scripts": {
         "dev": "nodemon src/index.ts",
         "build": "tsc",
+        "db-init": "npx prisma init",
+        "db-pull": "npx prisma db pull",
+        "db-push": "npx prisma db push",
+        "db-history": "npx prisma migrate dev",
+        "db-migrate": "mkdir -p prisma/migrations/0_init && npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
         "prettier": "prettier --write \"**/*.{ts,tsx,json,scss}\"",
         "eslint": "tsc --noEmit && eslint --quiet \"src/**/*.{ts,tsx,json}\"",
         "lint-staged": "lint-staged",
@@ -14,13 +19,14 @@
         "prepare": "husky install"
     },
     "lint-staged": {
-        "src/**/*.{ts,tsx,json,scss}": [
+        "src/**/*.{ts,tsx,json}": [
             "yarn prettier",
             "yarn eslint",
             "git add ."
         ]
     },
     "dependencies": {
+        "@prisma/client": "^5.7.0",
         "dotenv": "^16.3.1",
         "express": "^4.18.2"
     },
@@ -35,6 +41,7 @@
         "lint-staged": "^15.2.0",
         "nodemon": "^3.0.2",
         "prettier": "3.1.0",
+        "prisma": "^5.7.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
     }
