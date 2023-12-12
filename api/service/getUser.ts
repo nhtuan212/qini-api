@@ -9,10 +9,10 @@ export const queryUser = async ({ offset, limit }: any) => {
     };
     return await client.users
         .findMany(pagination)
-        .then(res => {
+        .then((res: any) => {
             return res;
         })
-        .catch(err => {
+        .catch((err: any) => {
             throw err;
         });
 };
@@ -26,6 +26,6 @@ export const createUser = async ({
         .create({
             data: query,
         })
-        .then(res => res)
-        .catch(err => err);
+        .then((res: any) => res)
+        .catch((err: any) => err);
 };
