@@ -1,6 +1,7 @@
 import express from "express";
 import { v4 } from "uuid";
 const app = express();
+import { dbConnection } from "../src/service";
 
 app.get("/api", (req, res) => {
     const path = `/api/item/${v4()}`;
@@ -12,6 +13,25 @@ app.get("/api", (req, res) => {
 app.get("/api/item/:slug", (req, res) => {
     const { slug } = req.params;
     res.end(`Item: ${slug}`);
+});
+
+app.use(express.static("public"));
+
+const port = process.env.PORT || 8000;
+
+app.listen(port, () => {
+    dbConnection()
+        .then(() => {
+            console.log("Database connected successfully!");
+        })
+        .then(() => {
+            console.log(`Example app listening on port ${port}`);
+        })
+        .catch(err => {
+            throw err;
+        });
+
+    // console.log(`Example app listening on port ${port}`);
 });
 
 module.exports = app;
