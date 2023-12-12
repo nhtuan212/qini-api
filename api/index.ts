@@ -1,17 +1,14 @@
 import "dotenv/config";
 import express from "express";
-// import { v4 } from "uuid";
-import { router } from "../src/router";
-import { dbConnection } from "../src/service";
+import { v4 } from "uuid";
 
 const app = express();
-const port = process.env.PORT || 8000;
 
 app.get("/", (req, res) => {
-    // const path = `/api/item/${v4()}`;
+    const path = `/api/item/${v4()}`;
     res.setHeader("Content-Type", "text/html");
     res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
-    // res.end(`Hello! Go to item: <a href="${path}">${path}</a>`);
+    res.end(`Hello! Go to item: <a href="${path}">${path}</a>`);
 });
 
 app.get("/api/item/:slug", (req, res) => {
@@ -19,24 +16,24 @@ app.get("/api/item/:slug", (req, res) => {
     res.end(`Item: ${slug}`);
 });
 
-router(app);
+// router(app);
 
-app.use(express.static("public"));
+// app.use(express.static("public"));
 
-app.listen(port, () => {
-    dbConnection()
-        .then(() => {
-            console.log("Database connected successfully!");
-        })
-        .then(() => {
-            console.log(`Example app listening on port ${port}`);
-        })
-        .catch(err => {
-            throw err;
-        });
+// app.listen(port, () => {
+//     dbConnection()
+//         .then(() => {
+//             console.log("Database connected successfully!");
+//         })
+//         .then(() => {
+//             console.log(`Example app listening on port ${port}`);
+//         })
+//         .catch(err => {
+//             throw err;
+//         });
 
-    // console.log(`Example app listening on port ${port}`);
-});
+//     // console.log(`Example app listening on port ${port}`);
+// });
 
 // import express from "express";
 // import { v4 } from "uuid";
