@@ -2,7 +2,7 @@ import { homePage } from "./homePage";
 // import { user, userSlug } from "./user";
 
 export const router = (app: any) => {
-    app.get("/", (req, res) => {
+    app.get("/", (req: any, res: any) => {
         console.log("=> ", "Database connected successfully!");
         res.send("Hello World!");
     });
