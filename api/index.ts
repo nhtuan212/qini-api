@@ -1,14 +1,24 @@
+import "dotenv/config";
 import express from "express";
-const app = express();
-import { router } from "../src/router";
+import { router } from "./router";
+import { dbConnection } from "./service";
 
-// app.get("/api", (req, res) => {
-//     res.setHeader("Content-Type", "text/html");
-//     res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
-//     res.json({ message: "Hello World" });
-// });
+const app = express();
+const port = process.env.PORT || 8000;
 
 router(app);
-app.use(express.static("public"));
+
+app.listen(port, () => {
+    dbConnection()
+        .then(() => {
+            console.log("Database connected successfully!");
+        })
+        .then(() => {
+            console.log(`Example app listening on port ${port}`);
+        })
+        .catch(err => {
+            throw err;
+        });
+});
 
 module.exports = app;
