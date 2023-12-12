@@ -38,6 +38,15 @@ export const CreateUser = async (req: Request, res: Response) => {
                 });
             }
 
+            // Case PrismaClientValidationError
+            if (data?.name === "PrismaClientValidationError") {
+                console.error({ data });
+                return res.status(statusCode).json({
+                    code: 404,
+                    message: data?.name,
+                });
+            }
+
             // Success
             return res.status(statusCode).json({
                 code: statusCode,
