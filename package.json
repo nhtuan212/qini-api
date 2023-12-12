@@ -4,6 +4,9 @@
     "main": "index.ts",
     "author": "Nguyen Hoang Tuan",
     "license": "MIT",
+    "include": [
+        "./api/*.ts"
+    ],
     "scripts": {
         "dev": "nodemon src/index.ts",
         "build": "tsc",
@@ -18,7 +21,8 @@
         "eslint": "tsc --noEmit && eslint --quiet \"src/**/*.{ts,tsx,json}\"",
         "lint-staged": "lint-staged",
         "serve": "node dist/index.js",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "vercel-build": "echo Hello!"
     },
     "lint-staged": {
         "src/**/*.{ts,tsx,json}": [
