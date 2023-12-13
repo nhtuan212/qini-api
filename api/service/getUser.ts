@@ -26,6 +26,26 @@ export const createUser = async ({
         .create({
             data: query,
         })
-        .then((res: any) => res)
-        .catch((err: any) => err);
+        .then((res: any) => {
+            return {
+                code: 200,
+                message: "Create success!",
+                data: res,
+            };
+        })
+        .catch((err: any) => {
+            if (err.code === "P2002") {
+                return {
+                    code: 400,
+                    message: `Create failed because "${err?.meta?.target}" already exists!`,
+                    data: [],
+                };
+            }
+
+            return {
+                code: 404,
+                message: err.message,
+                data: [],
+            };
+        });
 };
