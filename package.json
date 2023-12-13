@@ -9,7 +9,7 @@
     ],
     "scripts": {
         "dev": "nodemon api/index.ts",
-        "build": "tsc",
+        "build": "prisma generate && prisma db push && tsc",
         "prisma-init": "prisma init",
         "prisma-pull": "prisma db pull",
         "prisma-push": "prisma db push",
