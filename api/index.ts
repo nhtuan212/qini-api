@@ -8,25 +8,16 @@ const port = process.env.PORT || 8000;
 
 router(app);
 
-dbConnection()
-    .then(() => {
-        console.log("Database connected successfully!");
-    })
-    .then(() => {
-        console.log(`Example app listening on port ${port}`);
-    });
+// dbConnection()
+//     .then(() => {
+//         console.log("Database connected successfully!");
+//     })
+//     .then(() => {
+//         console.log(`Example app listening on port ${port}`);
+//     });
 
-// app.listen(port, () => {
-//     dbConnection()
-//         .then(() => {
-//             console.log("Database connected successfully!");
-//         })
-//         .then(() => {
-//             console.log(`Example app listening on port ${port}`);
-//         })
-//         .catch(err => {
-//             throw err;
-//         });
-// });
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
+});
 
-module.exports = app;
+// module.exports = app;
