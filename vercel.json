@@ -1,5 +1,5 @@
 {
     "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }],
-    "regions": ["sfo1"],
-    "functionFailoverRegions": ["dub1", "fra1"]
+    // "regions": ["sfo1"],
+    // "functionFailoverRegions": ["dub1", "fra1"]
 }
