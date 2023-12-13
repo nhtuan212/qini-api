@@ -20,37 +20,18 @@ export const GetUser = async (req: Request, res: Response) => {
 };
 
 //** [GET]/user/create */
+// "?username=Binayu1&password=123&email=mail1@gmail.com"
 export const CreateUser = async (req: Request, res: Response) => {
-    // Example params: http://localhost:8000/user/create
-    // "?username=Binayu1&password=123&email=mail1@gmail.com&active=true"
-
-    const { statusCode } = res;
-
-    return await createUser({
+    return createUser({
         query: req.query as Request["query"] & UserType,
     })
-        .then(data => {
-            // Case unique fields
-            if (data?.code === "P2002") {
-                return res.status(statusCode).json({
-                    code: data.code,
-                    message: `Create failed because "${data?.meta?.target}" already exists!`,
-                });
-            }
+        .then(resData => {
+            // Destructure data
+            const { code, message, data } = resData;
 
-            // Case PrismaClientValidationError
-            if (data?.name === "PrismaClientValidationError") {
-                console.error({ data });
-                return res.status(statusCode).json({
-                    code: 404,
-                    message: data?.name,
-                });
-            }
-
-            // Success
-            return res.status(statusCode).json({
-                code: statusCode,
-                message: "Create successfully!",
+            return res.status(code).json({
+                code,
+                message,
                 data,
             });
         })

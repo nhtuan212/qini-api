@@ -8,7 +8,7 @@
         "./api/*.ts"
     ],
     "scripts": {
-        "dev": "nodemon api/index.ts",
+        "dev": "NODE_ENV=development nodemon api/index.ts",
         "build": "prisma generate && prisma db push && tsc",
         "prisma-init": "prisma init",
         "prisma-pull": "prisma db pull",
