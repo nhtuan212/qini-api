@@ -8,15 +8,8 @@
         "./api/*.ts"
     ],
     "scripts": {
-        "dev": "NODE_ENV=development nodemon api/index.ts",
+        "dev": "NODE_ENV=development & nodemon api/index.ts",
         "build": "prisma generate && prisma db push && tsc",
-        "prisma-init": "prisma init",
-        "prisma-pull": "prisma db pull",
-        "prisma-push": "prisma db push",
-        "prisma-history": "prisma migrate dev",
-        "prisma-migrate": "mkdir -p prisma/migrations/0_init && prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
-        "prisma-generate": "prisma generate",
-        "prisma-update": "yarn prisma-pull && yarn prisma-migrate && yarn prisma-generate",
         "prettier": "prettier --write \"**/*.{ts,tsx,json,scss}\"",
         "eslint": "tsc --noEmit && eslint --quiet \"src/**/*.{ts,tsx,json}\"",
         "lint-staged": "lint-staged",
