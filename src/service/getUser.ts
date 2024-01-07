@@ -1,12 +1,14 @@
 import { Request } from "express";
 import { client } from ".";
 import { UserType } from "../types/users";
+import { hashPassword } from "../utils";
 
-export const queryUser = async ({ offset, limit }: any) => {
+export const getUser = async ({ offset, limit }: any) => {
     const pagination = {
         ...(offset && { skip: Number(offset) }),
         ...(limit && { take: Number(limit) }),
     };
+
     return await client.users
         .findMany(pagination)
         .then((res: any) => {
@@ -24,9 +26,12 @@ export const createUser = async ({
 }) => {
     return await client.users
         .create({
-            data: query,
+            data: {
+                ...query,
+                password: await hashPassword(query.password),
+            },
         })
-        .then((res: any) => {
+        .then(async (res: any) => {
             return {
                 code: 200,
                 message: "Create success!",

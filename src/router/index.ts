@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+// import { NextFunction, Response } from "express";
 import { homePage } from "./homePage";
 import { user } from "./user";
 
@@ -10,6 +10,6 @@ export const router = (app: any) => {
     //     next();
     // });
 
-    app.use("/api", homePage);
-    app.use("/api/user", user);
+    app.use("/", homePage);
+    app.use("/user", user);
 };

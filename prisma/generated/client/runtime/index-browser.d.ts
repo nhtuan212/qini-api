@@ -1,5 +1,4 @@
-declare class AnyNull extends NullTypesEnumValue {
-}
+declare class AnyNull extends NullTypesEnumValue {}
 
 declare type Args<T, F extends Operation> = T extends {
     [K: symbol]: {
@@ -11,10 +10,11 @@ declare type Args<T, F extends Operation> = T extends {
             };
         };
     };
-} ? T[symbol]['types']['operations'][F]['args'] : any;
-
-declare class DbNull extends NullTypesEnumValue {
 }
+    ? T[symbol]["types"]["operations"][F]["args"]
+    : any;
+
+declare class DbNull extends NullTypesEnumValue {}
 
 export declare namespace Decimal {
     export type Constructor = typeof Decimal;
@@ -155,17 +155,17 @@ export declare class Decimal {
 
     round(): Decimal;
 
-    sine() : Decimal;
-    sin() : Decimal;
+    sine(): Decimal;
+    sin(): Decimal;
 
     squareRoot(): Decimal;
     sqrt(): Decimal;
 
-    tangent() : Decimal;
-    tan() : Decimal;
+    tangent(): Decimal;
+    tan(): Decimal;
 
     times(n: Decimal.Value): Decimal;
-    mul(n: Decimal.Value) : Decimal;
+    mul(n: Decimal.Value): Decimal;
 
     toBinary(significantDigits?: number): string;
     toBinary(significantDigits: number, rounding: Decimal.Rounding): string;
@@ -184,7 +184,10 @@ export declare class Decimal {
     toFraction(max_denominator?: Decimal.Value): Decimal[];
 
     toHexadecimal(significantDigits?: number): string;
-    toHexadecimal(significantDigits: number, rounding: Decimal.Rounding): string;
+    toHexadecimal(
+        significantDigits: number,
+        rounding: Decimal.Rounding,
+    ): string;
     toHex(significantDigits?: number): string;
     toHex(significantDigits: number, rounding?: Decimal.Rounding): string;
 
@@ -204,7 +207,10 @@ export declare class Decimal {
     toPrecision(significantDigits: number, rounding: Decimal.Rounding): string;
 
     toSignificantDigits(significantDigits?: number): Decimal;
-    toSignificantDigits(significantDigits: number, rounding: Decimal.Rounding): Decimal;
+    toSignificantDigits(
+        significantDigits: number,
+        rounding: Decimal.Rounding,
+    ): Decimal;
     toSD(significantDigits?: number): Decimal;
     toSD(significantDigits: number, rounding: Decimal.Rounding): Decimal;
 
@@ -226,7 +232,11 @@ export declare class Decimal {
     static atan2(y: Decimal.Value, x: Decimal.Value): Decimal;
     static cbrt(n: Decimal.Value): Decimal;
     static ceil(n: Decimal.Value): Decimal;
-    static clamp(n: Decimal.Value, min: Decimal.Value, max: Decimal.Value): Decimal;
+    static clamp(
+        n: Decimal.Value,
+        min: Decimal.Value,
+        max: Decimal.Value,
+    ): Decimal;
     static clone(object?: Decimal.Config): Decimal.Constructor;
     static config(object: Decimal.Config): Decimal.Constructor;
     static cos(n: Decimal.Value): Decimal;
@@ -244,7 +254,7 @@ export declare class Decimal {
     static min(...n: Decimal.Value[]): Decimal;
     static mod(x: Decimal.Value, y: Decimal.Value): Decimal;
     static mul(x: Decimal.Value, y: Decimal.Value): Decimal;
-    static noConflict(): Decimal.Constructor;   // Browser only
+    static noConflict(): Decimal.Constructor; // Browser only
     static pow(base: Decimal.Value, exponent: Decimal.Value): Decimal;
     static random(significantDigits?: number): Decimal;
     static round(n: Decimal.Value): Decimal;
@@ -304,12 +314,17 @@ export declare class Decimal {
  */
 export declare function detectRuntime(): Runtime;
 
-declare type Exact<A, W> = (A extends unknown ? (W extends A ? {
-    [K in keyof A]: Exact<A[K], W[K]>;
-} : W) : never) | (A extends Narrowable ? A : never);
+declare type Exact<A, W> =
+    | (A extends unknown
+          ? W extends A
+              ? {
+                    [K in keyof A]: Exact<A[K], W[K]>;
+                }
+              : W
+          : never)
+    | (A extends Narrowable ? A : never);
 
-declare class JsonNull extends NullTypesEnumValue {
-}
+declare class JsonNull extends NullTypesEnumValue {}
 
 /**
  * Generates more strict variant of an enum which, unlike regular enum,
@@ -327,7 +342,9 @@ declare class JsonNull extends NullTypesEnumValue {
  * @param definition
  * @returns
  */
-export declare function makeStrictEnum<T extends Record<PropertyKey, string | number>>(definition: T): T;
+export declare function makeStrictEnum<
+    T extends Record<PropertyKey, string | number>,
+>(definition: T): T;
 
 declare type Narrowable = string | number | bigint | boolean | [];
 
@@ -358,21 +375,67 @@ export declare const objectEnumValues: {
     };
 };
 
-declare type Operation = 'findFirst' | 'findFirstOrThrow' | 'findUnique' | 'findUniqueOrThrow' | 'findMany' | 'create' | 'createMany' | 'update' | 'updateMany' | 'upsert' | 'delete' | 'deleteMany' | 'aggregate' | 'count' | 'groupBy' | '$queryRaw' | '$executeRaw' | '$queryRawUnsafe' | '$executeRawUnsafe' | 'findRaw' | 'aggregateRaw' | '$runCommandRaw';
+declare type Operation =
+    | "findFirst"
+    | "findFirstOrThrow"
+    | "findUnique"
+    | "findUniqueOrThrow"
+    | "findMany"
+    | "create"
+    | "createMany"
+    | "update"
+    | "updateMany"
+    | "upsert"
+    | "delete"
+    | "deleteMany"
+    | "aggregate"
+    | "count"
+    | "groupBy"
+    | "$queryRaw"
+    | "$executeRaw"
+    | "$queryRawUnsafe"
+    | "$executeRawUnsafe"
+    | "findRaw"
+    | "aggregateRaw"
+    | "$runCommandRaw";
 
 declare namespace Public {
-    export {
-        validator
-    }
+    export { validator };
 }
-export { Public }
+export { Public };
 
-declare type Runtime = "edge-routine" | "workerd" | "deno" | "lagon" | "react-native" | "netlify" | "electron" | "node" | "bun" | "edge-light" | "fastly" | "unknown";
+declare type Runtime =
+    | "edge-routine"
+    | "workerd"
+    | "deno"
+    | "lagon"
+    | "react-native"
+    | "netlify"
+    | "electron"
+    | "node"
+    | "bun"
+    | "edge-light"
+    | "fastly"
+    | "unknown";
 
 declare function validator<V>(): <S>(select: Exact<S, V>) => S;
 
-declare function validator<C, M extends Exclude<keyof C, `$${string}`>, O extends keyof C[M] & Operation>(client: C, model: M, operation: O): <S>(select: Exact<S, Args<C[M], O>>) => S;
+declare function validator<
+    C,
+    M extends Exclude<keyof C, `$${string}`>,
+    O extends keyof C[M] & Operation,
+>(client: C, model: M, operation: O): <S>(select: Exact<S, Args<C[M], O>>) => S;
 
-declare function validator<C, M extends Exclude<keyof C, `$${string}`>, O extends keyof C[M] & Operation, P extends keyof Args<C[M], O>>(client: C, model: M, operation: O, prop: P): <S>(select: Exact<S, Args<C[M], O>[P]>) => S;
+declare function validator<
+    C,
+    M extends Exclude<keyof C, `$${string}`>,
+    O extends keyof C[M] & Operation,
+    P extends keyof Args<C[M], O>,
+>(
+    client: C,
+    model: M,
+    operation: O,
+    prop: P,
+): <S>(select: Exact<S, Args<C[M], O>[P]>) => S;
 
-export { }
+export {};

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUser, queryUser } from "../service/getUser";
+import { createUser, getUser } from "../service/getUser";
 import { UserType } from "../types/users";
 
 //** [GET]/user */
@@ -7,7 +7,7 @@ export const GetUser = async (req: Request, res: Response) => {
     const { offset, limit } = req.query;
     const { statusCode } = res;
 
-    return await queryUser({ offset, limit })
+    return await getUser({ offset, limit })
         .then(data => {
             return res.status(statusCode).json({
                 statusCode,
