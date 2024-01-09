@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/client"
+  // output   = "./generated/client"
 }
 
 datasource db {
@@ -9,11 +9,11 @@ datasource db {
 }
 
 model users {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @db.VarChar(50)
   username  String    @unique @db.VarChar(50)
   password  String    @db.VarChar(100)
   email     String    @unique @db.VarChar(50)
   create_at DateTime  @default(now()) @db.Timestamp(6)
   update_at DateTime? @db.Timestamp(6)
-  status    String    @default("active") @db.VarChar(10)
+  active    Boolean   @default(true)
 }
