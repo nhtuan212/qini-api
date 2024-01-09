@@ -1,8 +1,7 @@
 import { Request } from "express";
 import { client } from ".";
 import { UserType } from "../types/users";
-import { hashPassword } from "../utils";
-import { v4 as uuidv4 } from "uuid";
+import { hashPassword, uuid } from "../utils";
 
 export const getUser = async ({ offset, limit }: any) => {
     const pagination = {
@@ -29,18 +28,18 @@ export const createUser = async ({
         .create({
             data: {
                 ...query,
-                id: uuidv4(),
+                id: uuid(),
                 password: await hashPassword(query.password),
             },
         })
-        .then(async (res: any) => {
+        .then(res => {
             return {
                 code: 200,
                 message: "Create success!",
                 data: res,
             };
         })
-        .catch((err: any) => {
+        .catch(err => {
             if (err.code === "P2002") {
                 return {
                     code: 400,
