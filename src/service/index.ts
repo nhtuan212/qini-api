@@ -1,5 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 // import { PrismaClient } from "../../prisma/generated/client";
+// generator client {
+//     provider = "prisma-client-js"
+//     output   = "./generated/client"
+// }
 
 export const client = new PrismaClient({
     log: [
