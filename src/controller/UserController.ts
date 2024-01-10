@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createUser, getUser } from "../service/getUser";
-import { UserType } from "../types/users";
+import { createUser, getUser } from "../service/userService";
+import { users } from "@prisma/client";
 
 //** [GET]/user */
 export const GetUser = async (req: Request, res: Response) => {
@@ -23,7 +23,7 @@ export const GetUser = async (req: Request, res: Response) => {
 // "?username=Binayu1&password=123&email=mail1@gmail.com"
 export const CreateUser = async (req: Request, res: Response) => {
     return createUser({
-        query: req.query as Request["query"] & UserType,
+        query: req.query as Request["query"] & users,
     })
         .then(resData => {
             // Destructure data
