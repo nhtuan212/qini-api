@@ -8,11 +8,17 @@ datasource db {
 }
 
 model users {
-  id        String    @id @default(uuid())
-  username  String    @unique @db.VarChar(50)
-  password  String    @db.VarChar(100)
-  email     String    @unique @db.VarChar(50)
-  create_at DateTime  @default(now()) @db.Timestamp(6)
-  update_at DateTime? @db.Timestamp(6)
-  active    Boolean   @default(true)
+  id       String    @id @default(uuid())
+  username String    @unique @db.VarChar(50)
+  password String    @db.VarChar(100)
+  email    String?   @unique @db.VarChar(50)
+  active   Boolean   @default(true)
+  createAt DateTime  @default(now()) @db.Timestamp(6)
+  role     Role      @default(USER)
+  updateAt DateTime? @db.Timestamp(6)
+}
+
+enum Role {
+  USER
+  ADMIN
 }

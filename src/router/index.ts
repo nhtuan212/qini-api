@@ -1,5 +1,5 @@
 // import { NextFunction, Response } from "express";
-import { homePage } from "./homePage";
+import { home } from "./home";
 import { user } from "./user";
 
 export const router = (app: any) => {
@@ -10,6 +10,6 @@ export const router = (app: any) => {
     //     next();
     // });
 
-    app.use("/", homePage);
+    app.use("/", home);
     app.use("/user", user);
 };

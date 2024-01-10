@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { client } from ".";
-import { UserType } from "../types/users";
+import { users } from "@prisma/client";
 import { hashPassword } from "../utils";
 
 export const getUser = async ({ offset, limit }: any) => {
@@ -22,7 +22,7 @@ export const getUser = async ({ offset, limit }: any) => {
 export const createUser = async ({
     query,
 }: {
-    query: Request["query"] & UserType;
+    query: Request["query"] & users;
 }) => {
     return await client.users
         .create({
