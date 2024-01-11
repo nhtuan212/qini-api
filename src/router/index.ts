@@ -1,8 +1,9 @@
-// import { NextFunction, Response } from "express";
+import express, { Express } from "express";
 import { home } from "./home";
+import { login } from "./login";
 import { user } from "./user";
 
-export const router = (app: any) => {
+export const router = (app: Express) => {
     // //** Cors */
     // app.use((res: Response, next: NextFunction) => {
     //     res.setHeader("Content-Type", "text/html");
@@ -35,6 +36,18 @@ export const router = (app: any) => {
         next();
     });
 
+    app.use(
+        // Encoded type urlencoded for Post method
+        express.urlencoded({
+            extended: false,
+        }),
+        // Encoded type raw/json for Post method
+        express.json({
+            type: "application/json",
+        }),
+    );
+
     app.use("/", home);
+    app.use("/login", login);
     app.use("/user", user);
 };
