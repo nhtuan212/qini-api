@@ -1,4 +1,5 @@
 import { client } from ".";
+import { passwordCompare } from "../utils";
 
 export const login = async ({
     username,
@@ -7,24 +8,27 @@ export const login = async ({
     username: string;
     password: string;
 }) => {
-    return await client.users
-        .findUnique({ where: { username, password } })
-        .then((res: any) => {
-            // console.log({ res });
-            if (!res) {
-                return {
-                    code: 401,
-                    message: "User or Password incorrectly!",
-                };
-            }
+    const user = await client.users.findUnique({
+        where: { username },
+    });
+    if (!user) {
+        return {
+            code: 401,
+            message: "User or Password incorrectly!",
+        };
+    }
 
-            return {
-                code: 200,
-                message: "Create success!",
-                data: res,
-            };
-        })
-        .catch((err: any) => {
-            throw err;
-        });
+    const passwordValid = await passwordCompare(password, user.password);
+    if (!passwordValid) {
+        return {
+            code: 401,
+            message: "User or Password incorrectly!",
+        };
+    }
+
+    return {
+        code: 200,
+        message: "Create success!",
+        data: user,
+    };
 };

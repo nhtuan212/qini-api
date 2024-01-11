@@ -28,8 +28,8 @@ export const client = new PrismaClient({
 
 export const dbConnection = async () => await client.$connect();
 
-// // Log all query events for debugging
-// prisma.$on("query", e => {
+//** Log all query events for debugging */
+// client.$on("query", e => {
 //     console.log("Query: " + e.query);
 //     console.log("Params: " + e.params);
 //     console.log("Duration: " + e.duration + "ms");
