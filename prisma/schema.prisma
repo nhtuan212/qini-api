@@ -7,7 +7,7 @@ datasource db {
   url      = env("POSTGRES_PRISMA_URL")
 }
 
-model users {
+model Users {
   id       String    @id @default(uuid())
   username String    @unique @db.VarChar(50)
   password String    @db.VarChar(100)

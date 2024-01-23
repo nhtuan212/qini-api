@@ -1,7 +1,6 @@
-import { Request } from "express";
 import { client } from ".";
-import { users } from "@prisma/client";
 import { hashPassword } from "../utils";
+import { Users } from "@prisma/client";
 
 export const getUser = async ({ offset, limit }: any) => {
     const pagination = {
@@ -19,11 +18,7 @@ export const getUser = async ({ offset, limit }: any) => {
         });
 };
 
-export const createUser = async ({
-    query,
-}: {
-    query: Request["query"] & users;
-}) => {
+export const createUser = async ({ query }: { query: Users }) => {
     return await client.users
         .create({
             data: {
