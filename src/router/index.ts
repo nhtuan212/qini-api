@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import { home } from "./home";
 import { login } from "./login";
 import { user } from "./user";
+import { report } from "./report";
 
 export const router = (app: Express) => {
     // //** Cors */
@@ -50,4 +51,5 @@ export const router = (app: Express) => {
     app.use("/", home);
     app.use("/login", login);
     app.use("/user", user);
+    app.use("/report", report);
 };
