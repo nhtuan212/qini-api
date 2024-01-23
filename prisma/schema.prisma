@@ -21,8 +21,8 @@ model users {
 model Reports {
   id         String    @id @default(uuid())
   name       String    @db.VarChar(50)
-  checkIn    Int
-  checkOut   Int
+  checkIn    String    @db.VarChar(10)
+  checkOut   String    @db.VarChar(10)
   revenue    Int
   date       DateTime  @default(now()) @db.Timestamp(6)
   createAt   DateTime  @default(now()) @db.Timestamp(6)
