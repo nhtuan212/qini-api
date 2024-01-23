@@ -18,6 +18,18 @@ model users {
   updateAt DateTime? @db.Timestamp(6)
 }
 
+model Reports {
+  id         String    @id @default(uuid())
+  name       String    @db.VarChar(50)
+  checkIn    Int
+  checkOut   Int
+  revenue    Int
+  date       DateTime  @default(now()) @db.Timestamp(6)
+  createAt   DateTime  @default(now()) @db.Timestamp(6)
+  updateAt   DateTime? @db.Timestamp(6)
+  timeWorked Int
+}
+
 enum Role {
   USER
   ADMIN
