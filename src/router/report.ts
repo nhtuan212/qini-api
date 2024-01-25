@@ -1,6 +1,7 @@
 import express from "express";
-import { AddReport } from "../controller/ReportController";
+import { Report } from "../controller/ReportController";
 
 const router = express.Router();
 
-export const report = router.post("/", AddReport);
+export const report = router.get("/", Report);
+router.post("/", Report);
