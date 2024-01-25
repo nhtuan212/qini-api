@@ -18,16 +18,25 @@ model Users {
   updateAt DateTime? @db.Timestamp(6)
 }
 
+model Revenues {
+  id       String    @id @default(uuid())
+  revenue  Float     @db.Real
+  createAt DateTime  @default(now()) @db.Timestamp(6)
+  updateAt DateTime? @db.Timestamp(6)
+  Reports  Reports[]
+}
+
 model Reports {
   id         String    @id @default(uuid())
+  revenueId  String    @db.VarChar(50)
   name       String    @db.VarChar(50)
   checkIn    String    @db.VarChar(10)
   checkOut   String    @db.VarChar(10)
-  revenue    Int
-  date       DateTime  @default(now()) @db.Timestamp(6)
+  target     Float     @db.Real
   createAt   DateTime  @default(now()) @db.Timestamp(6)
   updateAt   DateTime? @db.Timestamp(6)
-  timeWorked Int
+  timeWorked Float     @db.Real
+  revenue    Revenues  @relation(fields: [revenueId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

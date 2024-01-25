@@ -1,9 +1,9 @@
 import { client } from ".";
-import { Reports } from "@prisma/client";
+import { Revenues } from "@prisma/client";
 
 // Get method
-export const getReport = async () => {
-    return await client.reports
+export const getRevenue = async () => {
+    return await client.revenues
         .findMany({
             orderBy: {
                 createAt: "desc",
@@ -12,7 +12,7 @@ export const getReport = async () => {
         .then(res => {
             return {
                 code: 200,
-                message: "Get report successfully!",
+                message: "Get revenue successfully!",
                 data: res,
             };
         })
@@ -26,15 +26,15 @@ export const getReport = async () => {
 };
 
 // Post method
-export const createReport = async ({ body }: { body: Reports }) => {
-    return await client.reports
-        .createMany({
+export const createRevenue = async ({ body }: { body: Revenues }) => {
+    return await client.revenues
+        .create({
             data: body,
         })
         .then(res => {
             return {
                 code: 200,
-                message: "Add report successfully!",
+                message: "Add revenue successfully!",
                 data: res,
             };
         })
@@ -47,6 +47,32 @@ export const createReport = async ({ body }: { body: Reports }) => {
                 };
             }
 
+            return {
+                code: 404,
+                message: err.message,
+                data: [],
+            };
+        });
+};
+
+// Delete method
+export const deleteRevenue = async ({ body }: { body: Revenues }) => {
+    const { id } = body;
+
+    return await client.revenues
+        .delete({
+            where: {
+                id,
+            },
+        })
+        .then(res => {
+            return {
+                code: 200,
+                message: "Delete revenue successfully!",
+                data: res,
+            };
+        })
+        .catch(err => {
             return {
                 code: 404,
                 message: err.message,
