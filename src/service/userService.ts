@@ -18,12 +18,12 @@ export const getUser = async ({ offset, limit }: any) => {
         });
 };
 
-export const createUser = async ({ query }: { query: Users }) => {
+export const createUser = async ({ body }: { body: Users }) => {
     return await client.users
         .create({
             data: {
-                ...query,
-                password: await hashPassword(query.password),
+                ...body,
+                password: await hashPassword(body.password),
             },
         })
         .then(res => {
