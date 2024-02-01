@@ -18,6 +18,15 @@ model Users {
   updateAt DateTime? @db.Timestamp(6)
 }
 
+model Staffs {
+  id       String    @id @default(uuid())
+  name     String    @unique @db.VarChar(50)
+  email    String?   @unique @db.VarChar(50)
+  active   Boolean   @default(true)
+  createAt DateTime  @default(now()) @db.Timestamp(6)
+  updateAt DateTime? @db.Timestamp(6)
+}
+
 model Revenues {
   id       String    @id @default(uuid())
   revenue  Float     @db.Real

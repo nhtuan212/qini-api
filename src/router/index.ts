@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import { home } from "./home";
 import { login } from "./login";
 import { user } from "./user";
+import { staff } from "./staff";
 import { report } from "./report";
 import { revenue } from "./revenue";
 
@@ -52,6 +53,7 @@ export const router = (app: Express) => {
     app.use("/", home);
     app.use("/login", login);
     app.use("/user", user);
+    app.use("/staff", staff);
     app.use("/report", report);
     app.use("/revenue", revenue);
 };

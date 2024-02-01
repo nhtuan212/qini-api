@@ -25,7 +25,8 @@ export const getRevenue = async () => {
         });
 };
 
-// Post method
+//** Post method */
+// Create
 export const createRevenue = async ({ body }: { body: Revenues }) => {
     return await client.revenues
         .create({
