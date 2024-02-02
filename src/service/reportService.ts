@@ -2,11 +2,20 @@ import { client } from ".";
 import { Reports } from "@prisma/client";
 
 // Get method
-export const getReport = async () => {
+export const getReport = async ({ id, query }: { id: string; query: any }) => {
     return await client.reports
         .findMany({
             orderBy: {
                 createAt: "desc",
+            },
+            where: {
+                ...(id && { staffId: id }),
+                ...(Object.keys(query).length > 0 && {
+                    createAt: {
+                        gte: new Date(query.startDate),
+                        lte: new Date(query.endDate),
+                    },
+                }),
             },
         })
         .then(res => {
