@@ -71,7 +71,7 @@ export const createStaff = async ({ body }: { body: Staffs }) => {
 export const editStaff = async ({ id, body }: { id: string; body: Staffs }) => {
     return await client.staffs
         .update({
-            where: { id: id },
+            where: { id },
             data: { ...body, updateAt: new Date().toISOString() },
         })
         .then(res => {
@@ -82,6 +82,14 @@ export const editStaff = async ({ id, body }: { id: string; body: Staffs }) => {
             };
         })
         .catch(err => {
+            if (err.code === "P2002") {
+                return {
+                    code: 404,
+                    message: `Create failed because "${err?.meta?.target}" already exists!`,
+                    data: [],
+                };
+            }
+
             return {
                 code: 404,
                 message: err.message,

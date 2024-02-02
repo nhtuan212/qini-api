@@ -6,7 +6,10 @@ export const Report = async (req: Request, res: Response) => {
     switch (req.method) {
         //** GET */
         case "GET":
-            return await getReport().then(resData => {
+            return await getReport({
+                id: req.params.id,
+                query: req.query,
+            }).then(resData => {
                 // Destructure data
                 const { code, message, data } = resData;
 
