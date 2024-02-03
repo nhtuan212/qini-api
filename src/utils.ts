@@ -14,3 +14,7 @@ export const passwordCompare = async (
 ) => {
     return await bcrypt.compare(password, hash);
 };
+
+export const isDateValid = (date: Date) => {
+    return !isNaN(Number(new Date(date)));
+};

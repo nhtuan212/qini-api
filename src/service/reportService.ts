@@ -1,5 +1,6 @@
 import { client } from ".";
 import { Reports } from "@prisma/client";
+import { isDateValid } from "../utils";
 
 // Get method
 export const getReport = async ({ id, query }: { id: string; query: any }) => {
@@ -11,10 +12,13 @@ export const getReport = async ({ id, query }: { id: string; query: any }) => {
             where: {
                 ...(id && { staffId: id }),
                 ...(Object.keys(query).length > 0 && {
-                    createAt: {
-                        gte: new Date(query.startDate),
-                        lte: new Date(query.endDate),
-                    },
+                    ...(isDateValid(query.startDate) &&
+                        isDateValid(query.endDate) && {
+                            createAt: {
+                                gte: new Date(query.startDate),
+                                lte: new Date(query.endDate),
+                            },
+                        }),
                 }),
             },
         })
