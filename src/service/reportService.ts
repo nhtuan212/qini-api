@@ -3,23 +3,125 @@ import { Reports } from "@prisma/client";
 import { isDateValid } from "../utils";
 
 // Get method
-export const getReport = async ({ id, query }: { id: string; query: any }) => {
+export const getReport = async ({
+    path,
+    id,
+    query,
+}: {
+    path: string;
+    id: string;
+    query: any;
+}) => {
+    const whereByDate = {
+        ...(Object.keys(query).length > 0 && {
+            ...(isDateValid(query.startDate) &&
+                isDateValid(query.endDate) && {
+                    createAt: {
+                        gte: new Date(query.startDate),
+                        lte: new Date(`${query.endDate}T23:59:59.999Z`), // End of day
+                    },
+                }),
+        }),
+    };
+
+    if (path.includes("salary")) {
+        const staff = await client.staffs.findMany();
+
+        return await client.reports
+            .groupBy({
+                by: ["staffId"],
+                _sum: {
+                    target: true,
+                    timeWorked: true,
+                },
+                where: {
+                    ...whereByDate,
+                },
+            })
+            .then(res => {
+                const maxTarget = Math.max(
+                    ...res.map(
+                        item =>
+                            (item._sum.target as number) /
+                            (item._sum.timeWorked as number),
+                    ),
+                );
+
+                const secondMaxTarget = Math.max(
+                    ...res
+                        .map(
+                            item =>
+                                (item._sum.target as number) /
+                                (item._sum.timeWorked as number),
+                        )
+                        .filter(item => item !== maxTarget),
+                );
+
+                return {
+                    code: 200,
+                    message: "Get report by staff successfully!",
+                    data: res.map(item => {
+                        const totalTarget = item._sum.target as number;
+                        const totalTime = item._sum.timeWorked as number;
+                        const salaryByTime = totalTime * 25000;
+                        const performance = totalTarget / totalTime;
+
+                        let rank = "";
+                        let rate = 0;
+                        let total = 0;
+
+                        switch (performance) {
+                            case maxTarget:
+                                rank = "A";
+                                rate = 0.12;
+                                total = salaryByTime + performance * rate;
+                                break;
+                            case secondMaxTarget:
+                                rank = "B";
+                                rate = 0.11;
+                                total = salaryByTime + performance * rate;
+                                break;
+                            default:
+                                rank = "normal";
+                                rate = 0.1;
+                                total = salaryByTime + performance * rate;
+                                break;
+                        }
+
+                        return {
+                            staffName: staff.find(
+                                staffItem => staffItem.id === item.staffId,
+                            )?.name,
+                            rank,
+                            rate,
+                            totalTarget,
+                            totalTime,
+                            total,
+                            performance,
+                            ...item,
+                        };
+                    }),
+                };
+            });
+    }
+
     return await client.reports
         .findMany({
             orderBy: {
                 createAt: "desc",
             },
             where: {
-                ...(id && { staffId: id }),
-                ...(Object.keys(query).length > 0 && {
-                    ...(isDateValid(query.startDate) &&
-                        isDateValid(query.endDate) && {
-                            createAt: {
-                                gte: new Date(query.startDate),
-                                lte: new Date(query.endDate),
-                            },
-                        }),
-                }),
+                ...(path.includes("revenue") && { revenueId: id }),
+                ...(path.includes("staff") && { staffId: id }),
+                ...whereByDate,
+            },
+            include: {
+                staff: {
+                    select: {
+                        // id: true,
+                        name: true,
+                    },
+                },
             },
         })
         .then(res => {
