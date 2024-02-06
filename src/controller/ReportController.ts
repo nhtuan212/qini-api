@@ -7,6 +7,7 @@ export const Report = async (req: Request, res: Response) => {
         //** GET */
         case "GET":
             return await getReport({
+                path: req.route.path,
                 id: req.params.id,
                 query: req.query,
             }).then(resData => {

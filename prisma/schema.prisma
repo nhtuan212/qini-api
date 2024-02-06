@@ -25,6 +25,7 @@ model Staffs {
   active   Boolean   @default(true)
   createAt DateTime  @default(now()) @db.Timestamp(6)
   updateAt DateTime? @db.Timestamp(6)
+  Reports  Reports[]
 }
 
 model Revenues {
@@ -46,6 +47,7 @@ model Reports {
   timeWorked Float     @db.Real
   staffId    String    @default("") @db.VarChar(50)
   revenue    Revenues  @relation(fields: [revenueId], references: [id], onDelete: Cascade)
+  staff      Staffs    @relation(fields: [staffId], references: [id])
 }
 
 enum Role {
