@@ -73,18 +73,18 @@ export const getReport = async ({
                         switch (performance) {
                             case maxTarget:
                                 rank = "A";
-                                rate = 0.12;
-                                total = salaryByTime + performance * rate;
+                                rate = 0.012;
+                                total = salaryByTime + totalTarget * rate;
                                 break;
                             case secondMaxTarget:
                                 rank = "B";
-                                rate = 0.11;
-                                total = salaryByTime + performance * rate;
+                                rate = 0.011;
+                                total = salaryByTime + totalTarget * rate;
                                 break;
                             default:
                                 rank = "normal";
-                                rate = 0.1;
-                                total = salaryByTime + performance * rate;
+                                rate = 0.01;
+                                total = salaryByTime + totalTarget * rate;
                                 break;
                         }
 
