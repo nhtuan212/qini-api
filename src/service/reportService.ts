@@ -63,7 +63,7 @@ export const getReport = async ({
                     data: res.map(item => {
                         const totalTarget = item._sum.target as number;
                         const totalTime = item._sum.timeWorked as number;
-                        const salaryByTime = totalTime * 25000;
+                        const salaryByTime = totalTime * 22500;
                         const performance = totalTarget / totalTime;
 
                         let rank = "";
