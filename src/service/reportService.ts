@@ -61,9 +61,17 @@ export const getReport = async ({
                     code: 200,
                     message: "Get report by staff successfully!",
                     data: res.map(item => {
+                        const staffName = staff.find(
+                            staffItem => staffItem.id === item.staffId,
+                        )?.name;
+                        const salary =
+                            staff.find(
+                                staffItem => staffItem.id === item.staffId,
+                            )?.salary || 0;
+
                         const totalTarget = item._sum.target as number;
                         const totalTime = item._sum.timeWorked as number;
-                        const salaryByTime = totalTime * 22500;
+                        const salaryByTime = totalTime * salary;
                         const performance = totalTarget / totalTime;
 
                         let rank = "";
@@ -89,9 +97,8 @@ export const getReport = async ({
                         }
 
                         return {
-                            staffName: staff.find(
-                                staffItem => staffItem.id === item.staffId,
-                            )?.name,
+                            staffName,
+                            salary,
                             rank,
                             rate,
                             totalTarget,
