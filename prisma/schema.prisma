@@ -25,7 +25,6 @@ model Staffs {
   active   Boolean   @default(true)
   createAt DateTime  @default(now()) @db.Timestamp(6)
   updateAt DateTime? @db.Timestamp(6)
-  salary   Int       @default(0)
   Reports  Reports[]
 }
 
