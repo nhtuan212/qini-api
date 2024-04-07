@@ -29,7 +29,7 @@ export const getReport = async ({
 
         return await client.reports
             .groupBy({
-                by: ["staffId"],
+                by: ["staffId", "id"],
                 _sum: {
                     target: true,
                     timeWorked: true,
