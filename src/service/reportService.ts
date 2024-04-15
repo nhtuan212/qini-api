@@ -14,6 +14,10 @@ export const getReport = async ({
 }) => {
     const whereByDate = {
         ...(Object.keys(query).length > 0 && {
+            // Check if staffId is valid
+            ...(query.staffId && { staffId: query.staffId }),
+
+            // Check if startDate and endDate are valid date
             ...(isDateValid(query.startDate) &&
                 isDateValid(query.endDate) && {
                     createAt: {
@@ -29,7 +33,7 @@ export const getReport = async ({
 
         return await client.reports
             .groupBy({
-                by: ["staffId", "id"],
+                by: ["staffId"],
                 _sum: {
                     target: true,
                     timeWorked: true,
