@@ -1,15 +1,11 @@
-name: Deploy to Goggle App Engine (GAE)
+name: DEVELOPMENT CI/CD
 
 on:
     workflow_dispatch:
 
-# on:
-#     push:
-#         branches:
-#             - main
-#     pull_request:
-#         branches:
-#             - main
+env:
+    PRODUCTION_POSTGRES_PRISMA_URL: ${{ secrets.PRODUCTION_POSTGRES_PRISMA_URL }}
+    SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
 
 jobs:
     build-and-deploy:
