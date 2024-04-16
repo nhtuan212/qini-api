@@ -1,12 +1,15 @@
 name: Deploy to Goggle App Engine (GAE)
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+    workflow_dispatch:
+
+# on:
+#     push:
+#         branches:
+#             - main
+#     pull_request:
+#         branches:
+#             - main
 
 jobs:
     build-and-deploy:
