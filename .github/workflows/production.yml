@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
 
 env:
-    PRODUCTION_POSTGRES_PRISMA_URL: ${{ secrets.PRODUCTION_POSTGRES_PRISMA_URL }}
+    PRODUCTION_POSTGRES_PRISMA_URL: postgresql://admin:Binayu@95@34.87.29.85:5432/qini_db?schema=SCHEMA
     SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
 
 jobs:
