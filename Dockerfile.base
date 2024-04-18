@@ -1,0 +1,8 @@
+FROM node:19-bullseye
+
+WORKDIR /webapp
+
+COPY . /webapp
+RUN npm install
+RUN npm run build
+
