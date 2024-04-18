@@ -2,5 +2,14 @@
 
 runtime: nodejs18
 
+# # The following env variables may contain sensitive information that grants
+# # anyone access to your database. Do not add this file to your source control.
+# env_variables:
+#     INSTANCE_UNIX_SOCKET: /cloudsql/qini-420602:asia-southeast1:qini-postgresql-instance
+#     DB_USER: admin
+#     DB_PASS: Binayu@95
+#     DB_NAME: qini-api-db
+
+# service_account: qini-420602@appspot.gserviceaccount.com
 # service: node-express-api
 # [END app_yaml]

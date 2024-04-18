@@ -5,7 +5,9 @@ generator client {
 datasource db {
   provider = "postgresql"
   // url      = env("POSTGRES_PRISMA_URL")
-  url      = env("PRODUCTION_POSTGRES_PRISMA_URL")
+  // url      = "postgresql://admin:Binayu@95@35.186.158.220:5432/aini-api-db?host=35.186.158.220"
+  // url      = "postgresql://postgres:postgres@postgres-db-1:5432/postgres"
+  url      = "postgresql://admin:abc@123@35.239.32.105:5432/qini-db"
 }
 
 model Users {
