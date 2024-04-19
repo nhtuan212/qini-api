@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+    postgres:
+        image: postgres
+        ports:
+            - 2222:5432
+        container_name: qini-postgres
+        environment:
+            - POSTGRES_USER=admin
+            - POSTGRES_PASSWORD=123
+            - POSTGRES_DB=qini_db
+        networks:
+            - app-network
+
+    qini-api:
+        image: qini-api
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - 80:8000
+        container_name: qini-api
+        env_file:
+            - .env
+        restart: unless-stopped
+        command: npm start
+        networks:
+            - app-network
+        depends_on:
+            - postgres
+
+networks:
+    app-network:
+        driver: bridge
