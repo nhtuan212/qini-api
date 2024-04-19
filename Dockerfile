@@ -1,9 +1,14 @@
-FROM node:19-bullseye
+FROM node:20-alpine
 
-WORKDIR /webapp
+WORKDIR /src
+COPY . /src
 
-COPY . /webapp
-RUN npm -g install
+# Building the app
+RUN npm cache clean --force
+RUN npm install
 RUN npm run build
 
-ENTRYPOINT ["npm", "start"]
+# # Running the app
+# ENTRYPOINT ["npm", "start"]
+
+# EXPOSE 8000
