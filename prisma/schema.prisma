@@ -1,11 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../dist/generated/client"
 }
 
 datasource db {
   provider = "postgresql"
-  // url      = env("POSTGRES_PRISMA_URL")
-  url      = "postgresql://admin:123@postgres/qini_db"
+  url      = env("PRODUCTION_DATABASE_URL")
 }
 
 model Users {
