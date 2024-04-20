@@ -1,6 +1,6 @@
 import { client } from ".";
+import { Users } from "../../dist/generated/client";
 import { hashPassword } from "../utils";
-import { Users } from "@prisma/client";
 
 export const getUser = async ({ offset, limit }: any) => {
     const pagination = {

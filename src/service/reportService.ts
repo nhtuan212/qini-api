@@ -1,5 +1,5 @@
 import { client } from ".";
-import { Reports } from "@prisma/client";
+import { Reports } from "../../dist/generated/client";
 import { isDateValid } from "../utils";
 
 // Get method

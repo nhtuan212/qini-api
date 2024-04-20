@@ -1,5 +1,5 @@
 import { client } from ".";
-import { Revenues } from "@prisma/client";
+import { Revenues } from "../../dist/generated/client";
 
 // Get method
 export const getRevenue = async () => {

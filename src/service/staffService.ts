@@ -1,5 +1,5 @@
 import { client } from ".";
-import { Staffs } from "@prisma/client";
+import { Staffs } from "../../dist/generated/client";
 
 export const getStaff = async ({ id }: { id?: string }) => {
     if (id) {
