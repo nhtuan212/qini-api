@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
 
 env:
-    PORT: ${{ secrets.PORT }}
+    PORT: 123
     SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
 
     POSTGRES_IMAGE: ${{ secrets.POSTGRES_IMAGE }}
