@@ -1,11 +1,7 @@
 name: deploy-via-docker-compose
 
-# on:
-#     workflow_dispatch:
 on:
-    push:
-        branches:
-            - main
+    workflow_dispatch:
 
 env:
     PORT: ${{ secrets.PORT }}
@@ -35,4 +31,4 @@ jobs:
 
             - name: Build Docker image
               run: docker-compose up -d --build
-                  docker rmi $(docker images --filter "dangling=true" -q --no-trunc) #remove image danglin
+                #   docker rmi $(docker images --filter "dangling=true" -q --no-trunc) #remove image danglin
