@@ -1,36 +1,50 @@
-name: DEVELOPMENT CI/CD
+name: PRODUCTIOn CI/CD
 
 on:
     workflow_dispatch:
 
 env:
-    PRODUCTION_POSTGRES_PRISMA_URL: postgresql://admin:Binayu@95@34.87.29.85:5432/qini_db?schema=SCHEMA
+    PORT: ${{ secrets.PORT }}
     SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
+
+    POSTGRES_IMAGE: ${{ secrets.POSTGRES_IMAGE }}
+    POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+    POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+
+    APP_IMAGE: ${{ secrets.APP_IMAGE }}
+    APP_NAME: ${{ secrets.APP_NAME }}
+    APP_PORT: ${{ secrets.APP_PORT }}
+
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    PRODUCTION_DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
 
 jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
+            # - name: Checkout repository
+            #   uses: actions/checkout@v2
 
-            - name: Setup Node.js and yarn
-              uses: actions/setup-node@v2
-              with:
-                  node-version: "18"
+            # - name: Setup Node.js and yarn
+            #   uses: actions/setup-node@v2
+            #   with:
+            #       node-version: "18"
 
             - name: Install dependencies
               run: yarn install --frozen-lockfile
 
-            # - name: Build Node Project
-            #   run: yarn build
+            - name: Build Node Project
+              run: yarn build
 
-            - name: Google Cloud Auth
-              uses: "google-github-actions/auth@v2"
-              with:
-                  credentials_json: "${{ secrets.GCP_SA_KEY }}"
-                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+            # - name: Google Cloud Auth
+            #   uses: "google-github-actions/auth@v2"
+            #   with:
+            #       credentials_json: "${{ secrets.GCP_SA_KEY }}"
+            #       project_id: ${{ secrets.GCP_PROJECT_ID }}
 
             - name: Set up Cloud SDK
               uses: "google-github-actions/setup-gcloud@v2"
