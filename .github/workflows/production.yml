@@ -14,6 +14,7 @@ jobs:
             - name: Build Docker image
               env:
                   PORT: ${{ secrets.PORT }}
+                  PORT2: ${{ vars.PORT }}
                   SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
 
                   POSTGRES_IMAGE: ${{ secrets.POSTGRES_IMAGE }}
