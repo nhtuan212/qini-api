@@ -1,13 +1,12 @@
 name: PRODUCTION CI/CD
 
 on:
-    # push:
-    #     branches:
-    #         - main
+    push:
+        branches: ["main"]
     workflow_dispatch:
 
 jobs:
-    build-and-deploy:
+    build:
         runs-on: ubuntu-latest
 
         steps:
@@ -36,4 +35,4 @@ jobs:
               run: echo "Building Docker image secret ${{secrets.PORT}} - vars ${{vars.PORT2}}"
             #   run: |
             #       docker-compose up -d --build
-                  #   docker rmi $(docker images --filter "dangling=true" -q --no-trunc) #remove image danglin
+            #   docker rmi $(docker images --filter "dangling=true" -q --no-trunc) #remove image danglin
