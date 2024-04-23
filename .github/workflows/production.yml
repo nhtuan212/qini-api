@@ -1,36 +1,27 @@
-name: PRODUCTION CI/CD
+name: deploy-via-docker-compose
 
 on:
-    workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-    build-and-deploy:
-        runs-on: ubuntu-latest
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
 
-        steps:
-            - name: Check Out Repository
-              uses: actions/checkout@v3
-
-            - name: Build Docker image
-              env:
-                  PORT: ${{ secrets.PORT }}
-                  PORT2: ${{ vars.PORT }}
-                  SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
-
-                  POSTGRES_IMAGE: ${{ secrets.POSTGRES_IMAGE }}
-                  POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-                  POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-                  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-                  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-                  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-
-                  APP_IMAGE: ${{ secrets.APP_IMAGE }}
-                  APP_NAME: ${{ secrets.APP_NAME }}
-                  APP_PORT: ${{ secrets.APP_PORT }}
-
-                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-                  PRODUCTION_DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
-
-              run: |
-                  docker-compose up -d --build
-                  #   docker rmi $(docker images --filter "dangling=true" -q --no-trunc) #remove image danglin
+    - name: Check Out Repository
+      uses: actions/checkout@v3
+    
+    - name: Deploy
+      env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          USER_NAME: root
+          HOST_NAME: ${{ secrets.DEPLOY_SRV_IP }}
+      run: |
+          mkdir -p ~/.ssh
+          echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 700 ~/.ssh/id_rsa
+          eval $(ssh-agent -s)
+          rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/webapps/hikari-backend
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /webapps/hikari-backend && cp /webapps/environment/hikari-backend/.env /webapps/hikari-backend/ && docker-compose up -d --build"
