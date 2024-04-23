@@ -1,9 +1,9 @@
 name: PRODUCTION CI/CD
 
 on:
-    push:
-        branches:
-            - main
+    # push:
+    #     branches:
+    #         - main
     workflow_dispatch:
 
 jobs:
@@ -17,6 +17,7 @@ jobs:
             - name: Build Docker image
               env:
                   PORT: ${{ secrets.PORT }}
+                  PORT2: ${{ vars.PORT2 }}
                   SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
 
                   POSTGRES_IMAGE: ${{ secrets.POSTGRES_IMAGE }}
