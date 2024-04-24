@@ -9,6 +9,8 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
+        environment: production
+
         steps:
             - name: Check Out Repository
               uses: actions/checkout@v3
