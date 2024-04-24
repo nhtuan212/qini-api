@@ -18,7 +18,7 @@ jobs:
             - name: Build Docker image
               env:
                   PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-                  USER_NAME: root
+                  USER_NAME: s24235
                   HOST_NAME: ${{ secrets.HOST_NAME }}
               run: |
                   mkdir -p ~/.ssh
