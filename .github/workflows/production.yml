@@ -16,9 +16,17 @@ jobs:
               uses: actions/checkout@v3
 
             - name: Build Docker image
+              env:
+                  PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+                  USER_NAME: s24235
+                  HOST_NAME: ${{ secrets.HOST_NAME }}
               run: |
-                echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
-                cat ./.env
-            #   run: |
-            #       docker-compose up -d --build
-            #   docker rmi $(docker images --filter "dangling=true" -q --no-trunc) #remove image danglin
+                  mkdir -p ~/.ssh
+                  echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+                  chmod 700 ~/.ssh/id_rsa
+                  eval $(ssh-agent -s)
+
+                  echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
+
+                  rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/webapps/qini-api
+                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "sudo -s && cd /webapps/qini-api && docker-compose up -d --build"
