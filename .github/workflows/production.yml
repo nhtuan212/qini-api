@@ -28,5 +28,7 @@ jobs:
 
                   echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
 
+                  ssh $USER_NAME@$HOST_NAME
+
                   rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/webapps/qini-api
                   ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /webapps/qini-api && docker-compose up -d --build"
