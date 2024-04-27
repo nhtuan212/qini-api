@@ -28,4 +28,4 @@ jobs:
                   eval $(ssh-agent -s)
 
                   rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
-                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /apps/qini-api && cp /apps/environment/qini-api/.env /apps/qini-api/ && docker-compose up -d --build"
+                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /apps/qini-api && docker-compose up -d --build"
