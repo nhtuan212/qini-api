@@ -29,7 +29,4 @@ jobs:
 
                   echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
 
-                  ssh -tt root@45.251.114.243
-
-                  rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
-                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+                  ssh $USER_NAME@$HOST_NAME
