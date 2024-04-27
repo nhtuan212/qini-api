@@ -29,4 +29,4 @@ jobs:
 
                   echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
 
-                  sshpass -p “rSb34Tqc16CF” ssh -tt $USER_NAME@$HOST_NAME
+                  ssh $USER_NAME@$HOST_NAME
