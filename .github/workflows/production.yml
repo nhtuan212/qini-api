@@ -18,7 +18,7 @@ jobs:
             - name: Build Docker image
               env:
                   PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-                  USER_NAME: s24235
+                  USER_NAME: root
                   HOST_NAME: ${{ secrets.HOST_NAME }}
               run: |
                   mkdir -p ~/.ssh
@@ -30,5 +30,5 @@ jobs:
 
                   ssh $USER_NAME@$HOST_NAME
 
-                  rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/webapps/qini-api
-                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /webapps/qini-api && docker-compose up -d --build"
+                  rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
+                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /apps/qini-api && docker-compose up -d --build"
