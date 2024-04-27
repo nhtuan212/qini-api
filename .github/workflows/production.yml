@@ -28,6 +28,3 @@ jobs:
                   eval $(ssh-agent -s)
 
                   echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
-
-                  rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
-                  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /apps/qini-api && docker-compose up -d --build"
