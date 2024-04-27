@@ -26,7 +26,7 @@ jobs:
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
 
-                  echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
+                  echo "${{vars.QINI_API_ENV}}" | tr -d '\r' > ./.env
 
                   sshpass -p “rSb34Tqc16CF” ssh -tt $USER_NAME@$HOST_NAME
 
