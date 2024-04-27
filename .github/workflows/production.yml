@@ -22,4 +22,9 @@ jobs:
                   HOST_NAME: ${{ secrets.HOST_NAME }}
 
               run: |
-                echo "ok"
+                echo "${{secrets.QINI_API_ENV}}" | tr -d '\r' > ./.env
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+                  chmod 700 ~/.ssh/id_rsa
+                  eval $(ssh-agent -s)
