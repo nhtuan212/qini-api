@@ -26,3 +26,5 @@ jobs:
                   echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
+
+                  rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
