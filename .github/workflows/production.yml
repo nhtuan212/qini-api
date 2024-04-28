@@ -25,7 +25,7 @@ jobs:
               env:
                   PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
                   USER_NAME: root
-                  HOST_NAME: 45.251.114.243
+                  HOST_NAME: ${{ secrets.HOST_NAME }}
 
               run: |
                   mkdir -p ~/.ssh
