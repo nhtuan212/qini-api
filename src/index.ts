@@ -8,6 +8,8 @@ const port = process.env.PORT || 8000;
 
 router(app);
 
+console.log("ok");
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
     dbConnection()
