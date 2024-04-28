@@ -4,7 +4,8 @@ WORKDIR /src
 COPY . /src
 
 # Building the app
-RUN npm cache clean --force
+# RUN npm cache clean --force
+RUN npm cache verify
 RUN npm install
 RUN npx prisma generate
 RUN npm run build
