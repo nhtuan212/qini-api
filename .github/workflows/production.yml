@@ -19,7 +19,7 @@ jobs:
 
             - name: Set Environment Variables
               run: |
-                  echo "${{ secrets.QINI_API_ENV }}" > .env
+                  echo "${{ secrets.QINI_API_ENV }}" | tr -d '\r' > .env
 
             - name: Build Docker image
               env:
