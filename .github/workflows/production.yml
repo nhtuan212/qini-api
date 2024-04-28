@@ -22,12 +22,15 @@ jobs:
                   PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
                   USER_NAME: root
                   HOST_NAME: 45.251.114.243
+                  QINI_API_ENV: ${{ secrets.QINI_API_ENV }}
 
               run: |
                   mkdir -p ~/.ssh
                   echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
+
+                  echo "$QINI_API_ENV" | tr -d '\r' > ./.env
 
                   sshpass -p rSb34Tqc16CF rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
                 #   ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$HOST_NAME "cd /apps/qini-api && docker-compose up -d --build"
