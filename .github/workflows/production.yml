@@ -28,6 +28,6 @@ jobs:
                   echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
-                  ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+                  ssh-add - <<< "$PRIVATE_KEY"
 
                   ssh -i ~/.ssh/private.key -o UserKnownHostsFile=/github/home/.ssh/known_hosts -tt <USER_NAME>@<HOST_NAME>
