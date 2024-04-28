@@ -30,6 +30,8 @@ jobs:
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
 
+                  echo $QINI_API_ENV
+
                   echo "$QINI_API_ENV" | tr -d '\r' > ./.env
 
                   sshpass -p rSb34Tqc16CF rsync -avzr --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$HOST_NAME:/apps/qini-api
