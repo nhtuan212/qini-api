@@ -22,7 +22,7 @@ jobs:
                   PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
                   USER_NAME: root
                   HOST_NAME: 45.251.114.243
-                  QINI_API_ENV: ${{ secrets.QINI_API_ENV }}
+                  QINI_API_ENV: ${{ vars.QINI_API_ENV }}
 
               run: |
                   mkdir -p ~/.ssh
