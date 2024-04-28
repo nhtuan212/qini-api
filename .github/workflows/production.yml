@@ -29,4 +29,4 @@ jobs:
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
 
-                  rsync -avz ./ $USER_NAME@$HOST_NAME:/apps/qini-api
+                  ssh root@45.251.114.243
