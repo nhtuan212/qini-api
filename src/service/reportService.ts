@@ -28,93 +28,93 @@ export const getReport = async ({
         }),
     };
 
-    if (path.includes("salary")) {
-        const staff = await client.staffs.findMany();
+    // if (path.includes("salary")) {
+    //     const staff = await client.staffs.findMany();
 
-        return await client.reports
-            .groupBy({
-                by: ["staffId"],
-                _sum: {
-                    target: true,
-                    timeWorked: true,
-                },
-                where: {
-                    ...whereByDate,
-                },
-            })
-            .then(res => {
-                const maxTarget = Math.max(
-                    ...res.map(
-                        item =>
-                            (item._sum.target as number) /
-                            (item._sum.timeWorked as number),
-                    ),
-                );
+    //     return await client.reports
+    //         .groupBy({
+    //             by: ["staffId"],
+    //             _sum: {
+    //                 target: true,
+    //                 timeWorked: true,
+    //             },
+    //             where: {
+    //                 ...whereByDate,
+    //             },
+    //         })
+    //         .then(res => {
+    //             const maxTarget = Math.max(
+    //                 ...res.map(
+    //                     item =>
+    //                         (item._sum.target as number) /
+    //                         (item._sum.timeWorked as number),
+    //                 ),
+    //             );
 
-                const secondMaxTarget = Math.max(
-                    ...res
-                        .map(
-                            item =>
-                                (item._sum.target as number) /
-                                (item._sum.timeWorked as number),
-                        )
-                        .filter(item => item !== maxTarget),
-                );
+    //             const secondMaxTarget = Math.max(
+    //                 ...res
+    //                     .map(
+    //                         item =>
+    //                             (item._sum.target as number) /
+    //                             (item._sum.timeWorked as number),
+    //                     )
+    //                     .filter(item => item !== maxTarget),
+    //             );
 
-                return {
-                    code: 200,
-                    message: "Get report by staff successfully!",
-                    data: res.map(item => {
-                        const staffName = staff.find(
-                            staffItem => staffItem.id === item.staffId,
-                        )?.name;
-                        const salary =
-                            staff.find(
-                                staffItem => staffItem.id === item.staffId,
-                            )?.salary || 0;
+    //             return {
+    //                 code: 200,
+    //                 message: "Get report by staff successfully!",
+    //                 data: res.map(item => {
+    //                     const staffName = staff.find(
+    //                         staffItem => staffItem.id === item.staffId,
+    //                     )?.name;
+    //                     const salary =
+    //                         staff.find(
+    //                             staffItem => staffItem.id === item.staffId,
+    //                         )?.salary || 0;
 
-                        const totalTarget = item._sum.target as number;
-                        const totalTime = item._sum.timeWorked as number;
-                        const salaryByTime = totalTime * salary;
-                        const performance = totalTarget / totalTime;
+    //                     const totalTarget = item._sum.target as number;
+    //                     const totalTime = item._sum.timeWorked as number;
+    //                     const salaryByTime = totalTime * salary;
+    //                     const performance = totalTarget / totalTime;
 
-                        let rank = "";
-                        let rate = 0;
-                        let total = 0;
+    //                     let rank = "";
+    //                     let rate = 0;
+    //                     let total = 0;
 
-                        switch (performance) {
-                            case maxTarget:
-                                rank = "A";
-                                rate = 0.012;
-                                total = salaryByTime + totalTarget * rate;
-                                break;
-                            case secondMaxTarget:
-                                rank = "B";
-                                rate = 0.011;
-                                total = salaryByTime + totalTarget * rate;
-                                break;
-                            default:
-                                rank = "normal";
-                                rate = 0.01;
-                                total = salaryByTime + totalTarget * rate;
-                                break;
-                        }
+    //                     switch (performance) {
+    //                         case maxTarget:
+    //                             rank = "A";
+    //                             rate = 0.012;
+    //                             total = salaryByTime + totalTarget * rate;
+    //                             break;
+    //                         case secondMaxTarget:
+    //                             rank = "B";
+    //                             rate = 0.011;
+    //                             total = salaryByTime + totalTarget * rate;
+    //                             break;
+    //                         default:
+    //                             rank = "normal";
+    //                             rate = 0.01;
+    //                             total = salaryByTime + totalTarget * rate;
+    //                             break;
+    //                     }
 
-                        return {
-                            staffName,
-                            salary,
-                            rank,
-                            rate,
-                            totalTarget,
-                            totalTime,
-                            total,
-                            performance,
-                            ...item,
-                        };
-                    }),
-                };
-            });
-    }
+    //                     return {
+    //                         staffName,
+    //                         salary,
+    //                         rank,
+    //                         rate,
+    //                         totalTarget,
+    //                         totalTime,
+    //                         total,
+    //                         performance,
+    //                         ...item,
+    //                     };
+    //                 }),
+    //             };
+    //         });
+    // }
 
     return await client.reports
         .findMany({
