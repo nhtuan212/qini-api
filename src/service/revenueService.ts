@@ -30,7 +30,10 @@ export const getRevenue = async () => {
 export const createRevenue = async ({ body }: { body: Revenues }) => {
     return await client.revenues
         .create({
-            data: body,
+            data: {
+                revenue: Number(body.revenue),
+                date: body.date,
+            },
         })
         .then(res => {
             return {
