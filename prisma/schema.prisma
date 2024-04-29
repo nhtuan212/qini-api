@@ -26,13 +26,13 @@ model Staffs {
   active   Boolean   @default(true)
   createAt DateTime  @default(now()) @db.Timestamp(6)
   updateAt DateTime? @db.Timestamp(6)
-  salary   Int       @default(0)
   Reports  Reports[]
 }
 
 model Revenues {
   id       String    @id @default(uuid())
   revenue  Float     @db.Real
+  date     DateTime  @default(now()) @db.Timestamp(6)
   createAt DateTime  @default(now()) @db.Timestamp(6)
   updateAt DateTime? @db.Timestamp(6)
   Reports  Reports[]
