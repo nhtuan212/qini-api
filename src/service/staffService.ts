@@ -22,7 +22,7 @@ export const getStaff = async ({ id }: { id?: string }) => {
     return await client.staffs
         .findMany({
             orderBy: {
-                createAt: "desc",
+                name: "desc",
             },
         })
         .then((res: any) => {
