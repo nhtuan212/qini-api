@@ -1,6 +1,6 @@
 FROM node:20-alpine as builder
 
-RUN apk install node-typescript -y
+RUN npm install typescript -D
 
 WORKDIR /apps
 COPY . /apps
