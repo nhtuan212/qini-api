@@ -12,3 +12,4 @@ FROM node:20-alpine
 WORKDIR /src
 
 COPY --from=builder /src/dist .
+COPY --from=builder /src/package.json .
