@@ -1,5 +1,7 @@
 FROM node:20-alpine as builder
 
+RUN apt install node-typescript -y
+
 WORKDIR /apps
 COPY . /apps
 
@@ -11,4 +13,4 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /apps
 
-COPY --from=builder /apps/dist .
+COPY --from=builder /apps .
