@@ -1,16 +1,14 @@
-FROM node:20-alpine
+FROM node:20-alpine as builder
 
 WORKDIR /src
 COPY . /src
 
-# Building the app
-# RUN npm cache clean --force
 RUN npm cache verify
 RUN npm install
 RUN npx prisma generate
 RUN npm run build
 
-# # Running the app
-# ENTRYPOINT ["npm", "start"]
+FROM node:20-alpine
+WORKDIR /src
 
-# EXPOSE 8000
+COPY --from=builder /src/dist .
