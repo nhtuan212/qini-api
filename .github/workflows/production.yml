@@ -28,10 +28,6 @@ jobs:
                   IP: ${{ secrets.IP }}
                   PASSWORD: ${{ secrets.PASSWORD }}
 
-            - name: Apply all pending migrations to the database
-             run: |
-                  npx prisma migrate deploy
-
               run: |
                   mkdir -p ~/.ssh
                   echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
