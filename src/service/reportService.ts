@@ -1,50 +1,12 @@
 import { client } from ".";
 import { Reports } from "../../dist/generated/client";
-import { isDateValid } from "../utils";
 
 // Get method
-export const getReport = async ({
-    path,
-    id,
-    query,
-}: {
-    path: string;
-    id: string;
-    query: any;
-}) => {
-    const whereByDate = {
-        ...(Object.keys(query).length > 0 && {
-            // Check if staffId is valid
-            ...(query.staffId && { staffId: query.staffId }),
-
-            // Check if startDate and endDate are valid date
-            ...(isDateValid(query.startDate) &&
-                isDateValid(query.endDate) && {
-                    createAt: {
-                        gte: new Date(query.startDate),
-                        lte: new Date(`${query.endDate}T23:59:59.999Z`), // End of day
-                    },
-                }),
-        }),
-    };
-
+export const getReport = async () => {
     return await client.reports
         .findMany({
             orderBy: {
                 createAt: "desc",
-            },
-            where: {
-                ...(path.includes("revenue") && { revenueId: id }),
-                ...(path.includes("staff") && { staffId: id }),
-                ...whereByDate,
-            },
-            include: {
-                staff: {
-                    select: {
-                        // id: true,
-                        name: true,
-                    },
-                },
             },
         })
         .then(res => {
@@ -63,11 +25,15 @@ export const getReport = async ({
         });
 };
 
-// Post method
+//** Post method */
+// Create
 export const createReport = async ({ body }: { body: Reports }) => {
     return await client.reports
-        .createMany({
-            data: body,
+        .create({
+            data: {
+                revenue: Number(body.revenue),
+                createAt: body.createAt,
+            },
         })
         .then(res => {
             return {
@@ -85,6 +51,32 @@ export const createReport = async ({ body }: { body: Reports }) => {
                 };
             }
 
+            return {
+                code: 404,
+                message: err.message,
+                data: [],
+            };
+        });
+};
+
+// Delete method
+export const deleteReport = async ({ body }: { body: Reports }) => {
+    const { id } = body;
+
+    return await client.reports
+        .delete({
+            where: {
+                id,
+            },
+        })
+        .then(res => {
+            return {
+                code: 200,
+                message: "Delete report successfully!",
+                data: res,
+            };
+        })
+        .catch(err => {
             return {
                 code: 404,
                 message: err.message,

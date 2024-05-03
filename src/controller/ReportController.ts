@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { createReport, getReport } from "../service/reportService";
+import {
+    createReport,
+    deleteReport,
+    getReport,
+} from "../service/reportService";
 
 //** [Method]/report */
 export const Report = async (req: Request, res: Response) => {
     switch (req.method) {
         //** GET */
         case "GET":
-            return await getReport({
-                path: req.route.path,
-                id: req.params.id,
-                query: req.query,
-            }).then(resData => {
+            return await getReport().then(resData => {
                 // Destructure data
                 const { code, message, data } = resData;
 
@@ -24,6 +24,25 @@ export const Report = async (req: Request, res: Response) => {
         //** POST */
         case "POST":
             return await createReport({
+                body: req.body,
+            })
+                .then(resData => {
+                    // Destructure data
+                    const { code, message, data } = resData;
+
+                    return res.status(code).json({
+                        code,
+                        message,
+                        data,
+                    });
+                })
+                .catch(err => {
+                    throw err;
+                });
+
+        //** DELETE */
+        case "DELETE":
+            return await deleteReport({
                 body: req.body,
             })
                 .then(resData => {

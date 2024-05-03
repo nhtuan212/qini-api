@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
 import {
-    createRevenue,
-    deleteRevenue,
-    getRevenue,
-} from "../service/revenueService";
+    createReport,
+    getReportOnStaff,
+} from "../service/reportOnStaffService";
 
-//** [Method]/revenue */
-export const Revenue = async (req: Request, res: Response) => {
+//** [Method]/report */
+export const ReportOnStaff = async (req: Request, res: Response) => {
     switch (req.method) {
         //** GET */
         case "GET":
-            return await getRevenue().then(resData => {
+            return await getReportOnStaff({
+                query: req.query,
+            }).then(resData => {
                 // Destructure data
                 const { code, message, data } = resData;
 
@@ -23,26 +24,7 @@ export const Revenue = async (req: Request, res: Response) => {
 
         //** POST */
         case "POST":
-            return await createRevenue({
-                body: req.body,
-            })
-                .then(resData => {
-                    // Destructure data
-                    const { code, message, data } = resData;
-
-                    return res.status(code).json({
-                        code,
-                        message,
-                        data,
-                    });
-                })
-                .catch(err => {
-                    throw err;
-                });
-
-        //** DELETE */
-        case "DELETE":
-            return await deleteRevenue({
+            return await createReport({
                 body: req.body,
             })
                 .then(resData => {
