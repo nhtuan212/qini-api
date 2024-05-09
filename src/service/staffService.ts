@@ -1,7 +1,7 @@
 import { client } from ".";
 import { Staffs } from "../../dist/generated/client";
 
-export const getStaff = async ({ id }: { id?: string }) => {
+export const getStaff = async ({ id }: { id: string }) => {
     if (id) {
         return await client.staffs
             .findUnique({

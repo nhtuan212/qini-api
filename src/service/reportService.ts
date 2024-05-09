@@ -2,9 +2,40 @@ import { client } from ".";
 import { Reports } from "../../dist/generated/client";
 
 // Get method
-export const getReport = async () => {
+export const getReport = async ({ params }: { params: any }) => {
+    const { id } = params;
+
+    const reportWhereClause = {
+        ...(Object.keys(params).length > 0 && {
+            ...(id && { id }),
+        }),
+    };
+
     return await client.reports
         .findMany({
+            where: {
+                ...reportWhereClause,
+            },
+            include: {
+                shift: {
+                    select: {
+                        name: true,
+                    },
+                },
+                reportsOnStaffs: {
+                    select: {
+                        checkIn: true,
+                        checkOut: true,
+                        target: true,
+                        timeWorked: true,
+                        staff: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
             orderBy: {
                 createAt: "desc",
             },
@@ -32,6 +63,7 @@ export const createReport = async ({ body }: { body: Reports }) => {
         .create({
             data: {
                 revenue: Number(body.revenue),
+                shiftId: body.shiftId,
                 createAt: body.createAt,
             },
         })

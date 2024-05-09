@@ -5,6 +5,7 @@ import { user } from "./user";
 import { staff } from "./staff";
 import { report } from "./report";
 import { reportOnStaff } from "./reportOnStaff";
+import { shift } from "./shift";
 
 export const router = (app: Express) => {
     // //** Cors */
@@ -56,4 +57,5 @@ export const router = (app: Express) => {
     app.use("/staff", staff);
     app.use("/report", report);
     app.use("/report-on-staff", reportOnStaff);
+    app.use("/shift", shift);
 };

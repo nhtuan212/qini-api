@@ -25,15 +25,17 @@ model Staffs {
   active          Boolean           @default(true)
   createAt        DateTime          @default(now()) @db.Timestamp(6)
   updateAt        DateTime?         @db.Timestamp(6)
-  ReportsOnStaffs ReportsOnStaffs[]
+  reportsOnStaffs ReportsOnStaffs[]
 }
 
 model Reports {
   id              String            @id @default(uuid())
+  shiftId         String            @db.VarChar(50)
   revenue         Float             @db.Real
   createAt        DateTime          @default(now()) @db.Timestamp(6)
   updateAt        DateTime?         @db.Timestamp(6)
-  ReportsOnStaffs ReportsOnStaffs[]
+  reportsOnStaffs ReportsOnStaffs[]
+  shift           Shifts            @relation(fields: [shiftId], references: [id])
 }
 
 model ReportsOnStaffs {
@@ -48,6 +50,14 @@ model ReportsOnStaffs {
   updateAt   DateTime? @db.Timestamp(6)
   staff      Staffs    @relation(fields: [staffId], references: [id])
   report     Reports   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model Shifts {
+  id       String    @id @default(uuid())
+  name     String    @unique @db.VarChar(50)
+  createAt DateTime  @default(now()) @db.Timestamp(6)
+  updateAt DateTime? @db.Timestamp(6)
+  Reports  Reports[]
 }
 
 enum Role {

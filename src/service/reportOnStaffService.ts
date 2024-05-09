@@ -29,10 +29,13 @@ export const getReportOnStaff = async ({ query }: { query: any }) => {
                 ...reportWhereClause,
             },
             include: {
-                staff: {
-                    select: {
-                        // id: true,
-                        name: true,
+                report: {
+                    include: {
+                        shift: {
+                            select: {
+                                name: true,
+                            },
+                        },
                     },
                 },
             },
@@ -40,7 +43,7 @@ export const getReportOnStaff = async ({ query }: { query: any }) => {
         .then(res => {
             return {
                 code: 200,
-                message: "Get report successfully!",
+                message: "Get report on staff successfully!",
                 data: res,
             };
         })
@@ -62,7 +65,7 @@ export const createReport = async ({ body }: { body: ReportsOnStaffs }) => {
         .then(res => {
             return {
                 code: 200,
-                message: "Add report successfully!",
+                message: "Add report on staff successfully!",
                 data: res,
             };
         })
