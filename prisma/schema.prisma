@@ -17,6 +17,8 @@ model Users {
   createAt DateTime  @default(now()) @db.Timestamp(6)
   role     Role      @default(USER)
   updateAt DateTime? @db.Timestamp(6)
+
+  @@map("users")
 }
 
 model Staffs {
@@ -26,6 +28,8 @@ model Staffs {
   createAt        DateTime          @default(now()) @db.Timestamp(6)
   updateAt        DateTime?         @db.Timestamp(6)
   reportsOnStaffs ReportsOnStaffs[]
+
+  @@map("staffs")
 }
 
 model Reports {
@@ -36,6 +40,8 @@ model Reports {
   updateAt        DateTime?         @db.Timestamp(6)
   reportsOnStaffs ReportsOnStaffs[]
   shift           Shifts            @relation(fields: [shiftId], references: [id])
+
+  @@map("reports")
 }
 
 model ReportsOnStaffs {
@@ -50,6 +56,8 @@ model ReportsOnStaffs {
   updateAt   DateTime? @db.Timestamp(6)
   staff      Staffs    @relation(fields: [staffId], references: [id])
   report     Reports   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@map("reports_on_staffs")
 }
 
 model Shifts {
@@ -58,6 +66,8 @@ model Shifts {
   createAt DateTime  @default(now()) @db.Timestamp(6)
   updateAt DateTime? @db.Timestamp(6)
   Reports  Reports[]
+
+  @@map("shifts")
 }
 
 enum Role {
