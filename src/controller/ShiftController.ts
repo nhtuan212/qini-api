@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getShift } from "../service/shiftService";
+import { createShift, getShift } from "../service/shiftService";
 
 //** [GET]/user */
 export const Shift = async (req: Request, res: Response) => {
@@ -7,6 +7,22 @@ export const Shift = async (req: Request, res: Response) => {
         //** GET */
         case "GET":
             return await getShift()
+                .then(resData => {
+                    // Destructure data
+                    const { code, data } = resData;
+
+                    return res.status(code).json({
+                        code,
+                        data,
+                    });
+                })
+                .catch(err => {
+                    throw err;
+                });
+
+        //** POST */
+        case "POST":
+            return await createShift(req.body)
                 .then(resData => {
                     // Destructure data
                     const { code, data } = resData;
