@@ -38,8 +38,8 @@ model Reports {
   revenue         Float             @db.Real
   createAt        DateTime          @default(now()) @db.Timestamp(6)
   updateAt        DateTime?         @db.Timestamp(6)
-  reportsOnStaffs ReportsOnStaffs[]
   shift           Shifts            @relation(fields: [shiftId], references: [id])
+  reportsOnStaffs ReportsOnStaffs[]
 
   @@map("reports")
 }
@@ -54,8 +54,8 @@ model ReportsOnStaffs {
   target     Float     @db.Real
   createAt   DateTime  @default(now()) @db.Timestamp(6)
   updateAt   DateTime? @db.Timestamp(6)
-  staff      Staffs    @relation(fields: [staffId], references: [id])
   report     Reports   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  staff      Staffs    @relation(fields: [staffId], references: [id])
 
   @@map("reports_on_staffs")
 }
@@ -71,7 +71,7 @@ model Shifts {
 }
 
 enum Role {
+  USER
   ADMIN
   REPORT
-  USER
 }
