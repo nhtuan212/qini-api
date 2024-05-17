@@ -71,6 +71,7 @@ model Shifts {
 }
 
 enum Role {
-  USER
   ADMIN
+  REPORT
+  USER
 }
