@@ -3,6 +3,7 @@ import {
     createReport,
     deleteReport,
     getReport,
+    updateReport,
 } from "../service/reportService";
 
 //** [Method]/report */
@@ -26,6 +27,26 @@ export const Report = async (req: Request, res: Response) => {
         //** POST */
         case "POST":
             return await createReport({
+                body: req.body,
+            })
+                .then(resData => {
+                    // Destructure data
+                    const { code, message, data } = resData;
+
+                    return res.status(code).json({
+                        code,
+                        message,
+                        data,
+                    });
+                })
+                .catch(err => {
+                    throw err;
+                });
+
+        //** PUT */
+        case "PUT":
+            return await updateReport({
+                id: req.params.id,
                 body: req.body,
             })
                 .then(resData => {

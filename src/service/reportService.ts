@@ -91,6 +91,39 @@ export const createReport = async ({ body }: { body: Reports }) => {
         });
 };
 
+// Put method
+export const updateReport = async ({
+    id,
+    body,
+}: {
+    id: string;
+    body: Reports;
+}) => {
+    return await client.reports
+        .update({
+            where: {
+                id,
+            },
+            data: {
+                ...body,
+            },
+        })
+        .then(res => {
+            return {
+                code: 200,
+                message: "Update report successfully!",
+                data: res,
+            };
+        })
+        .catch(err => {
+            return {
+                code: 404,
+                message: err.message,
+                data: [],
+            };
+        });
+};
+
 // Delete method
 export const deleteReport = async ({ body }: { body: Reports }) => {
     const { id } = body;

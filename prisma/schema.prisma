@@ -38,6 +38,7 @@ model Reports {
   revenue         Float             @db.Real
   createAt        DateTime          @default(now()) @db.Timestamp(6)
   updateAt        DateTime?         @db.Timestamp(6)
+  isApproved      Boolean           @default(false)
   shift           Shifts            @relation(fields: [shiftId], references: [id])
   reportsOnStaffs ReportsOnStaffs[]
 
