@@ -78,7 +78,7 @@ export const createReport = async ({
         .create({
             data: {
                 ...body,
-                revenue: Number(body.revenue),
+                revenue: body.revenue && Number(body.revenue),
                 reportsOnStaffs: {
                     createMany: {
                         data: body.reportsOnStaffs,
