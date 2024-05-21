@@ -125,7 +125,7 @@ export const updateReport = async ({
             },
             data: {
                 ...body,
-                revenue: Number(body.revenue),
+                revenue: body.revenue && Number(body.revenue),
             },
         })
         .then(res => {
