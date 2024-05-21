@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {
-    createReport,
+    createReportOnStaff,
     getReportOnStaff,
 } from "../service/reportOnStaffService";
 
@@ -24,7 +24,7 @@ export const ReportOnStaff = async (req: Request, res: Response) => {
 
         //** POST */
         case "POST":
-            return await createReport({
+            return await createReportOnStaff({
                 body: req.body,
             })
                 .then(resData => {

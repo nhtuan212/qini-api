@@ -30,6 +30,7 @@ export const getReport = async ({ params }: { params: any }) => {
                         timeWorked: true,
                         staff: {
                             select: {
+                                id: true,
                                 name: true,
                             },
                         },
@@ -58,13 +59,31 @@ export const getReport = async ({ params }: { params: any }) => {
 
 //** Post method */
 // Create
-export const createReport = async ({ body }: { body: Reports }) => {
+export const createReport = async ({
+    body,
+}: {
+    body: Reports & {
+        reportsOnStaffs: [
+            {
+                checkIn: string;
+                checkOut: string;
+                target: number;
+                timeWorked: number;
+                staffId: string;
+            },
+        ];
+    };
+}) => {
     return await client.reports
         .create({
             data: {
+                ...body,
                 revenue: Number(body.revenue),
-                shiftId: body.shiftId,
-                createAt: body.createAt,
+                reportsOnStaffs: {
+                    createMany: {
+                        data: body.reportsOnStaffs,
+                    },
+                },
             },
         })
         .then(res => {
@@ -106,6 +125,7 @@ export const updateReport = async ({
             },
             data: {
                 ...body,
+                revenue: Number(body.revenue),
             },
         })
         .then(res => {

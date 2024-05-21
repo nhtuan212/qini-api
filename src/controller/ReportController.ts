@@ -50,6 +50,12 @@ export const Report = async (req: Request, res: Response) => {
                 body: req.body,
             })
                 .then(resData => {
+                    if (!resData) {
+                        return res
+                            .status(404)
+                            .json({ message: "Report not found!" });
+                    }
+
                     // Destructure data
                     const { code, message, data } = resData;
 

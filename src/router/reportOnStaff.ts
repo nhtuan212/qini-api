@@ -6,3 +6,4 @@ const router = express.Router();
 export const reportOnStaff = router.get("/", ReportOnStaff);
 router.get("/:id", ReportOnStaff);
 router.post("/", ReportOnStaff);
+router.put("/", ReportOnStaff);

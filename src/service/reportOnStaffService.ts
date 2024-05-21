@@ -57,7 +57,11 @@ export const getReportOnStaff = async ({ query }: { query: any }) => {
 };
 
 // Post method
-export const createReport = async ({ body }: { body: ReportsOnStaffs }) => {
+export const createReportOnStaff = async ({
+    body,
+}: {
+    body: ReportsOnStaffs;
+}) => {
     return await client.reportsOnStaffs
         .createMany({
             data: body,
