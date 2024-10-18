@@ -79,6 +79,9 @@ export const createReport = async ({
             data: {
                 ...body,
                 revenue: body.revenue && Number(body.revenue),
+                transfer: body.transfer && Number(body.transfer),
+                cash: body.cash && Number(body.cash),
+
                 reportsOnStaffs: {
                     createMany: {
                         data: body.reportsOnStaffs,
