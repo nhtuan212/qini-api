@@ -37,6 +37,7 @@ model Reports {
   shiftId         String            @db.VarChar(50)
   transfer        Float?            @db.Real
   cash            Float?            @db.Real
+  deduction       Float?            @db.Real
   revenue         Float             @db.Real
   description     String?           @db.VarChar(200)
   createAt        DateTime          @default(now()) @db.Timestamp(6)
