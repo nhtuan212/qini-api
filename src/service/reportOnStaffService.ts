@@ -89,3 +89,31 @@ export const createReportOnStaff = async ({
             };
         });
 };
+
+// Delete many
+export const deleteManyReportOnStaffs = async ({
+    staffId,
+}: {
+    staffId: string;
+}) => {
+    return await client.reportsOnStaffs
+        .deleteMany({
+            where: {
+                staffId,
+            },
+        })
+        .then(res => {
+            return {
+                code: 200,
+                message: "Delete report on staff successfully!",
+                data: res,
+            };
+        })
+        .catch(err => {
+            return {
+                code: 404,
+                message: err.message,
+                data: [],
+            };
+        });
+};

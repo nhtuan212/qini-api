@@ -1,5 +1,6 @@
 import { client } from ".";
 import { Staffs } from "../../dist/generated/client";
+import { deleteManyReportOnStaffs } from "./reportOnStaffService";
 
 export const getStaff = async ({ id }: { id: string }) => {
     if (id) {
@@ -101,11 +102,14 @@ export const editStaff = async ({ id, body }: { id: string; body: Staffs }) => {
 export const deleteStaff = async ({ body }: { body: Staffs }) => {
     const { id } = body;
 
-    return await client.staffs
-        .delete({
-            where: {
-                id,
-            },
+    return await client
+        .$transaction(async prisma => {
+            await deleteManyReportOnStaffs({ staffId: id });
+            return prisma.staffs.delete({
+                where: {
+                    id,
+                },
+            });
         })
         .then(res => {
             return {

@@ -60,7 +60,7 @@ model ReportsOnStaffs {
   createAt   DateTime  @default(now()) @db.Timestamp(6)
   updateAt   DateTime? @db.Timestamp(6)
   report     Reports   @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  staff      Staffs    @relation(fields: [staffId], references: [id])
+  staff      Staffs    @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
   @@map("reports_on_staffs")
 }
