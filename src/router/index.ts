@@ -43,8 +43,6 @@ export const router = (app: Express) => {
     //     next();
     // });
 
-    app.use(cors({ origin: "*" }));
-
     app.use(
         // Encoded type urlencoded for Post method
         express.urlencoded({
@@ -53,6 +51,14 @@ export const router = (app: Express) => {
         // Encoded type raw/json for Post method
         express.json({
             type: "application/json",
+        }),
+
+        // Cors
+        cors({
+            origin: "*",
+            methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
+            allowedHeaders: ["X-Requested-With", "content-type"],
+            credentials: true,
         }),
     );
 
