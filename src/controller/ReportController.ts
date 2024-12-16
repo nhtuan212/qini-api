@@ -11,16 +11,15 @@ export const Report = async (req: Request, res: Response) => {
     switch (req.method) {
         //** GET */
         case "GET":
-            return await getReport({
-                params: req.params,
-            }).then(resData => {
+            return await getReport(req).then(resData => {
                 // Destructure data
-                const { code, message, data } = resData;
+                const { code, message, data, pagination } = resData;
 
                 return res.status(code).json({
                     code,
                     message,
                     data,
+                    pagination,
                 });
             });
 

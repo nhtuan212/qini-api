@@ -6,6 +6,7 @@ import { staff } from "./staff";
 import { report } from "./report";
 import { reportOnStaff } from "./reportOnStaff";
 import { shift } from "./shift";
+import cors from "cors";
 
 export const router = (app: Express) => {
     // //** Cors */
@@ -17,6 +18,8 @@ export const router = (app: Express) => {
 
     // // Add headers before the routes are defined
     // app.use((req: any, res: any, next: any) => {
+    //     console.log({ req });
+
     //     // Website you wish to allow to connect
     //     res.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -39,6 +42,8 @@ export const router = (app: Express) => {
     //     // Pass to next layer of middleware
     //     next();
     // });
+
+    app.use(cors());
 
     app.use(
         // Encoded type urlencoded for Post method

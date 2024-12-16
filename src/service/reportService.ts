@@ -1,8 +1,11 @@
 import { client } from ".";
 import { Reports } from "../../dist/generated/client";
+import { Pagination } from "../constants";
+import { paginationQuery } from "../utils";
 
 // Get method
-export const getReport = async ({ params }: { params: any }) => {
+export const getReport = async (req: { [key: string]: any }) => {
+    const { query, params } = req;
     const { id } = params;
 
     const reportWhereClause = {
@@ -13,10 +16,16 @@ export const getReport = async ({ params }: { params: any }) => {
 
     return await client.reports
         .findMany({
+            ...paginationQuery(query),
             where: {
                 ...reportWhereClause,
             },
             include: {
+                _count: {
+                    select: {
+                        reportsOnStaffs: true,
+                    },
+                },
                 shift: {
                     select: {
                         name: true,
@@ -41,11 +50,20 @@ export const getReport = async ({ params }: { params: any }) => {
                 createAt: "desc",
             },
         })
-        .then(res => {
+        .then(async res => {
             return {
                 code: 200,
                 message: "Get report successfully!",
                 data: res,
+                pagination: {
+                    page: Number(query.page || 1),
+                    rowsPerPage: Number(query.limit || Pagination.limit),
+                    total: await client.reports.count({
+                        where: {
+                            ...reportWhereClause,
+                        },
+                    }),
+                },
             };
         })
         .catch(err => {
@@ -53,6 +71,7 @@ export const getReport = async ({ params }: { params: any }) => {
                 code: 404,
                 message: err.message,
                 data: [],
+                pagination: {},
             };
         });
 };
