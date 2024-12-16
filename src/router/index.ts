@@ -43,7 +43,7 @@ export const router = (app: Express) => {
     //     next();
     // });
 
-    app.use(cors());
+    app.use(cors({ origin: "*" }));
 
     app.use(
         // Encoded type urlencoded for Post method
