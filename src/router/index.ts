@@ -6,42 +6,35 @@ import { staff } from "./staff";
 import { report } from "./report";
 import { reportOnStaff } from "./reportOnStaff";
 import { shift } from "./shift";
-import cors from "cors";
+// import cors from "cors";
 
 export const router = (app: Express) => {
-    // //** Cors */
-    // app.use((res: Response, next: NextFunction) => {
-    //     res.setHeader("Content-Type", "text/html");
-    //     res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
-    //     next();
-    // });
+    // Add headers before the routes are defined
+    app.use((req: any, res: any, next: any) => {
+        console.log({ req });
 
-    // // Add headers before the routes are defined
-    // app.use((req: any, res: any, next: any) => {
-    //     console.log({ req });
+        // Website you wish to allow to connect
+        res.setHeader("Access-Control-Allow-Origin", "*");
 
-    //     // Website you wish to allow to connect
-    //     res.setHeader("Access-Control-Allow-Origin", "*");
+        // Request methods you wish to allow
+        res.setHeader(
+            "Access-Control-Allow-Methods",
+            "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+        );
 
-    //     // Request methods you wish to allow
-    //     res.setHeader(
-    //         "Access-Control-Allow-Methods",
-    //         "GET, POST, OPTIONS, PUT, PATCH, DELETE",
-    //     );
+        // Request headers you wish to allow
+        res.setHeader(
+            "Access-Control-Allow-Headers",
+            "X-Requested-With,content-type",
+        );
 
-    //     // Request headers you wish to allow
-    //     res.setHeader(
-    //         "Access-Control-Allow-Headers",
-    //         "X-Requested-With,content-type",
-    //     );
+        // Set to true if you need the website to include cookies in the requests sent
+        // to the API (e.g. in case you use sessions)
+        res.setHeader("Access-Control-Allow-Credentials", 1);
 
-    //     // Set to true if you need the website to include cookies in the requests sent
-    //     // to the API (e.g. in case you use sessions)
-    //     res.setHeader("Access-Control-Allow-Credentials", 1);
-
-    //     // Pass to next layer of middleware
-    //     next();
-    // });
+        // Pass to next layer of middleware
+        next();
+    });
 
     app.use(
         // Encoded type urlencoded for Post method
@@ -52,15 +45,12 @@ export const router = (app: Express) => {
         express.json({
             type: "application/json",
         }),
-
-        // Cors
-        cors({
-            origin: "*",
-            methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
-            allowedHeaders: ["X-Requested-With", "content-type"],
-            credentials: true,
-        }),
     );
+
+    console.log("cors");
+
+    // // Cors
+    // app.use(cors());
 
     app.use("/", home);
     app.use("/login", login);
