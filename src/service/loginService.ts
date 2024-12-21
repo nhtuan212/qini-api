@@ -13,7 +13,7 @@ export const login = async ({
     });
     if (!user) {
         return {
-            code: 401,
+            status: 401,
             message: "User or Password incorrectly!",
         };
     }
@@ -21,13 +21,13 @@ export const login = async ({
     const passwordValid = await passwordCompare(password, user.password);
     if (!passwordValid) {
         return {
-            code: 401,
+            status: 401,
             message: "User or Password incorrectly!",
         };
     }
 
     return {
-        code: 200,
+        status: 200,
         message: "Create success!",
         data: user,
     };

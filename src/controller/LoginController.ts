@@ -12,10 +12,10 @@ export const Login = async (req: Request, res: Response) => {
             })
                 .then(resData => {
                     // Destructure data
-                    const { code, message, data } = resData as any;
+                    const { status, message, data } = resData;
 
-                    return res.status(code).json({
-                        code,
+                    return res.status(status).json({
+                        status,
                         message,
                         data,
                     });

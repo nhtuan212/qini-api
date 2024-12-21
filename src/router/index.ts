@@ -1,4 +1,5 @@
 import express, { Express } from "express";
+import cors from "cors";
 import { home } from "./home";
 import { login } from "./login";
 import { user } from "./user";
@@ -6,7 +7,6 @@ import { staff } from "./staff";
 import { report } from "./report";
 import { reportOnStaff } from "./reportOnStaff";
 import { shift } from "./shift";
-import cors from "cors";
 
 export const router = (app: Express) => {
     app.use(
