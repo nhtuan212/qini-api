@@ -138,18 +138,43 @@ export const updateReport = async ({
     body,
 }: {
     id: string;
-    body: Reports;
+    body: Reports & {
+        reportsOnStaffs: [
+            {
+                checkIn: string;
+                checkOut: string;
+                target: number;
+                timeWorked: number;
+                staffId: string;
+            },
+        ];
+    };
 }) => {
-    return await client.reports
-        .update({
+    const { reportsOnStaffs, ...reportData } = body;
+    const updateReportData = {
+        ...reportData,
+        revenue: body.revenue && Number(body.revenue),
+    };
+
+    const updateReport = client.reports.update({
+        where: {
+            id,
+        },
+        data: updateReportData,
+    });
+
+    const updateReportsOnStaffs = reportsOnStaffs.map(staff =>
+        client.reportsOnStaffs.updateMany({
             where: {
-                id,
+                reportId: id,
+                staffId: staff.staffId,
             },
-            data: {
-                ...body,
-                revenue: body.revenue && Number(body.revenue),
-            },
-        })
+            data: staff,
+        }),
+    );
+
+    return await client
+        .$transaction([updateReport, ...updateReportsOnStaffs])
         .then(res => {
             return {
                 code: 200,

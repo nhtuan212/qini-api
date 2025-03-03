@@ -28,6 +28,7 @@ model Staffs {
   createAt        DateTime          @default(now()) @db.Timestamp(6)
   updateAt        DateTime?         @db.Timestamp(6)
   reportsOnStaffs ReportsOnStaffs[]
+  TimeSheets      TimeSheets[]
 
   @@map("staffs")
 }
@@ -73,6 +74,18 @@ model Shifts {
   Reports  Reports[]
 
   @@map("shifts")
+}
+
+model TimeSheets {
+  id       String    @id @default(uuid())
+  staffId  String    @db.VarChar(50)
+  checkIn  String    @db.VarChar(10)
+  checkOut String    @db.VarChar(10)
+  createAt DateTime  @default(now()) @db.Timestamp(6)
+  updateAt DateTime? @db.Timestamp(6)
+  staff    Staffs    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@map("time_sheets")
 }
 
 enum Role {
