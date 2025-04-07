@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createShift, getShift } from "../service/shiftService";
+import { getShift, createShift, updateShift } from "../service/shiftService";
 
 //** [GET]/user */
 export const Shift = async (req: Request, res: Response) => {
@@ -29,6 +29,32 @@ export const Shift = async (req: Request, res: Response) => {
 
                     return res.status(code).json({
                         code,
+                        data,
+                    });
+                })
+                .catch(err => {
+                    throw err;
+                });
+
+        //** PUT */
+        case "PUT":
+            return await updateShift({
+                id: req.params.id,
+                body: req.body,
+            })
+                .then(resData => {
+                    if (!resData) {
+                        return res
+                            .status(404)
+                            .json({ message: "Shift not found!" });
+                    }
+
+                    // Destructure data
+                    const { code, message, data } = resData;
+
+                    return res.status(code).json({
+                        code,
+                        message,
                         data,
                     });
                 })

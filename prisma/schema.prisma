@@ -66,9 +66,22 @@ model ReportsOnStaffs {
   @@map("reports_on_staffs")
 }
 
+// model Targets {
+//   id         String    @id @default(uuid())
+//   name       String    @unique @db.VarChar(50)
+//   targetDate DateTime  @db.Date
+//   createAt   DateTime  @default(now()) @db.Timestamp(6)
+//   updateAt   DateTime? @db.Timestamp(6)
+
+//   @@map("targets")
+// }
+
 model Shifts {
   id       String    @id @default(uuid())
   name     String    @unique @db.VarChar(50)
+  checkIn  String    @default("") @db.VarChar(10)
+  checkOut String    @default("") @db.VarChar(10)
+  isTarget Boolean   @default(false)
   createAt DateTime  @default(now()) @db.Timestamp(6)
   updateAt DateTime? @db.Timestamp(6)
   Reports  Reports[]

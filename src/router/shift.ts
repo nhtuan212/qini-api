@@ -5,3 +5,4 @@ const router = express.Router();
 
 export const shift = router.get("/", Shift);
 router.post("/", Shift);
+router.put("/:id", Shift);
