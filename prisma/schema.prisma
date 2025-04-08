@@ -66,39 +66,64 @@ model ReportsOnStaffs {
   @@map("reports_on_staffs")
 }
 
-// model Targets {
-//   id         String    @id @default(uuid())
-//   name       String    @unique @db.VarChar(50)
-//   targetDate DateTime  @db.Date
-//   createAt   DateTime  @default(now()) @db.Timestamp(6)
-//   updateAt   DateTime? @db.Timestamp(6)
+model Target {
+  id        String    @id @default(uuid())
+  name      String    @unique @db.VarChar(50)
+  target_at DateTime  @db.Timestamp(6)
+  create_at DateTime  @default(now()) @db.Timestamp(6)
+  update_at DateTime? @db.Timestamp(6)
 
-//   @@map("targets")
-// }
+  TargetShift TargetShift[]
 
-model Shifts {
-  id       String    @id @default(uuid())
-  name     String    @unique @db.VarChar(50)
-  checkIn  String    @default("") @db.VarChar(10)
-  checkOut String    @default("") @db.VarChar(10)
-  isTarget Boolean   @default(false)
-  createAt DateTime  @default(now()) @db.Timestamp(6)
-  updateAt DateTime? @db.Timestamp(6)
-  Reports  Reports[]
-
-  @@map("shifts")
+  @@map("target")
 }
 
-model TimeSheets {
-  id       String    @id @default(uuid())
-  staffId  String    @db.VarChar(50)
-  checkIn  String    @db.VarChar(10)
-  checkOut String    @db.VarChar(10)
-  createAt DateTime  @default(now()) @db.Timestamp(6)
-  updateAt DateTime? @db.Timestamp(6)
-  staff    Staffs    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+model TargetShift {
+  id          String    @id @default(uuid())
+  target_id   String    @db.VarChar(50)
+  shift_id    String    @db.VarChar(50)
+  cash        Float     @default(0) @db.Real
+  transfer    Float     @default(0) @db.Real
+  deduction   Float     @default(0) @db.Real
+  revenue     Float     @default(0) @db.Real
+  description String?   @db.VarChar(200)
+  create_at   DateTime  @default(now()) @db.Timestamp(6)
+  update_at   DateTime? @db.Timestamp(6)
 
-  @@map("time_sheets")
+  shift  Shifts @relation(fields: [shift_id], references: [id], onDelete: Cascade)
+  Target Target @relation(fields: [target_id], references: [id], onDelete: Cascade)
+
+  @@map("target_shift")
+}
+
+model TargetStaff {
+  id              String    @id @default(uuid())
+  staff_id        String    @db.VarChar(50)
+  target_shift_id String    @db.VarChar(50)
+  check_in        String    @db.VarChar(10)
+  check_out       String    @db.VarChar(10)
+  working_hours   Float     @db.Real
+  create_at       DateTime  @default(now()) @db.Timestamp(6)
+  update_at       DateTime? @db.Timestamp(6)
+
+  Staff       Staffs      @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+  TargetShift TargetShift @relation(fields: [target_shift_id], references: [id], onDelete: Cascade)
+
+  @@map("target_staff")
+}
+
+model Shifts {
+  id           String        @id @default(uuid())
+  name         String        @unique @db.VarChar(50)
+  checkIn      String        @default("") @db.VarChar(10)
+  checkOut     String        @default("") @db.VarChar(10)
+  isTarget     Boolean       @default(false)
+  createAt     DateTime      @default(now()) @db.Timestamp(6)
+  updateAt     DateTime?     @db.Timestamp(6)
+  Reports      Reports[]
+  TargetShifts TargetShift[]
+
+  @@map("shifts")
 }
 
 enum Role {
