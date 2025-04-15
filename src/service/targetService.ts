@@ -203,9 +203,10 @@ export const createTarget = async ({
                                         staff.check_in,
                                         staff.check_out,
                                     ),
-                                    target:
+                                    target: Math.trunc(
                                         (shift.revenue || 0) /
-                                        shift.staffs.length,
+                                            shift.staffs.length,
+                                    ),
                                 },
                             }),
                         ),
@@ -332,9 +333,10 @@ export const updateTarget = async ({
                                                     staff.check_in,
                                                     staff.check_out,
                                                 ),
-                                            target:
+                                            target: Math.trunc(
                                                 (shift.revenue || 0) /
-                                                staffData.length,
+                                                    staffData.length,
+                                            ),
                                         },
                                     });
                                 }),
