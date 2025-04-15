@@ -141,7 +141,7 @@ export const getTargetStaffByQueryRaw = async (req: { [key: string]: any }) => {
               INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
               INNER JOIN shift s ON t_shift.shift_id = s.id
               INNER JOIN target t ON t.id = t_shift.target_id
-              WHERE ts.staff_id = $1
+              WHERE ts.staff_id = $1::uuid
               ${
                   start_date && end_date
                       ? "AND t.target_at BETWEEN $2 AND $3"
