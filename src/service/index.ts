@@ -1,4 +1,5 @@
 import { PrismaClient } from "../../dist/generated/client";
+import { v4 as uuidv4 } from "uuid";
 
 export const client = new PrismaClient({
     datasources: {
@@ -28,6 +29,26 @@ export const client = new PrismaClient({
         },
     ],
 });
+
+// const dbConnection = async () => await client.$connect();
+
+// Middleware: generate UUID in code if not provided
+const prisma = client.$extends({
+    name: "autoUUID",
+
+    query: {
+        $allModels: {
+            async create({ args, query }) {
+                if (!args.data.id) {
+                    args.data.id = uuidv4(); // generate UUID
+                }
+                return query(args);
+            },
+        },
+    },
+});
+
+export default prisma;
 
 export const dbConnection = async () => await client.$connect();
 

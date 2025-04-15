@@ -29,3 +29,17 @@ export const paginationQuery = (query: { [key: string]: any }) => {
         take: Number(query.limit || Pagination.limit),
     };
 };
+
+export const calculateWorkingHours = (
+    checkIn: string,
+    checkOut: string,
+): number => {
+    const [inH, inM] = checkIn.split(":").map(Number);
+    const [outH, outM] = checkOut.split(":").map(Number);
+
+    const inMinutes = inH * 60 + inM;
+    const outMinutes = outH * 60 + outM;
+
+    const diffMinutes = outMinutes - inMinutes;
+    return Number((diffMinutes / 60).toFixed(2)); // Convert to hours
+};

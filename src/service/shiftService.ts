@@ -1,8 +1,8 @@
 import { client } from ".";
-import { Staffs } from "../../dist/generated/client";
+import { Staff } from "../../dist/generated/client";
 
 export const getShift = async () => {
-    return await client.shifts
+    return await client.shift
         .findMany({
             orderBy: {
                 name: "asc",
@@ -21,7 +21,7 @@ export const getShift = async () => {
 };
 
 export const createShift = async (data: any) => {
-    return await client.shifts
+    return await client.shift
         .createMany({
             data,
         })
@@ -42,9 +42,9 @@ export const updateShift = async ({
     body,
 }: {
     id: string;
-    body: Staffs;
+    body: Staff;
 }) => {
-    return await client.shifts
+    return await client.shift
         .update({
             where: {
                 id,

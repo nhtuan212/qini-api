@@ -1,10 +1,9 @@
 import { client } from ".";
-import { Staffs } from "../../dist/generated/client";
-import { deleteManyReportOnStaffs } from "./reportOnStaffService";
+import { Staff } from "../../dist/generated/client";
 
 export const getStaff = async ({ id }: { id: string }) => {
     if (id) {
-        return await client.staffs
+        return await client.staff
             .findUnique({
                 where: { id },
             })
@@ -20,7 +19,7 @@ export const getStaff = async ({ id }: { id: string }) => {
             });
     }
 
-    return await client.staffs
+    return await client.staff
         .findMany({
             orderBy: {
                 name: "asc",
@@ -38,8 +37,8 @@ export const getStaff = async ({ id }: { id: string }) => {
         });
 };
 
-export const createStaff = async ({ body }: { body: Staffs }) => {
-    return await client.staffs
+export const createStaff = async ({ body }: { body: Staff }) => {
+    return await client.staff
         .create({
             data: {
                 ...body,
@@ -69,11 +68,11 @@ export const createStaff = async ({ body }: { body: Staffs }) => {
         });
 };
 
-export const editStaff = async ({ id, body }: { id: string; body: Staffs }) => {
-    return await client.staffs
+export const editStaff = async ({ id, body }: { id: string; body: Staff }) => {
+    return await client.staff
         .update({
             where: { id },
-            data: { ...body, updateAt: new Date().toISOString() },
+            data: { ...body, updated_at: new Date().toISOString() },
         })
         .then(res => {
             return {
@@ -99,13 +98,12 @@ export const editStaff = async ({ id, body }: { id: string; body: Staffs }) => {
         });
 };
 
-export const deleteStaff = async ({ body }: { body: Staffs }) => {
+export const deleteStaff = async ({ body }: { body: Staff }) => {
     const { id } = body;
 
     return await client
         .$transaction(async prisma => {
-            await deleteManyReportOnStaffs({ staffId: id });
-            return prisma.staffs.delete({
+            return prisma.staff.delete({
                 where: {
                     id,
                 },
