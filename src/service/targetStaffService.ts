@@ -147,6 +147,7 @@ export const getTargetStaffByQueryRaw = async (req: { [key: string]: any }) => {
                       ? "AND t.target_at BETWEEN $2 AND $3"
                       : ""
               }
+              ORDER BY t.target_at DESC
             `,
         ...(start_date && end_date
             ? [
