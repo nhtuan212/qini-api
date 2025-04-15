@@ -188,7 +188,7 @@ export const createTarget = async ({
                         },
                     });
 
-                    if (shift.staffs.length === 0) return;
+                    if (!shift.staffs?.length) return;
 
                     // Create target staff
                     await Promise.all(
