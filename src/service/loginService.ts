@@ -8,7 +8,7 @@ export const login = async ({
     username: string;
     password: string;
 }) => {
-    const user = await client.users.findUnique({
+    const user = await client.user.findUnique({
         where: { username },
     });
     if (!user) {

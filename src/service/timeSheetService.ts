@@ -1,5 +1,5 @@
 import { client } from ".";
-import { Users } from "../../dist/generated/client";
+import { User } from "../../dist/generated/client";
 import { hashPassword } from "../utils";
 
 export const getTimeSheet = async ({ offset, limit }: any) => {
@@ -8,7 +8,7 @@ export const getTimeSheet = async ({ offset, limit }: any) => {
         ...(limit && { take: Number(limit) }),
     };
 
-    return await client.users
+    return await client.user
         .findMany(pagination)
         .then((res: any) => {
             return res;
@@ -18,8 +18,8 @@ export const getTimeSheet = async ({ offset, limit }: any) => {
         });
 };
 
-export const createTimeSheet = async ({ body }: { body: Users }) => {
-    return await client.users
+export const createTimeSheet = async ({ body }: { body: User }) => {
+    return await client.user
         .create({
             data: {
                 ...body,

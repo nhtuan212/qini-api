@@ -4,9 +4,9 @@ import { home } from "./home";
 import { login } from "./login";
 import { user } from "./user";
 import { staff } from "./staff";
-import { report } from "./report";
-import { reportOnStaff } from "./reportOnStaff";
 import { shift } from "./shift";
+import { target } from "./target";
+import { targetStaff } from "./targetStaff";
 
 export const router = (app: Express) => {
     app.use(
@@ -29,7 +29,7 @@ export const router = (app: Express) => {
     app.use("/login", login);
     app.use("/user", user);
     app.use("/staff", staff);
-    app.use("/report", report);
-    app.use("/report-on-staff", reportOnStaff);
+    app.use("/target", target);
+    app.use("/target-staff", targetStaff);
     app.use("/shift", shift);
 };

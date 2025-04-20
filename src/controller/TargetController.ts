@@ -1,17 +1,16 @@
 import { Request, Response } from "express";
 import {
-    createReport,
-    deleteReport,
-    getReport,
-    updateReport,
-} from "../service/reportService";
+    getTarget,
+    createTarget,
+    deleteTarget,
+    updateTarget,
+} from "../service/targetService";
 
 //** [Method]/report */
-export const Report = async (req: Request, res: Response) => {
+export const Target = async (req: Request, res: Response) => {
     switch (req.method) {
-        //** GET */
         case "GET":
-            return await getReport(req).then(resData => {
+            return await getTarget(req).then(resData => {
                 // Destructure data
                 const { code, message, data, pagination } = resData;
 
@@ -23,9 +22,8 @@ export const Report = async (req: Request, res: Response) => {
                 });
             });
 
-        //** POST */
         case "POST":
-            return await createReport({
+            return await createTarget({
                 body: req.body,
             })
                 .then(resData => {
@@ -42,9 +40,8 @@ export const Report = async (req: Request, res: Response) => {
                     throw err;
                 });
 
-        //** PUT */
         case "PUT":
-            return await updateReport({
+            return await updateTarget({
                 id: req.params.id,
                 body: req.body,
             })
@@ -52,7 +49,7 @@ export const Report = async (req: Request, res: Response) => {
                     if (!resData) {
                         return res
                             .status(404)
-                            .json({ message: "Report not found!" });
+                            .json({ message: "Target not found!" });
                     }
 
                     // Destructure data
@@ -68,9 +65,8 @@ export const Report = async (req: Request, res: Response) => {
                     throw err;
                 });
 
-        //** DELETE */
         case "DELETE":
-            return await deleteReport({
+            return await deleteTarget({
                 body: req.body,
             })
                 .then(resData => {
