@@ -155,7 +155,7 @@ export const getTargetStaffByQueryRaw = async (req: { [key: string]: any }) => {
                   new Date(start_date),
                   new Date(
                       new Date(query.end_date).setDate(
-                          new Date(query.end_date).getDate() + 1,
+                          new Date(query.end_date).getDate(),
                       ),
                   ),
               ]
