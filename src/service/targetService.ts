@@ -116,10 +116,10 @@ export const getTarget = async (req: { [key: string]: any }) => {
             },
             orderBy: [
                 {
-                    created_at: "desc",
+                    target_at: "desc",
                 },
                 {
-                    target_at: "desc",
+                    created_at: "desc",
                 },
             ],
         })
