@@ -1,5 +1,5 @@
 import { client } from ".";
-import { passwordCompare } from "../utils";
+import { comparePassword } from "../utils";
 
 export const login = async ({
     username,
@@ -18,7 +18,7 @@ export const login = async ({
         };
     }
 
-    const passwordValid = await passwordCompare(password, user.password);
+    const passwordValid = await comparePassword(password, user.password);
     if (!passwordValid) {
         return {
             status: 401,

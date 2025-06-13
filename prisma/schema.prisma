@@ -28,7 +28,9 @@ model Staff {
   active       Boolean       @default(true)
   created_at   DateTime      @default(now()) @db.Timestamp(6)
   updated_at   DateTime?     @db.Timestamp(6)
+  password     String?       @db.VarChar(255)
   target_staff TargetStaff[]
+  TimeSheet    TimeSheet[]
 
   @@map("staff")
 }
@@ -94,6 +96,21 @@ model Shift {
   TargetShift TargetShift[]
 
   @@map("shift")
+}
+
+model TimeSheet {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id      String    @db.Uuid
+  check_in      String?   @db.VarChar(10)
+  check_out     String?   @db.VarChar(10)
+  working_hours Float?    @db.Real
+  date          DateTime  @db.Date
+  created_at    DateTime  @default(now()) @db.Timestamptz(0)
+  updated_at    DateTime? @updatedAt @db.Timestamptz(0)
+  staff         Staff     @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+
+  @@unique([staff_id, date])
+  @@map("time_sheet")
 }
 
 enum Role {

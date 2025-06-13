@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import {
     createStaff,
     deleteStaff,
-    editStaff,
+    updateStaff,
     getStaff,
+    validateStaffPassword,
 } from "../service/staffService";
 
 //** [GET]/user */
@@ -29,6 +30,21 @@ export const Staff = async (req: Request, res: Response) => {
 
         //** POST */
         case "POST":
+            if (req.path.includes("/validate-password")) {
+                return await validateStaffPassword({
+                    id: req.params.id,
+                    password: req.body.password,
+                }).then(resData => {
+                    const { code, message, data } = resData;
+
+                    return res.status(code).json({
+                        code,
+                        message,
+                        data,
+                    });
+                });
+            }
+
             return createStaff({
                 body: req.body,
             })
@@ -48,7 +64,7 @@ export const Staff = async (req: Request, res: Response) => {
 
         //** PUT */
         case "PUT":
-            return editStaff({
+            return updateStaff({
                 id: req.params.id,
                 body: req.body,
             })

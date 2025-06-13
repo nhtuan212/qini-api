@@ -3,5 +3,8 @@ import { TimeSheet } from "../controller/TimeSheetController";
 
 const router = express.Router();
 
-export const user = router.get("/", TimeSheet);
+export const timeSheet = router.get("/", TimeSheet);
 router.post("/", TimeSheet);
+router.get("/:id", TimeSheet);
+router.put("/:id", TimeSheet);
+router.delete("/", TimeSheet);

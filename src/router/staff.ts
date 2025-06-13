@@ -5,6 +5,7 @@ const router = express.Router();
 
 export const staff = router.get("/", Staff);
 router.post("/", Staff);
+router.post("/:id/validate-password", Staff);
 router.get("/:id", Staff);
 router.put("/:id", Staff);
 router.delete("/", Staff);

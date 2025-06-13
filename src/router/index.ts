@@ -7,6 +7,7 @@ import { staff } from "./staff";
 import { shift } from "./shift";
 import { target } from "./target";
 import { targetStaff } from "./targetStaff";
+import { timeSheet } from "./timeSheet";
 
 export const router = (app: Express) => {
     app.use(
@@ -32,4 +33,5 @@ export const router = (app: Express) => {
     app.use("/target", target);
     app.use("/target-staff", targetStaff);
     app.use("/shift", shift);
+    app.use("/time-sheet", timeSheet);
 };

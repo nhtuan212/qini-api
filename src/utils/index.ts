@@ -1,18 +1,17 @@
-import bcrypt from "bcrypt";
-import { Pagination } from "./constants";
+import bcrypt from "bcryptjs";
+import { Pagination } from "../constants";
 
-// Hash Password
-export const hashPassword = async (password: string | Buffer) => {
-    return await bcrypt
-        .hash(password, Number(process.env.SALT_ROUNDS))
-        .then(res => res);
+export const hashPassword = async (
+    password: string,
+    saltRounds: number = 10,
+): Promise<string> => {
+    return await bcrypt.hash(password, saltRounds);
 };
 
-// Password Compare
-export const passwordCompare = async (
-    password: string | Buffer,
+export const comparePassword = async (
+    password: string,
     hash: string,
-) => {
+): Promise<boolean> => {
     return await bcrypt.compare(password, hash);
 };
 
@@ -43,3 +42,6 @@ export const calculateWorkingHours = (
     const diffMinutes = outMinutes - inMinutes;
     return Number((diffMinutes / 60).toFixed(2)); // Convert to hours
 };
+
+// Crypto
+export { generateRSAKeyPair, decryptPassword } from "./crypto";
