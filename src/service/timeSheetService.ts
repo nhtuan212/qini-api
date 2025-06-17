@@ -1,55 +1,70 @@
 import { client } from ".";
 import { TimeSheet } from "../../dist/generated/client";
+import { isValidISODate } from "../utils";
 
-export const getTimeSheet = async ({
-    id,
-    offset,
-    limit,
-}: {
-    id?: string;
-    offset?: any;
-    limit?: any;
-}) => {
-    if (id) {
-        return await client.timeSheet
-            .findUnique({
-                where: { id },
-                include: {
-                    staff: true,
-                },
-            })
-            .then((res: any) => {
+const formatTimeSheetResponse = (res: any, type: "many" | "one") => {
+    switch (type) {
+        case "many": {
+            return res.map((item: any) => {
+                const { staff, shift, ...rest } = item;
                 return {
-                    code: 200,
-                    message: "Get TimeSheet successfully!",
-                    data: res,
+                    ...rest,
+                    staff_name: staff?.name,
+                    shift_name: shift?.name,
                 };
-            })
-            .catch((err: any) => {
-                throw err;
             });
+        }
+        case "one": {
+            const { staff, shift, ...rest } = res;
+            return {
+                ...rest,
+                staff_name: staff?.name,
+                shift_name: shift?.name,
+            };
+        }
+        default:
+            return [];
     }
+};
 
-    const pagination = {
-        ...(offset && { skip: Number(offset) }),
-        ...(limit && { take: Number(limit) }),
+export const getTimeSheet = async (req: { [key: string]: any }) => {
+    const { query, params } = req;
+    const { id } = params;
+    const { staff_id, shift_id, date } = query;
+
+    const whereClause = {
+        ...(Object.keys(params).length > 0 && {
+            ...(id && { id }),
+        }),
+
+        ...(Object.keys(query).length > 0 && {
+            ...(staff_id && { staff_id }),
+            ...(shift_id && { shift_id }),
+            ...(date && isValidISODate(date) && { date: new Date(date) }),
+        }),
     };
 
-    return await client.timeSheet
+    return client.timeSheet
         .findMany({
-            ...pagination,
+            where: { ...whereClause },
             include: {
                 staff: true,
+                shift: true,
             },
             orderBy: {
-                date: "desc",
+                created_at: "asc",
             },
         })
-        .then((res: any) => {
+        .then(res => {
             return {
                 code: 200,
                 message: "Get TimeSheets successfully!",
-                data: res,
+                data: formatTimeSheetResponse(res, "many"),
+                pagination: {
+                    total: res.length,
+                    page: Number(query.page) || 1,
+                    limit: Number(query.limit) || 10,
+                },
             };
         })
         .catch((err: any) => {
@@ -66,13 +81,14 @@ export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
             },
             include: {
                 staff: true,
+                shift: true,
             },
         })
         .then(res => {
             return {
                 code: 200,
                 message: "Create TimeSheet success!",
-                data: res,
+                data: formatTimeSheetResponse(res, "one"),
             };
         })
         .catch(err => {
@@ -80,7 +96,7 @@ export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
                 return {
                     code: 400,
                     message:
-                        "Create failed because time_sheet for this staff and date already exists!",
+                        "Create failed because time_sheet for this shift already exists!",
                     data: [],
                 };
             }
@@ -162,13 +178,14 @@ export const updateTimeSheet = async ({
             data,
             include: {
                 staff: true,
+                shift: true,
             },
         })
         .then(res => {
             return {
                 code: 200,
                 message: "Update time_sheet successfully!",
-                data: res,
+                data: formatTimeSheetResponse(res, "one"),
             };
         })
         .catch(err => {

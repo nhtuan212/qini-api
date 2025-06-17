@@ -11,19 +11,16 @@ export const TimeSheet = async (req: Request, res: Response) => {
     switch (req.method) {
         //** GET */
         case "GET":
-            return await getTimeSheet({
-                id: req?.params?.id,
-                offset: req?.query?.offset,
-                limit: req?.query?.limit,
-            })
+            return await getTimeSheet(req)
                 .then(resData => {
                     // Destructure data
-                    const { code, message, data } = resData;
+                    const { code, message, data, pagination } = resData;
 
                     return res.status(code).json({
                         code,
                         message,
                         data,
+                        pagination,
                     });
                 })
                 .catch(err => {

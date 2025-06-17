@@ -94,6 +94,7 @@ model Shift {
   created_at  DateTime      @default(now()) @db.Timestamp(6)
   updated_at  DateTime?     @db.Timestamp(6)
   TargetShift TargetShift[]
+  TimeSheet   TimeSheet[]
 
   @@map("shift")
 }
@@ -101,6 +102,7 @@ model Shift {
 model TimeSheet {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   staff_id      String    @db.Uuid
+  shift_id      String?   @db.Uuid
   check_in      String?   @db.VarChar(10)
   check_out     String?   @db.VarChar(10)
   working_hours Float?    @db.Real
@@ -108,8 +110,8 @@ model TimeSheet {
   created_at    DateTime  @default(now()) @db.Timestamptz(0)
   updated_at    DateTime? @updatedAt @db.Timestamptz(0)
   staff         Staff     @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+  shift         Shift?    @relation(fields: [shift_id], references: [id], onDelete: Cascade)
 
-  @@unique([staff_id, date])
   @@map("time_sheet")
 }
 
