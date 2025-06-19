@@ -1,7 +1,68 @@
 import { client } from ".";
-import { Target, TargetStaff } from "../../dist/generated/client";
+import {
+    Prisma,
+    Target,
+    TargetShift,
+    TargetStaff,
+} from "../../dist/generated/client";
 import { Pagination } from "../constants";
 import { calculateWorkingHours, isDateValid, paginationQuery } from "../utils";
+
+//** Variables */
+const targetShiftSelect = {
+    select: {
+        shift_id: true,
+        revenue: true,
+        cash: true,
+        transfer: true,
+        deduction: true,
+        description: true,
+
+        shift: {
+            select: {
+                name: true,
+            },
+        },
+
+        target_staff: {
+            select: {
+                staff_id: true,
+                check_in: true,
+                check_out: true,
+                working_hours: true,
+                target: true,
+                staff: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        },
+    },
+    orderBy: [
+        {
+            shift: {
+                is_target: Prisma.SortOrder.desc,
+            },
+        },
+        {
+            shift: {
+                check_in: Prisma.SortOrder.asc,
+            },
+        },
+    ],
+};
+
+const targetSelect = {
+    id: true,
+    name: true,
+    revenue: true,
+    cash: true,
+    transfer: true,
+    deduction: true,
+    target_at: true,
+    target_shift: targetShiftSelect,
+};
 
 //** Get targets */
 export const getTarget = async (req: { [key: string]: any }) => {
@@ -36,44 +97,7 @@ export const getTarget = async (req: { [key: string]: any }) => {
                 where: {
                     id,
                 },
-                select: {
-                    id: true,
-                    name: true,
-                    target_at: true,
-
-                    target_shift: {
-                        select: {
-                            shift_id: true,
-                            revenue: true,
-                            cash: true,
-                            transfer: true,
-                            deduction: true,
-                            description: true,
-
-                            shift: {
-                                select: {
-                                    name: true,
-                                },
-                            },
-
-                            target_staff: {
-                                select: {
-                                    staff_id: true,
-                                    check_in: true,
-                                    check_out: true,
-                                    working_hours: true,
-                                    target: true,
-
-                                    staff: {
-                                        select: {
-                                            name: true,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
+                select: targetSelect,
             })
             .then(async res => {
                 const newData = {
@@ -113,6 +137,26 @@ export const getTarget = async (req: { [key: string]: any }) => {
             ...paginationQuery(query),
             where: {
                 ...targetWhereClause,
+            },
+            include: {
+                target_shift: {
+                    select: {
+                        shift_id: true,
+                        revenue: true,
+                        cash: true,
+                        transfer: true,
+                        deduction: true,
+                        description: true,
+                        target_staff: {
+                            select: {
+                                staff_id: true,
+                                check_in: true,
+                                check_out: true,
+                                working_hours: true,
+                            },
+                        },
+                    },
+                },
             },
             orderBy: [
                 {
@@ -154,68 +198,93 @@ export const createTarget = async ({
     body,
 }: {
     body: Target & {
-        shifts: { [key: string]: any }[];
+        target_shift: {
+            [key: string]: any;
+        };
     };
 }) => {
     return await client
-        .$transaction(async tx => {
-            const targetTotal = calcTargetTotal(body.shifts);
+        .$transaction(
+            async tx => {
+                const targetTotal = calcTargetTotal(body.target_shift);
 
-            //** Create target */
-            const target = await tx.target.create({
-                data: {
-                    name: body.name,
-                    target_at: new Date(body.target_at),
-                    revenue: targetTotal.revenue,
-                    cash: targetTotal.cash,
-                    transfer: targetTotal.transfer,
-                    deduction: targetTotal.deduction,
-                },
-            });
+                //** Create target */
+                const target = await tx.target.create({
+                    data: {
+                        name: body.name,
+                        target_at: new Date(body.target_at),
+                        revenue: targetTotal.revenue,
+                        cash: targetTotal.cash,
+                        transfer: targetTotal.transfer,
+                        deduction: targetTotal.deduction,
+                    },
+                });
 
-            await Promise.all(
-                Object.entries(body.shifts).map(async ([shift_id, shift]) => {
-                    // Create target shift
-                    const newTargetShift = await tx.targetShift.create({
-                        data: {
-                            target_id: target.id,
-                            shift_id,
-                            revenue: shift.revenue,
-                            cash: shift.cash,
-                            transfer: shift.transfer,
-                            deduction: shift.deduction,
-                            description: shift.description ?? "",
-                        },
-                    });
-
-                    if (!shift.staffs?.length) return;
-
-                    // Create target staff
-                    await Promise.all(
-                        shift.staffs.map((staff: TargetStaff) =>
-                            tx.targetStaff.create({
+                //** Create target shift */
+                await Promise.all(
+                    body.target_shift.map(
+                        async (
+                            shift: TargetShift & {
+                                [key: string]: any;
+                            },
+                        ) => {
+                            const target_shift = await tx.targetShift.create({
                                 data: {
-                                    target_shift_id: newTargetShift.id,
-                                    staff_id: staff.staff_id,
-                                    check_in: staff.check_in,
-                                    check_out: staff.check_out,
-                                    working_hours: calculateWorkingHours(
-                                        staff.check_in,
-                                        staff.check_out,
-                                    ),
-                                    target: Math.trunc(
-                                        (shift.revenue || 0) /
-                                            shift.staffs.length,
-                                    ),
+                                    target_id: target.id,
+                                    shift_id: shift.shift_id,
+                                    revenue: shift.revenue,
+                                    cash: shift.cash,
+                                    transfer: shift.transfer,
+                                    deduction: shift.deduction,
+                                    description: shift.description ?? "",
                                 },
-                            }),
-                        ),
-                    );
-                }),
-            );
+                            });
 
-            return target;
-        })
+                            //** Create target_staff */
+                            await Promise.all(
+                                shift.target_staff.map(
+                                    async (staff: TargetStaff) => {
+                                        await tx.targetStaff.create({
+                                            data: {
+                                                target_shift_id:
+                                                    target_shift.id,
+                                                staff_id: staff.staff_id,
+                                                check_in: staff.check_in,
+                                                check_out: staff.check_out,
+                                                working_hours:
+                                                    calculateWorkingHours(
+                                                        staff.check_in,
+                                                        staff.check_out,
+                                                    ),
+                                                target: Math.trunc(
+                                                    (shift.revenue || 0) /
+                                                        shift.target_staff
+                                                            .length,
+                                                ),
+                                            },
+                                        });
+                                    },
+                                ),
+                            );
+                        },
+                    ),
+                );
+
+                //** Get current target */
+                const currentTarget = await tx.target.findUnique({
+                    where: {
+                        id: target.id,
+                    },
+                    select: targetSelect,
+                });
+
+                return currentTarget;
+            },
+            {
+                maxWait: 5000,
+                timeout: 10000,
+            },
+        )
         .then(res => {
             return {
                 code: 200,
@@ -246,15 +315,8 @@ export const updateTarget = async ({
 }: {
     id: string;
     body: Target & {
-        shifts: {
-            [key: string]: {
-                revenue: number;
-                cash: number;
-                transfer: number;
-                deduction: number;
-                description?: string;
-                staffs?: any[];
-            };
+        target_shift: {
+            [key: string]: any;
         };
     };
 }) => {
@@ -274,14 +336,16 @@ export const updateTarget = async ({
 
                 if (!currentTarget) throw new Error("Target not found");
 
-                const targetTotal = calcTargetTotal(body.shifts);
+                const targetTotal = calcTargetTotal(body.target_shift);
+
                 const shiftChanged = hasShiftChanged(
                     currentTarget,
-                    body.shifts,
+                    body.target_shift,
                 );
 
                 const target = await tx.target.update({
                     where: { id },
+                    select: targetSelect,
                     data: {
                         name: body.name,
                         target_at: new Date(body.target_at),
@@ -294,56 +358,67 @@ export const updateTarget = async ({
 
                 if (!shiftChanged) return target;
 
+                //** Delete target shift */
                 await tx.targetShift.deleteMany({
                     where: { target_id: id },
                 });
 
-                await Promise.all(
-                    Object.entries(body.shifts).map(
-                        async ([shift_id, shift]) => {
-                            // Create target shift
-                            const newTargetShift = await tx.targetShift.create({
-                                data: {
-                                    target_id: id,
-                                    shift_id,
-                                    revenue: shift.revenue,
-                                    cash: shift.cash,
-                                    transfer: shift.transfer,
-                                    deduction: shift.deduction,
-                                    description: shift.description ?? "",
-                                },
-                            });
-
-                            const staffData = (shift.staffs || []).filter(
-                                s => s.staff_id,
-                            );
-                            if (staffData.length === 0) return;
-
-                            // Create target staff
-                            await Promise.all(
-                                staffData.map(staff => {
-                                    return tx.targetStaff.create({
-                                        data: {
-                                            target_shift_id: newTargetShift.id,
-                                            staff_id: staff.staff_id,
-                                            check_in: staff.check_in,
-                                            check_out: staff.check_out,
-                                            working_hours:
-                                                calculateWorkingHours(
-                                                    staff.check_in,
-                                                    staff.check_out,
-                                                ),
-                                            target: Math.trunc(
-                                                (shift.revenue || 0) /
-                                                    staffData.length,
-                                            ),
-                                        },
-                                    });
-                                }),
-                            );
-                        },
-                    ),
+                //** Create target shift */
+                const targetShifts = body.target_shift.map(
+                    (target_shift: TargetShift) => ({
+                        target_id: id,
+                        shift_id: target_shift.shift_id,
+                        revenue: target_shift.revenue,
+                        cash: target_shift.cash,
+                        transfer: target_shift.transfer,
+                        deduction: target_shift.deduction,
+                        description: target_shift.description,
+                    }),
                 );
+
+                await tx.targetShift.createMany({
+                    data: targetShifts,
+                });
+
+                //** Create target staff */
+                const createdShifts = await tx.targetShift.findMany({
+                    where: { target_id: id },
+                    select: { id: true, shift_id: true },
+                });
+
+                const targetStaffs = body.target_shift.flatMap(
+                    (target_shift: any) => {
+                        const targetShift = createdShifts.find(
+                            ts => ts.shift_id === target_shift.shift_id,
+                        );
+                        if (!targetShift) return [];
+
+                        const staffData = (
+                            target_shift.target_staff || []
+                        ).filter((s: TargetStaff) => s.staff_id);
+                        if (staffData.length === 0) return [];
+
+                        return staffData.map((target_staff: TargetStaff) => ({
+                            target_shift_id: targetShift.id,
+                            staff_id: target_staff.staff_id,
+                            check_in: target_staff.check_in,
+                            check_out: target_staff.check_out,
+                            working_hours: calculateWorkingHours(
+                                target_staff.check_in,
+                                target_staff.check_out,
+                            ),
+                            target: Math.trunc(
+                                (target_shift.revenue || 0) / staffData.length,
+                            ),
+                        }));
+                    },
+                );
+
+                if (targetStaffs.length > 0) {
+                    await tx.targetStaff.createMany({
+                        data: targetStaffs,
+                    });
+                }
 
                 return target;
             },
@@ -401,7 +476,8 @@ export const deleteTarget = async ({ body }: { body: Target }) => {
         });
 };
 
-function calcTargetTotal(shifts: Record<string, any>) {
+//** Calculate target total */
+const calcTargetTotal = (shifts: Record<string, any>) => {
     return Object.values(shifts).reduce(
         (acc, s) => ({
             revenue: acc.revenue + (s.revenue || 0),
@@ -411,9 +487,10 @@ function calcTargetTotal(shifts: Record<string, any>) {
         }),
         { revenue: 0, cash: 0, transfer: 0, deduction: 0 },
     );
-}
+};
 
-function hasShiftChanged(existing: any, newShifts: Record<string, any>) {
+//** Check if shift changed */
+const hasShiftChanged = (existing: any, newShifts: Record<string, any>) => {
     const oldShifts = existing.target_shift;
 
     if (oldShifts.length !== Object.keys(newShifts).length) return true;
@@ -439,13 +516,14 @@ function hasShiftChanged(existing: any, newShifts: Record<string, any>) {
 
         return basicChanged || staffChanged;
     });
-}
+};
 
-function isStaffChanged(
+//** Check if staff changed */
+const isStaffChanged = (
     oldStaffs: any[],
     newStaffs: any[],
     revenue: number,
-): boolean {
+): boolean => {
     if (oldStaffs.length !== newStaffs.length) return true;
 
     return newStaffs.some(newStaff => {
@@ -466,4 +544,4 @@ function isStaffChanged(
 
         return !match;
     });
-}
+};
