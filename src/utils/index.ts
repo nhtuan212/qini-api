@@ -64,5 +64,15 @@ export const getDefaultTargetAt = () => {
     }
 };
 
+export const dateFilterQuery = (start_date?: string, end_date?: string) => {
+    if (start_date && end_date) {
+        return { gte: new Date(start_date), lte: new Date(end_date) };
+    }
+    if (start_date) {
+        return { gte: new Date(start_date) };
+    }
+    return undefined;
+};
+
 // Crypto
 export { generateRSAKeyPair, decryptPassword } from "./crypto";

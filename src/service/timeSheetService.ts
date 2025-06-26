@@ -1,7 +1,6 @@
 import { client } from ".";
 import { TimeSheet } from "../../dist/generated/client";
-import { getStaff } from "./staffService";
-import { getDefaultTargetAt, isValidISODate } from "../utils";
+import { getDefaultTargetAt } from "../utils";
 
 const formatTimeSheetResponse = (res: any, type: "many" | "one") => {
     switch (type) {
@@ -29,35 +28,71 @@ const formatTimeSheetResponse = (res: any, type: "many" | "one") => {
 };
 
 export const getTimeSheet = async (req: { [key: string]: any }) => {
-    const { query, params } = req;
-    const { id } = params;
-    const { staff_id, shift_id, date } = query;
+    const { query } = req;
+    const { staff_id, shift_id, start_date, end_date } = query;
 
-    const whereClause = {
-        ...(Object.keys(params).length > 0 && {
-            ...(id && { id }),
-        }),
+    const where: string[] = [];
+    const params: any[] = [];
 
-        ...(Object.keys(query).length > 0 && {
-            ...(staff_id && { staff_id }),
-            ...(shift_id && { shift_id }),
-            ...(date &&
-                isValidISODate(date) && {
-                    date: {
-                        gte: new Date(date),
-                        lte: new Date(
-                            new Date(date).setDate(
-                                new Date(date).getDate() + 1,
-                            ),
-                        ),
-                    },
-                }),
-        }),
-    };
+    if (staff_id) {
+        where.push(`ts.staff_id = $${params.length + 1}::uuid`);
+        params.push(staff_id);
+    }
+    if (shift_id) {
+        where.push(`s.id = $${params.length + 1}::uuid`);
+        params.push(shift_id);
+    }
+    if (start_date && end_date) {
+        where.push(
+            `ts.date BETWEEN $${params.length + 1}::date AND $${
+                params.length + 2
+            }::date`,
+        );
+        params.push(start_date, end_date);
+    } else if (start_date) {
+        where.push(`ts.date >= $${params.length + 1}::date`);
+        params.push(start_date);
+    }
+
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
+
+    const sql = `
+        SELECT
+            ts.id, ts.staff_id, ts.shift_id, ts.target_shift_id, ts.check_in, ts.check_out, ts.working_hours, ts.date,
+            st.name AS staff_name,
+            s.name AS shift_name,
+            t_shift.revenue / tsc.cnt AS target
+        FROM time_sheet ts
+        INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
+        INNER JOIN shift s ON t_shift.shift_id = s.id
+        INNER JOIN staff st ON ts.staff_id = st.id
+        INNER JOIN (
+            SELECT target_shift_id, COUNT(*) AS cnt
+            FROM time_sheet
+            GROUP BY target_shift_id
+        ) tsc ON tsc.target_shift_id = ts.target_shift_id
+        ${whereClause}
+        ORDER BY ts.date desc;
+    `;
+
+    const sumWorkingHoursQuery = `
+        SELECT COALESCE(SUM(ts.working_hours), 0) AS total_working_hours
+        FROM time_sheet ts
+        INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
+        INNER JOIN shift s ON t_shift.shift_id = s.id
+        INNER JOIN staff st ON ts.staff_id = st.id
+        ${whereClause};
+    `;
+
+    const [result, sumResult] = await Promise.all([
+        client.$queryRawUnsafe(sql, ...params),
+        client.$queryRawUnsafe(sumWorkingHoursQuery, ...params),
+    ]);
+
+    const total_working_hours = (sumResult as any)[0]?.total_working_hours || 0;
 
     return client.timeSheet
         .findMany({
-            where: { ...whereClause },
             include: {
                 staff: true,
                 shift: true,
@@ -70,7 +105,8 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
             return {
                 code: 200,
                 message: "Get TimeSheets successfully!",
-                data: formatTimeSheetResponse(res, "many"),
+                data: result,
+                total_working_hours,
                 pagination: {
                     total: res.length,
                     page: Number(query.page) || 1,
@@ -82,6 +118,47 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
             throw err;
         });
 };
+
+// export const getTimeSheet = async (req: { [key: string]: any }) => {
+//     const { query, params } = req;
+//     const { id } = params;
+//     const { staff_id, shift_id, start_date, end_date } = query;
+//     const dateFilter = dateFilterQuery(start_date, end_date);
+
+//     const whereClause = {
+//         ...(id && { id }),
+//         ...(staff_id && { staff_id }),
+//         ...(shift_id && { shift_id }),
+//         ...(dateFilter && { date: dateFilter }),
+//     };
+
+//     return client.timeSheet
+//         .findMany({
+//             where: whereClause,
+//             include: {
+//                 staff: true,
+//                 shift: true,
+//             },
+//             orderBy: {
+//                 created_at: "desc",
+//             },
+//         })
+//         .then(res => {
+//             return {
+//                 code: 200,
+//                 message: "Get TimeSheets successfully!",
+//                 data: formatTimeSheetResponse(res, "many"),
+//                 pagination: {
+//                     total: res.length,
+//                     page: Number(query.page) || 1,
+//                     limit: Number(query.limit) || 10,
+//                 },
+//             };
+//         })
+//         .catch((err: any) => {
+//             throw err;
+//         });
+// };
 
 export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
     return await client.timeSheet
@@ -187,159 +264,4 @@ export const deleteTimeSheet = async (id: string) => {
                 data: [],
             };
         });
-};
-
-type StaffTargetResult = {
-    staff_id: string;
-    staff_name: string;
-    time_sheet_id: string | null;
-    check_in: string | null;
-    check_out: string | null;
-    working_hours: number | null;
-    target: number | null;
-    target_shift_id: string | null;
-    shift_id: string | null;
-    shift_name: string | null;
-    date: Date | null;
-    target_id: string | null;
-};
-
-export const getTimeSheetReport = async (req: { [key: string]: any }) => {
-    const { query } = req;
-    const { staff_id } = query;
-
-    return await client
-        .$transaction(async prisma => {
-            const staff = await getStaff({ id: staff_id });
-            const timeSheet = await prisma.timeSheet.findMany({
-                orderBy: {
-                    created_at: "desc",
-                },
-                where: {
-                    staff_id: staff_id,
-                },
-                select: {
-                    id: true,
-                    check_in: true,
-                    check_out: true,
-                    working_hours: true,
-
-                    staff: {
-                        select: {
-                            id: true,
-                            name: true,
-                        },
-                    },
-                },
-            });
-
-            const totalWorkingHours = timeSheet.reduce(
-                (sum, item) => sum + (item.working_hours || 0),
-                0,
-            );
-
-            const totalTarget = 0;
-            // const totalTarget = timeSheet.reduce(
-            //     (sum, item) => sum + (item.target || 0),
-            //     0,
-            // );
-
-            return {
-                code: 200,
-                message: "Get target staff successfully!",
-                data: {
-                    id: staff?.data?.id || query.staff_id,
-                    name: staff?.data?.name || "",
-                    totalWorkingHours,
-                    totalTarget,
-                    shifts: timeSheet.map((item: any) => {
-                        return {
-                            ...item,
-                            shift_name: item.target_shift.shift.name,
-                            date: item.target_shift.target.date,
-                            target_shift: undefined,
-                            staff: undefined,
-                        };
-                    }),
-                },
-            };
-        })
-        .catch(err => {
-            return {
-                code: 404,
-                message: err.message,
-                data: [],
-            };
-        });
-};
-
-export const getTimeSheetReportByQueryRaw = async (req: {
-    [key: string]: any;
-}) => {
-    const { query } = req;
-    const { staff_id, start_date, end_date } = query;
-
-    const staff = await getStaff({ id: staff_id });
-    const result = await client.$queryRawUnsafe<StaffTargetResult[]>(
-        `
-              SELECT
-                  ts.id AS time_sheet_id,
-                  ts.check_in,
-                  ts.check_out,
-                  ts.working_hours,
-                  ts.target,
-                  t_shift.id AS target_shift_id,
-                  s.id AS shift_id,
-                  s.name AS shift_name,
-                  t.date,
-                  t.id AS target_id
-              FROM time_sheet ts
-              INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
-              INNER JOIN shift s ON t_shift.shift_id = s.id
-              INNER JOIN target t ON t.id = t_shift.target_id
-              WHERE ts.staff_id = $1::uuid
-              ${start_date && end_date ? "AND t.date BETWEEN $2 AND $3" : ""}
-              ORDER BY t.date DESC
-            `,
-        ...(start_date && end_date
-            ? [
-                  staff_id,
-                  new Date(start_date),
-                  new Date(
-                      new Date(query.end_date).setDate(
-                          new Date(query.end_date).getDate(),
-                      ),
-                  ),
-              ]
-            : [staff_id]),
-    );
-
-    const totalWorkingHours = result.reduce(
-        (sum, item) => sum + (item.working_hours || 0),
-        0,
-    );
-    const totalTarget = result.reduce(
-        (sum, item) => sum + (item.target || 0),
-        0,
-    );
-
-    return {
-        code: 200,
-        message: "Get staff id successfully!",
-        data: {
-            staff_id: staff?.data?.id || staff_id,
-            staff_name: staff?.data?.name || "",
-            totalWorkingHours,
-            totalTarget,
-            shifts: result.map(r => ({
-                target_shift_id: r.target_shift_id,
-                check_in: r.check_in,
-                check_out: r.check_out,
-                working_hours: r.working_hours,
-                target: r.target,
-                shift_name: r.shift_name,
-                date: r.date,
-            })),
-        },
-    };
 };

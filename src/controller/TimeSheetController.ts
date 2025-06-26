@@ -14,12 +14,19 @@ export const TimeSheet = async (req: Request, res: Response) => {
             return await getTimeSheet(req)
                 .then(resData => {
                     // Destructure data
-                    const { code, message, data, pagination } = resData;
+                    const {
+                        code,
+                        message,
+                        data,
+                        pagination,
+                        total_working_hours,
+                    } = resData;
 
                     return res.status(code).json({
                         code,
                         message,
                         data,
+                        total_working_hours,
                         pagination,
                     });
                 })
