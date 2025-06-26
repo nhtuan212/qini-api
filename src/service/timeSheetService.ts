@@ -161,6 +161,32 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
 // };
 
 export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
+    if (Array.isArray(body)) {
+        return client.timeSheet
+            .createManyAndReturn({
+                data: body.map(item => ({
+                    ...item,
+                    working_hours: item.working_hours || 0,
+                    date: item.date || getDefaultTargetAt(),
+                })),
+                include: {
+                    staff: true,
+                    shift: true,
+                },
+                skipDuplicates: true, // Optional: skip duplicates
+            })
+            .then(res => ({
+                code: 200,
+                message: "Create TimeSheets success!",
+                data: formatTimeSheetResponse(res, "many"),
+            }))
+            .catch(err => ({
+                code: 400,
+                message: err.message,
+                data: [],
+            }));
+    }
+
     return await client.timeSheet
         .create({
             data: {

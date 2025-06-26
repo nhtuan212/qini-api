@@ -80,19 +80,19 @@ model TargetShift {
 }
 
 model TimeSheet {
-  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  staff_id        String       @db.Uuid
-  shift_id        String       @db.Uuid
-  target_shift_id String       @db.Uuid
-  check_in        String       @default("") @db.VarChar(10)
-  check_out       String       @default("") @db.VarChar(10)
-  working_hours   Float        @default(0) @db.Real
-  date            DateTime?    @db.Date
-  created_at      DateTime     @default(now()) @db.Timestamptz(0)
-  updated_at      DateTime?    @db.Timestamptz(0)
-  staff           Staff        @relation(fields: [staff_id], references: [id], onDelete: Cascade)
-  shift           Shift        @relation(fields: [shift_id], references: [id], onDelete: Cascade)
-  TargetShift     TargetShift? @relation(fields: [target_shift_id], references: [id], onDelete: Cascade)
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id        String      @db.Uuid
+  shift_id        String      @db.Uuid
+  target_shift_id String      @db.Uuid
+  check_in        String      @default("") @db.VarChar(10)
+  check_out       String      @default("") @db.VarChar(10)
+  working_hours   Float       @default(0) @db.Real
+  date            DateTime?   @db.Date
+  created_at      DateTime    @default(now()) @db.Timestamptz(0)
+  updated_at      DateTime?   @db.Timestamptz(0)
+  staff           Staff       @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+  shift           Shift       @relation(fields: [shift_id], references: [id], onDelete: Cascade)
+  TargetShift     TargetShift @relation(fields: [target_shift_id], references: [id], onDelete: Cascade)
 
   @@map("time_sheet")
 }
