@@ -35,7 +35,6 @@ const targetShiftSelect = {
                 check_in: true,
                 check_out: true,
                 working_hours: true,
-                target: true,
                 staff: {
                     select: {
                         name: true,

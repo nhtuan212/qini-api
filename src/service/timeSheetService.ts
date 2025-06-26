@@ -31,7 +31,7 @@ const formatTimeSheetResponse = (res: any, type: "many" | "one") => {
 export const getTimeSheet = async (req: { [key: string]: any }) => {
     const { query, params } = req;
     const { id } = params;
-    const { staff_id, shift_id, target_at } = query;
+    const { staff_id, shift_id, date } = query;
 
     const whereClause = {
         ...(Object.keys(params).length > 0 && {
@@ -41,13 +41,13 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
         ...(Object.keys(query).length > 0 && {
             ...(staff_id && { staff_id }),
             ...(shift_id && { shift_id }),
-            ...(target_at &&
-                isValidISODate(target_at) && {
-                    target_at: {
-                        gte: new Date(target_at),
+            ...(date &&
+                isValidISODate(date) && {
+                    date: {
+                        gte: new Date(date),
                         lte: new Date(
-                            new Date(target_at).setDate(
-                                new Date(target_at).getDate() + 1,
+                            new Date(date).setDate(
+                                new Date(date).getDate() + 1,
                             ),
                         ),
                     },
@@ -89,7 +89,7 @@ export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
             data: {
                 ...body,
                 working_hours: 0,
-                created_at: getDefaultTargetAt(),
+                date: getDefaultTargetAt(),
             },
             include: {
                 staff: true,
@@ -200,7 +200,7 @@ type StaffTargetResult = {
     target_shift_id: string | null;
     shift_id: string | null;
     shift_name: string | null;
-    target_at: Date | null;
+    date: Date | null;
     target_id: string | null;
 };
 
@@ -256,7 +256,7 @@ export const getTimeSheetReport = async (req: { [key: string]: any }) => {
                         return {
                             ...item,
                             shift_name: item.target_shift.shift.name,
-                            target_at: item.target_shift.target.target_at,
+                            date: item.target_shift.target.date,
                             target_shift: undefined,
                             staff: undefined,
                         };
@@ -291,19 +291,15 @@ export const getTimeSheetReportByQueryRaw = async (req: {
                   t_shift.id AS target_shift_id,
                   s.id AS shift_id,
                   s.name AS shift_name,
-                  t.target_at,
+                  t.date,
                   t.id AS target_id
               FROM time_sheet ts
               INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
               INNER JOIN shift s ON t_shift.shift_id = s.id
               INNER JOIN target t ON t.id = t_shift.target_id
               WHERE ts.staff_id = $1::uuid
-              ${
-                  start_date && end_date
-                      ? "AND t.target_at BETWEEN $2 AND $3"
-                      : ""
-              }
-              ORDER BY t.target_at DESC
+              ${start_date && end_date ? "AND t.date BETWEEN $2 AND $3" : ""}
+              ORDER BY t.date DESC
             `,
         ...(start_date && end_date
             ? [
@@ -342,7 +338,7 @@ export const getTimeSheetReportByQueryRaw = async (req: {
                 working_hours: r.working_hours,
                 target: r.target,
                 shift_name: r.shift_name,
-                target_at: r.target_at,
+                date: r.date,
             })),
         },
     };
