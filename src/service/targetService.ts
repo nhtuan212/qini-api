@@ -1,16 +1,18 @@
 import { client } from ".";
 import {
     Prisma,
+    Shift,
     Target,
     TargetShift,
-    TargetStaff,
+    TimeSheet,
 } from "../../dist/generated/client";
+import { isEmpty, isValidISODate } from "../utils";
 import { Pagination } from "../constants";
-import { calculateWorkingHours, isDateValid, paginationQuery } from "../utils";
 
 //** Variables */
 const targetShiftSelect = {
     select: {
+        id: true,
         shift_id: true,
         revenue: true,
         cash: true,
@@ -21,11 +23,14 @@ const targetShiftSelect = {
         shift: {
             select: {
                 name: true,
+                start_time: true,
+                end_time: true,
             },
         },
 
-        target_staff: {
+        time_sheet: {
             select: {
+                id: true,
                 staff_id: true,
                 check_in: true,
                 check_out: true,
@@ -47,7 +52,7 @@ const targetShiftSelect = {
         },
         {
             shift: {
-                check_in: Prisma.SortOrder.asc,
+                start_time: Prisma.SortOrder.asc,
             },
         },
     ],
@@ -56,12 +61,71 @@ const targetShiftSelect = {
 const targetSelect = {
     id: true,
     name: true,
-    revenue: true,
-    cash: true,
-    transfer: true,
-    deduction: true,
     target_at: true,
     target_shift: targetShiftSelect,
+};
+
+const formatTargetResponse = (res: any, groupBy?: any) => {
+    interface TargetShiftProps {
+        shift: Shift;
+        time_sheet: TimeSheet[];
+    }
+
+    if (Array.isArray(res)) {
+        return res.map((target: any) => {
+            const { target_shift, ...rest } = target;
+            const targetSum = groupBy.find(
+                (group: any) => group.target_id === target.id,
+            );
+
+            return {
+                ...rest,
+                revenue: targetSum?._sum.revenue || 0,
+                cash: targetSum?._sum.cash || 0,
+                transfer: targetSum?._sum.transfer || 0,
+                deduction: targetSum?._sum.deduction || 0,
+                target_shift: target_shift.map(
+                    (target_shift: TargetShiftProps) => {
+                        const { shift, time_sheet, ...rest } = target_shift;
+                        return {
+                            ...rest,
+                            shift_name: shift.name,
+                            start_time: shift.start_time,
+                            end_time: shift.end_time,
+                            time_sheet: time_sheet.map((time_sheet: any) => {
+                                const { staff, ...rest } = time_sheet;
+                                return {
+                                    ...rest,
+                                    staff_name: staff.name,
+                                };
+                            }),
+                        };
+                    },
+                ),
+            };
+        });
+    }
+
+    const { target_shift, ...rest } = res;
+
+    return {
+        ...rest,
+        target_shift: target_shift.map((target_shift: TargetShiftProps) => {
+            const { shift, time_sheet, ...rest } = target_shift;
+            return {
+                ...rest,
+                ...groupBy,
+                shift_name: shift.name,
+                time_sheet: time_sheet.map((time_sheet: any) => {
+                    const { staff, ...rest } = time_sheet;
+                    return {
+                        ...rest,
+                        staff_name: staff.name,
+                    };
+                }),
+            };
+        }),
+    };
 };
 
 //** Get targets */
@@ -75,9 +139,21 @@ export const getTarget = async (req: { [key: string]: any }) => {
         }),
 
         ...(Object.keys(query).length > 0 && {
+            ...(query.target_at &&
+                isValidISODate(query.target_at) && {
+                    target_at: {
+                        gte: new Date(query.target_at),
+                        lte: new Date(
+                            new Date(query.target_at).setDate(
+                                new Date(query.target_at).getDate() + 1,
+                            ),
+                        ),
+                    },
+                }),
+
             // Check if startDate and endDate are valid date
-            ...(isDateValid(query.start_date) &&
-                isDateValid(query.end_date) && {
+            ...(isValidISODate(query.start_date) &&
+                isValidISODate(query.end_date) && {
                     target_at: {
                         gte: new Date(query.start_date),
                         lte: new Date(
@@ -90,107 +166,80 @@ export const getTarget = async (req: { [key: string]: any }) => {
         }),
     };
 
-    if (targetWhereClause.id) {
-        //** Use Prisma client to get target */
-        return await client.target
-            .findUnique({
-                where: {
-                    id,
-                },
-                select: targetSelect,
-            })
-            .then(async res => {
-                const newData = {
-                    ...res,
-                    target_shift: res?.target_shift.map((shift: any) => ({
-                        ...shift,
-                        shift: undefined,
-                        target_name: shift.shift.name,
+    if (id) {
+        const target = await client.target.findUnique({
+            where: { id },
+            select: targetSelect,
+        });
 
-                        target_staff: shift.target_staff.map((staff: any) => ({
-                            ...staff,
-                            staff: undefined,
-                            staff_name: staff.staff.name,
-                        })),
-                    })),
-                };
+        const groupBy = await client.targetShift.groupBy({
+            by: ["target_id"],
+            where: { target_id: id },
+            _sum: {
+                revenue: true,
+                cash: true,
+                transfer: true,
+                deduction: true,
+            },
+        });
 
+        return Promise.all([target, groupBy]).then(
+            async ([target, groupBy]) => {
                 return {
                     code: 200,
                     message: "Get target successfully!",
-                    data: newData,
+                    data: formatTargetResponse(target, groupBy),
                     pagination: {
-                        page: Number(query.page || 1),
-                        rowsPerPage: Number(query.limit || Pagination.limit),
-                        total: await client.target.count({
-                            where: {
-                                ...targetWhereClause,
-                            },
-                        }),
+                        page: 1,
+                        rowsPerPage: 1,
+                        total: target ? 1 : 0,
                     },
                 };
-            });
+            },
+        );
     }
 
-    return await client.target
-        .findMany({
-            ...paginationQuery(query),
-            where: {
-                ...targetWhereClause,
+    const targets = await client.target.findMany({
+        select: targetSelect,
+        where: targetWhereClause,
+        orderBy: [
+            {
+                target_at: "desc",
             },
-            include: {
-                target_shift: {
-                    select: {
-                        shift_id: true,
-                        revenue: true,
-                        cash: true,
-                        transfer: true,
-                        deduction: true,
-                        description: true,
-                        target_staff: {
-                            select: {
-                                staff_id: true,
-                                check_in: true,
-                                check_out: true,
-                                working_hours: true,
-                            },
-                        },
-                    },
-                },
+            {
+                created_at: "desc",
             },
-            orderBy: [
-                {
-                    target_at: "desc",
-                },
-                {
-                    created_at: "desc",
-                },
-            ],
-        })
-        .then(async res => {
+        ],
+    });
+
+    const total = await client.target.count({
+        where: targetWhereClause,
+    });
+
+    const groupBy = await client.targetShift.groupBy({
+        by: ["target_id"],
+        _sum: {
+            revenue: true,
+            cash: true,
+            transfer: true,
+            deduction: true,
+        },
+    });
+
+    return Promise.all([targets, total, groupBy]).then(
+        async ([targets, total, groupBy]) => {
             return {
                 code: 200,
                 message: "Get target successfully!",
-                data: res,
+                data: formatTargetResponse(targets, groupBy),
                 pagination: {
                     page: Number(query.page || 1),
                     rowsPerPage: Number(query.limit || Pagination.limit),
-                    total: await client.target.count({
-                        where: {
-                            ...targetWhereClause,
-                        },
-                    }),
+                    total,
                 },
             };
-        })
-        .catch(err => {
-            return {
-                code: 404,
-                message: err.message,
-                data: [],
-                pagination: {},
-            };
-        });
+        },
+    );
 };
 
 //** Create target */
@@ -198,98 +247,74 @@ export const createTarget = async ({
     body,
 }: {
     body: Target & {
-        target_shift: {
+        target_shift?: {
             [key: string]: any;
         };
     };
 }) => {
-    return await client
-        .$transaction(
-            async tx => {
-                const targetTotal = calcTargetTotal(body.target_shift);
+    const shifts =
+        body.target_shift && !isEmpty(body.target_shift)
+            ? body.target_shift
+            : await client.shift.findMany();
 
-                //** Create target */
-                const target = await tx.target.create({
-                    data: {
-                        name: body.name,
-                        target_at: new Date(body.target_at),
-                        revenue: targetTotal.revenue,
-                        cash: targetTotal.cash,
-                        transfer: targetTotal.transfer,
-                        deduction: targetTotal.deduction,
-                    },
-                });
+    const target = await client.target.create({
+        data: {
+            name: body.name,
+            target_at: new Date(body.target_at),
+        },
+    });
 
-                //** Create target shift */
-                await Promise.all(
-                    body.target_shift.map(
-                        async (
-                            shift: TargetShift & {
-                                [key: string]: any;
-                            },
-                        ) => {
-                            const target_shift = await tx.targetShift.create({
-                                data: {
-                                    target_id: target.id,
-                                    shift_id: shift.shift_id,
-                                    revenue: shift.revenue,
-                                    cash: shift.cash,
-                                    transfer: shift.transfer,
-                                    deduction: shift.deduction,
-                                    description: shift.description ?? "",
-                                },
-                            });
+    //** Create target shifts */
+    const target_shift = await client.targetShift.createManyAndReturn({
+        data: shifts.map((shift: TargetShift) => ({
+            target_id: target.id,
+            shift_id: shift.id,
+        })),
+    });
 
-                            //** Create target_staff */
-                            await Promise.all(
-                                shift.target_staff.map(
-                                    async (staff: TargetStaff) => {
-                                        await tx.targetStaff.create({
-                                            data: {
-                                                target_shift_id:
-                                                    target_shift.id,
-                                                staff_id: staff.staff_id,
-                                                check_in: staff.check_in,
-                                                check_out: staff.check_out,
-                                                working_hours:
-                                                    calculateWorkingHours(
-                                                        staff.check_in,
-                                                        staff.check_out,
-                                                    ),
-                                                target: Math.trunc(
-                                                    (shift.revenue || 0) /
-                                                        shift.target_staff
-                                                            .length,
-                                                ),
-                                            },
-                                        });
-                                    },
-                                ),
-                            );
-                        },
+    //** Create time sheets */
+    const time_sheet = shifts.flatMap(
+        (shift: TargetShift & { time_sheet: TimeSheet[] }) => {
+            if (shift.time_sheet && !isEmpty(shift.time_sheet)) {
+                return shift.time_sheet.map((time_sheet: TimeSheet) => ({
+                    target_shift_id: target_shift.find(
+                        (ts: TargetShift) => ts.shift_id === shift.id,
+                    )?.id,
+                    staff_id: time_sheet.staff_id,
+                    check_in: time_sheet.check_in,
+                    check_out: time_sheet.check_out,
+                    working_hours: time_sheet.working_hours,
+                    target: Math.trunc(
+                        (shift.revenue || 0) / shift.time_sheet.length,
                     ),
-                );
+                    target_at: new Date(body.target_at),
+                }));
+            }
+            return [];
+        },
+    );
 
-                //** Get current target */
-                const currentTarget = await tx.target.findUnique({
-                    where: {
-                        id: target.id,
-                    },
-                    select: targetSelect,
-                });
+    if (!isEmpty(time_sheet)) {
+        await client.timeSheet.createManyAndReturn({
+            data: time_sheet,
+        });
+    }
 
-                return currentTarget;
-            },
-            {
-                maxWait: 5000,
-                timeout: 10000,
-            },
-        )
-        .then(res => {
+    return Promise.all([target, target_shift, time_sheet])
+        .then(() => {
             return {
                 code: 200,
                 message: "Add target successfully!",
-                data: res,
+                data: {
+                    ...target,
+                    target_shift: target_shift.map((ts: TargetShift) => ({
+                        ...ts,
+                        // time_sheet: time_sheet.filter(
+                        //     (time_sheet: TimeSheet) =>
+                        //         time_sheet.target_shift_id === ts.id,
+                        // ),
+                    })),
+                },
             };
         })
         .catch(err => {
@@ -314,138 +339,22 @@ export const updateTarget = async ({
     body,
 }: {
     id: string;
-    body: Target & {
-        target_shift: {
-            [key: string]: any;
-        };
-    };
+    body: Target;
 }) => {
-    return await client
-        .$transaction(
-            async tx => {
-                const currentTarget = await tx.target.findUnique({
-                    where: { id },
-                    include: {
-                        target_shift: {
-                            include: {
-                                target_staff: true,
-                            },
-                        },
-                    },
-                });
-
-                if (!currentTarget) throw new Error("Target not found");
-
-                const targetTotal = calcTargetTotal(body.target_shift);
-
-                const shiftChanged = hasShiftChanged(
-                    currentTarget,
-                    body.target_shift,
-                );
-
-                const target = await tx.target.update({
-                    where: { id },
-                    select: targetSelect,
-                    data: {
-                        name: body.name,
-                        target_at: new Date(body.target_at),
-                        revenue: targetTotal.revenue,
-                        cash: targetTotal.cash,
-                        transfer: targetTotal.transfer,
-                        deduction: targetTotal.deduction,
-                    },
-                });
-
-                if (!shiftChanged) return target;
-
-                //** Delete target shift */
-                await tx.targetShift.deleteMany({
-                    where: { target_id: id },
-                });
-
-                //** Create target shift */
-                const targetShifts = body.target_shift.map(
-                    (target_shift: TargetShift) => ({
-                        target_id: id,
-                        shift_id: target_shift.shift_id,
-                        revenue: target_shift.revenue,
-                        cash: target_shift.cash,
-                        transfer: target_shift.transfer,
-                        deduction: target_shift.deduction,
-                        description: target_shift.description,
-                    }),
-                );
-
-                await tx.targetShift.createMany({
-                    data: targetShifts,
-                });
-
-                //** Create target staff */
-                const createdShifts = await tx.targetShift.findMany({
-                    where: { target_id: id },
-                    select: { id: true, shift_id: true },
-                });
-
-                const targetStaffs = body.target_shift.flatMap(
-                    (target_shift: any) => {
-                        const targetShift = createdShifts.find(
-                            ts => ts.shift_id === target_shift.shift_id,
-                        );
-                        if (!targetShift) return [];
-
-                        const staffData = (
-                            target_shift.target_staff || []
-                        ).filter((s: TargetStaff) => s.staff_id);
-                        if (staffData.length === 0) return [];
-
-                        return staffData.map((target_staff: TargetStaff) => ({
-                            target_shift_id: targetShift.id,
-                            staff_id: target_staff.staff_id,
-                            check_in: target_staff.check_in,
-                            check_out: target_staff.check_out,
-                            working_hours: calculateWorkingHours(
-                                target_staff.check_in,
-                                target_staff.check_out,
-                            ),
-                            target: Math.trunc(
-                                (target_shift.revenue || 0) / staffData.length,
-                            ),
-                        }));
-                    },
-                );
-
-                if (targetStaffs.length > 0) {
-                    await tx.targetStaff.createMany({
-                        data: targetStaffs,
-                    });
-                }
-
-                return target;
+    return await client.target
+        .update({
+            select: targetSelect,
+            where: { id },
+            data: {
+                name: body.name,
+                target_at: new Date(body.target_at),
             },
-            {
-                maxWait: 5000,
-                timeout: 10000,
-            },
-        )
+        })
         .then(res => {
             return {
                 code: 200,
                 message: "Update target successfully!",
-                data: res,
-            };
-        })
-        .catch(err => {
-            if (err.code === "P2002") {
-                return {
-                    code: 400,
-                    message: `Update failed because "${err?.meta?.target}" already exists!`,
-                    data: [],
-                };
-            }
-            return {
-                code: 404,
-                message: err.message,
-                data: [],
+                data: formatTargetResponse(res),
             };
         });
 };
@@ -474,74 +383,4 @@ export const deleteTarget = async ({ body }: { body: Target }) => {
                 data: [],
             };
         });
-};
-
-//** Calculate target total */
-const calcTargetTotal = (shifts: Record<string, any>) => {
-    return Object.values(shifts).reduce(
-        (acc, s) => ({
-            revenue: acc.revenue + (s.revenue || 0),
-            cash: acc.cash + (s.cash || 0),
-            transfer: acc.transfer + (s.transfer || 0),
-            deduction: acc.deduction + (s.deduction || 0),
-        }),
-        { revenue: 0, cash: 0, transfer: 0, deduction: 0 },
-    );
-};
-
-//** Check if shift changed */
-const hasShiftChanged = (existing: any, newShifts: Record<string, any>) => {
-    const oldShifts = existing.target_shift;
-
-    if (oldShifts.length !== Object.keys(newShifts).length) return true;
-
-    return Object.entries(newShifts).some(([shift_id, newShift]) => {
-        const old = oldShifts.find(
-            (s: { shift_id: string }) => s.shift_id === shift_id,
-        );
-        if (!old) return true;
-
-        const basicChanged =
-            old.revenue !== newShift.revenue ||
-            old.cash !== newShift.cash ||
-            old.transfer !== newShift.transfer ||
-            old.deduction !== newShift.deduction ||
-            (old.description || "") !== (newShift.description || "");
-
-        const staffChanged = isStaffChanged(
-            old.target_staff ?? [],
-            newShift.staffs ?? [],
-            newShift.revenue,
-        );
-
-        return basicChanged || staffChanged;
-    });
-};
-
-//** Check if staff changed */
-const isStaffChanged = (
-    oldStaffs: any[],
-    newStaffs: any[],
-    revenue: number,
-): boolean => {
-    if (oldStaffs.length !== newStaffs.length) return true;
-
-    return newStaffs.some(newStaff => {
-        const working_hours = calculateWorkingHours(
-            newStaff.check_in,
-            newStaff.check_out,
-        );
-        const target = revenue / newStaffs.length;
-
-        const match = oldStaffs.find(
-            s =>
-                s.staff_id === newStaff.staff_id &&
-                s.check_in === newStaff.check_in &&
-                s.check_out === newStaff.check_out &&
-                s.working_hours === working_hours &&
-                s.target === target,
-        );
-
-        return !match;
-    });
 };

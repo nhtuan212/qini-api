@@ -1,6 +1,7 @@
 import { client } from ".";
 import { TimeSheet } from "../../dist/generated/client";
-import { calculateWorkingHours, isValidISODate } from "../utils";
+import { getStaff } from "./staffService";
+import { getDefaultTargetAt, isValidISODate } from "../utils";
 
 const formatTimeSheetResponse = (res: any, type: "many" | "one") => {
     switch (type) {
@@ -30,7 +31,7 @@ const formatTimeSheetResponse = (res: any, type: "many" | "one") => {
 export const getTimeSheet = async (req: { [key: string]: any }) => {
     const { query, params } = req;
     const { id } = params;
-    const { staff_id, shift_id, date } = query;
+    const { staff_id, shift_id, target_at } = query;
 
     const whereClause = {
         ...(Object.keys(params).length > 0 && {
@@ -40,7 +41,17 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
         ...(Object.keys(query).length > 0 && {
             ...(staff_id && { staff_id }),
             ...(shift_id && { shift_id }),
-            ...(date && isValidISODate(date) && { date: new Date(date) }),
+            ...(target_at &&
+                isValidISODate(target_at) && {
+                    target_at: {
+                        gte: new Date(target_at),
+                        lte: new Date(
+                            new Date(target_at).setDate(
+                                new Date(target_at).getDate() + 1,
+                            ),
+                        ),
+                    },
+                }),
         }),
     };
 
@@ -52,7 +63,7 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
                 shift: true,
             },
             orderBy: {
-                created_at: "asc",
+                created_at: "desc",
             },
         })
         .then(res => {
@@ -78,6 +89,7 @@ export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
             data: {
                 ...body,
                 working_hours: 0,
+                created_at: getDefaultTargetAt(),
             },
             include: {
                 staff: true,
@@ -116,33 +128,12 @@ export const updateTimeSheet = async ({
     id: string;
     body: TimeSheet;
 }) => {
-    // Fetch existing record to get check_in if not provided
-    const existingRecord = await client.timeSheet.findUnique({
-        where: { id },
-        select: { check_in: true, check_out: true },
-    });
-
-    if (!existingRecord) {
-        return {
-            code: 404,
-            message: "TimeSheet not found!",
-            data: [],
-        };
-    }
-
-    // Use existing check_in if not provided in body
-    const check_in = body.check_in || existingRecord.check_in;
-    const check_out = body.check_out || existingRecord.check_out;
-
-    const data = {
-        ...body,
-        working_hours: calculateWorkingHours(check_in, check_out),
-    };
-
     return await client.timeSheet
         .update({
-            where: { id },
-            data,
+            where: {
+                id,
+            },
+            data: body,
             include: {
                 staff: true,
                 shift: true,
@@ -173,9 +164,7 @@ export const updateTimeSheet = async ({
         });
 };
 
-export const deleteTimeSheet = async ({ body }: { body: TimeSheet }) => {
-    const { id } = body;
-
+export const deleteTimeSheet = async (id: string) => {
     return await client
         .$transaction(async prisma => {
             return prisma.timeSheet.delete({
@@ -198,4 +187,163 @@ export const deleteTimeSheet = async ({ body }: { body: TimeSheet }) => {
                 data: [],
             };
         });
+};
+
+type StaffTargetResult = {
+    staff_id: string;
+    staff_name: string;
+    time_sheet_id: string | null;
+    check_in: string | null;
+    check_out: string | null;
+    working_hours: number | null;
+    target: number | null;
+    target_shift_id: string | null;
+    shift_id: string | null;
+    shift_name: string | null;
+    target_at: Date | null;
+    target_id: string | null;
+};
+
+export const getTimeSheetReport = async (req: { [key: string]: any }) => {
+    const { query } = req;
+    const { staff_id } = query;
+
+    return await client
+        .$transaction(async prisma => {
+            const staff = await getStaff({ id: staff_id });
+            const timeSheet = await prisma.timeSheet.findMany({
+                orderBy: {
+                    created_at: "desc",
+                },
+                where: {
+                    staff_id: staff_id,
+                },
+                select: {
+                    id: true,
+                    check_in: true,
+                    check_out: true,
+                    working_hours: true,
+
+                    staff: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
+            });
+
+            const totalWorkingHours = timeSheet.reduce(
+                (sum, item) => sum + (item.working_hours || 0),
+                0,
+            );
+
+            const totalTarget = 0;
+            // const totalTarget = timeSheet.reduce(
+            //     (sum, item) => sum + (item.target || 0),
+            //     0,
+            // );
+
+            return {
+                code: 200,
+                message: "Get target staff successfully!",
+                data: {
+                    id: staff?.data?.id || query.staff_id,
+                    name: staff?.data?.name || "",
+                    totalWorkingHours,
+                    totalTarget,
+                    shifts: timeSheet.map((item: any) => {
+                        return {
+                            ...item,
+                            shift_name: item.target_shift.shift.name,
+                            target_at: item.target_shift.target.target_at,
+                            target_shift: undefined,
+                            staff: undefined,
+                        };
+                    }),
+                },
+            };
+        })
+        .catch(err => {
+            return {
+                code: 404,
+                message: err.message,
+                data: [],
+            };
+        });
+};
+
+export const getTimeSheetReportByQueryRaw = async (req: {
+    [key: string]: any;
+}) => {
+    const { query } = req;
+    const { staff_id, start_date, end_date } = query;
+
+    const staff = await getStaff({ id: staff_id });
+    const result = await client.$queryRawUnsafe<StaffTargetResult[]>(
+        `
+              SELECT
+                  ts.id AS time_sheet_id,
+                  ts.check_in,
+                  ts.check_out,
+                  ts.working_hours,
+                  ts.target,
+                  t_shift.id AS target_shift_id,
+                  s.id AS shift_id,
+                  s.name AS shift_name,
+                  t.target_at,
+                  t.id AS target_id
+              FROM time_sheet ts
+              INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
+              INNER JOIN shift s ON t_shift.shift_id = s.id
+              INNER JOIN target t ON t.id = t_shift.target_id
+              WHERE ts.staff_id = $1::uuid
+              ${
+                  start_date && end_date
+                      ? "AND t.target_at BETWEEN $2 AND $3"
+                      : ""
+              }
+              ORDER BY t.target_at DESC
+            `,
+        ...(start_date && end_date
+            ? [
+                  staff_id,
+                  new Date(start_date),
+                  new Date(
+                      new Date(query.end_date).setDate(
+                          new Date(query.end_date).getDate(),
+                      ),
+                  ),
+              ]
+            : [staff_id]),
+    );
+
+    const totalWorkingHours = result.reduce(
+        (sum, item) => sum + (item.working_hours || 0),
+        0,
+    );
+    const totalTarget = result.reduce(
+        (sum, item) => sum + (item.target || 0),
+        0,
+    );
+
+    return {
+        code: 200,
+        message: "Get staff id successfully!",
+        data: {
+            staff_id: staff?.data?.id || staff_id,
+            staff_name: staff?.data?.name || "",
+            totalWorkingHours,
+            totalTarget,
+            shifts: result.map(r => ({
+                target_shift_id: r.target_shift_id,
+                check_in: r.check_in,
+                check_out: r.check_out,
+                working_hours: r.working_hours,
+                target: r.target,
+                shift_name: r.shift_name,
+                target_at: r.target_at,
+            })),
+        },
+    };
 };

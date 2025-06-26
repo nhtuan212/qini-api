@@ -68,9 +68,7 @@ export const TimeSheet = async (req: Request, res: Response) => {
 
         //** DELETE */
         case "DELETE":
-            return deleteTimeSheet({
-                body: req.body,
-            })
+            return deleteTimeSheet(req.params.id)
                 .then(resData => {
                     // Destructure data
                     const { code, message, data } = resData;
