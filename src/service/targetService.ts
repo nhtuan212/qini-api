@@ -157,7 +157,7 @@ export const getTarget = async (req: { [key: string]: any }) => {
                         gte: new Date(query.start_date),
                         lte: new Date(
                             new Date(query.end_date).setDate(
-                                new Date(query.end_date).getDate(),
+                                new Date(query.end_date).getDate() + 1,
                             ),
                         ),
                     },
