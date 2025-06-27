@@ -6,7 +6,7 @@ import {
     TargetShift,
     TimeSheet,
 } from "../../dist/generated/client";
-import { isEmpty, isValidISODate } from "../utils";
+import { isEmpty, isValidISODate, paginationQuery } from "../utils";
 import { Pagination } from "../constants";
 
 //** Variables */
@@ -201,6 +201,7 @@ export const getTarget = async (req: { [key: string]: any }) => {
     const targets = await client.target.findMany({
         select: targetSelect,
         where: targetWhereClause,
+        ...paginationQuery(query),
         orderBy: [
             {
                 target_at: "desc",
