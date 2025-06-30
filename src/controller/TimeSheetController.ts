@@ -19,6 +19,7 @@ export const TimeSheet = async (req: Request, res: Response) => {
                         message,
                         data,
                         pagination,
+                        total_target,
                         total_working_hours,
                     } = resData;
 
@@ -28,6 +29,7 @@ export const TimeSheet = async (req: Request, res: Response) => {
                         data,
                         total_working_hours,
                         pagination,
+                        total_target,
                     });
                 })
                 .catch(err => {

@@ -61,7 +61,7 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
             ts.id, ts.staff_id, ts.shift_id, ts.target_shift_id, ts.check_in, ts.check_out, ts.working_hours, ts.date,
             st.name AS staff_name,
             s.name AS shift_name,
-            t_shift.revenue / tsc.cnt AS target
+            FLOOR(t_shift.revenue / tsc.cnt) AS target
         FROM time_sheet ts
         INNER JOIN target_shift t_shift ON ts.target_shift_id = t_shift.id
         INNER JOIN shift s ON t_shift.shift_id = s.id
@@ -89,6 +89,9 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
         client.$queryRawUnsafe(sumWorkingHoursQuery, ...params),
     ]);
 
+    const total_target = (result as any).reduce((sum: number, row: any) => {
+        return sum + (row.target || 0);
+    }, 0);
     const total_working_hours = (sumResult as any)[0]?.total_working_hours || 0;
 
     return client.timeSheet
@@ -107,6 +110,7 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
                 message: "Get TimeSheets successfully!",
                 data: result,
                 total_working_hours,
+                total_target,
                 pagination: {
                     total: res.length,
                     page: Number(query.page) || 1,
