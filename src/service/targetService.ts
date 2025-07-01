@@ -309,10 +309,7 @@ export const createTarget = async ({
                     ...target,
                     target_shift: target_shift.map((ts: TargetShift) => ({
                         ...ts,
-                        // time_sheet: time_sheet.filter(
-                        //     (time_sheet: TimeSheet) =>
-                        //         time_sheet.target_shift_id === ts.id,
-                        // ),
+                        time_sheet: [],
                     })),
                 },
             };
