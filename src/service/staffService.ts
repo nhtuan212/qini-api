@@ -7,7 +7,13 @@ export const getStaff = async ({ id }: { id: string }) => {
         return await client.staff
             .findUnique({
                 where: { id },
-                select: { id: true, name: true, is_target: true, active: true },
+                select: {
+                    id: true,
+                    name: true,
+                    is_target: true,
+                    is_first_login: true,
+                    active: true,
+                },
             })
             .then((res: any) => {
                 return {
@@ -26,7 +32,13 @@ export const getStaff = async ({ id }: { id: string }) => {
             orderBy: {
                 name: "asc",
             },
-            select: { id: true, name: true, is_target: true, active: true },
+            select: {
+                id: true,
+                name: true,
+                is_target: true,
+                is_first_login: true,
+                active: true,
+            },
         })
         .then((res: any) => {
             return {
