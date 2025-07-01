@@ -36,6 +36,8 @@ services:
             - app-network
         # depends_on:
         #     - postgres
+        volumes:
+            - /etc/apps/rsa-private-key.pem:/apps/rsa-private-key.pem
 
 networks:
     app-network:

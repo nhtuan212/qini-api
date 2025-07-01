@@ -1,4 +1,6 @@
-export const RSA_PRIVATE_KEY = process.env.RSA_PRIVATE_KEY || "";
+import { readFileSync } from "fs";
+
+export const RSA_PRIVATE_KEY = readFileSync("./rsa-private-key.pem", "utf8");
 
 export const Pagination = {
     skip: 0,
