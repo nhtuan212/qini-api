@@ -123,47 +123,6 @@ export const getTimeSheet = async (req: { [key: string]: any }) => {
         });
 };
 
-// export const getTimeSheet = async (req: { [key: string]: any }) => {
-//     const { query, params } = req;
-//     const { id } = params;
-//     const { staff_id, shift_id, start_date, end_date } = query;
-//     const dateFilter = dateFilterQuery(start_date, end_date);
-
-//     const whereClause = {
-//         ...(id && { id }),
-//         ...(staff_id && { staff_id }),
-//         ...(shift_id && { shift_id }),
-//         ...(dateFilter && { date: dateFilter }),
-//     };
-
-//     return client.timeSheet
-//         .findMany({
-//             where: whereClause,
-//             include: {
-//                 staff: true,
-//                 shift: true,
-//             },
-//             orderBy: {
-//                 created_at: "desc",
-//             },
-//         })
-//         .then(res => {
-//             return {
-//                 code: 200,
-//                 message: "Get TimeSheets successfully!",
-//                 data: formatTimeSheetResponse(res, "many"),
-//                 pagination: {
-//                     total: res.length,
-//                     page: Number(query.page) || 1,
-//                     limit: Number(query.limit) || 10,
-//                 },
-//             };
-//         })
-//         .catch((err: any) => {
-//             throw err;
-//         });
-// };
-
 export const createTimeSheet = async ({ body }: { body: TimeSheet }) => {
     if (Array.isArray(body)) {
         return client.timeSheet
