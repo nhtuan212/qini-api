@@ -16,7 +16,7 @@ model User {
   email      String?   @unique @db.VarChar(50)
   active     Boolean   @default(true)
   created_at DateTime  @default(now()) @db.Timestamp(6)
-  role       Role      @default(USER)
+  role       Role      @default(REPORT)
   updated_at DateTime? @db.Timestamp(6)
 
   @@map("user")
@@ -101,7 +101,7 @@ model TimeSheet {
 }
 
 enum Role {
-  USER
   ADMIN
   REPORT
+  MANAGER
 }
