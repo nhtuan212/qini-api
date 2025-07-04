@@ -10,8 +10,8 @@ const port = process.env.PORT || 8000;
 
 router(app);
 
-cron.schedule("0 5 * * *", async () => {
-    //** Create target at 5:00 AM every day */
+cron.schedule("0 7 * * *", async () => {
+    //** Create target at 7:00 AM every day */
     await createTarget({
         body: {
             name: "Doanh số",
