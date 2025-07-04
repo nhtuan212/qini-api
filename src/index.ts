@@ -15,7 +15,9 @@ cron.schedule("0 7 * * *", async () => {
     await createTarget({
         body: {
             name: "Doanh số",
-            target_at: new Date(),
+            target_at: new Date().toLocaleString("en-US", {
+                timeZone: "Asia/Ho_Chi_Minh",
+            }),
         } as any,
     });
 });
