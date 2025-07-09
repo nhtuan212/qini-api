@@ -10,6 +10,7 @@ export const getStaff = async ({ id }: { id: string }) => {
                 select: {
                     id: true,
                     name: true,
+                    salary: true,
                     is_target: true,
                     is_first_login: true,
                     active: true,
@@ -35,6 +36,7 @@ export const getStaff = async ({ id }: { id: string }) => {
             select: {
                 id: true,
                 name: true,
+                salary: true,
                 is_target: true,
                 is_first_login: true,
                 active: true,

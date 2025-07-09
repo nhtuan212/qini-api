@@ -121,9 +121,19 @@ export const updateTargetShift = async ({
     id: string;
     body: TargetShift;
 }) => {
+    const { revenue, cash, transfer, deduction } = body;
+
+    const data = {
+        ...body,
+        revenue: revenue ? Number(body.revenue) : 0,
+        cash: cash ? Number(body.cash) : 0,
+        transfer: transfer ? Number(body.transfer) : 0,
+        deduction: deduction ? Number(body.deduction) : 0,
+    };
+
     const updateTargetShift = await client.targetShift.update({
         where: { id },
-        data: body,
+        data,
     });
 
     return Promise.all([updateTargetShift]).then(

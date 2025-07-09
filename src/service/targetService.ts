@@ -22,6 +22,7 @@ const targetShiftSelect = {
 
         shift: {
             select: {
+                kiot_id: true,
                 name: true,
                 start_time: true,
                 end_time: true,
@@ -88,6 +89,7 @@ const formatTargetResponse = (res: any, groupBy?: any) => {
                         const { shift, time_sheet, ...rest } = target_shift;
                         return {
                             ...rest,
+                            kiot_id: shift.kiot_id,
                             shift_name: shift.name,
                             start_time: shift.start_time,
                             end_time: shift.end_time,

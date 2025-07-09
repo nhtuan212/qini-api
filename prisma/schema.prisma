@@ -39,6 +39,7 @@ model Staff {
 
 model Shift {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  kiot_id     String?       @db.VarChar(50)
   name        String        @unique @db.VarChar(50)
   start_time  String        @default("") @db.VarChar(10)
   end_time    String        @default("") @db.VarChar(10)
@@ -69,6 +70,7 @@ model TargetShift {
   shift_id    String      @db.Uuid
   cash        Float       @default(0) @db.Real
   transfer    Float       @default(0) @db.Real
+  point       Float       @default(0) @db.Real
   deduction   Float       @default(0) @db.Real
   revenue     Float       @default(0) @db.Real
   description String?     @default("") @db.VarChar(200)
