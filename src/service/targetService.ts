@@ -17,6 +17,7 @@ const targetShiftSelect = {
         revenue: true,
         cash: true,
         transfer: true,
+        point: true,
         deduction: true,
         description: true,
 
