@@ -1,13 +1,12 @@
 import { PrismaClient } from "../../dist/generated/client";
 import { v4 as uuidv4 } from "uuid";
 
+console.log(process.env.NODE_ENV);
+
 export const client = new PrismaClient({
     datasources: {
         db: {
-            url:
-                process.env.NODE_ENV === "production"
-                    ? process.env.DATABASE_URL
-                    : process.env.PRODUCTION_DATABASE_URL,
+            url: process.env.PRODUCTION_DATABASE_URL,
         },
     },
     log: [
