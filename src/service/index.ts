@@ -1,8 +1,6 @@
 import { PrismaClient } from "../../dist/generated/client";
 import { v4 as uuidv4 } from "uuid";
 
-console.log(process.env.NODE_ENV);
-
 export const client = new PrismaClient({
     datasources: {
         db: {
