@@ -15,11 +15,5 @@ services:
         environment:
             - NODE_ENV=production
         command: node dist/index.js
-        networks:
-            - db_default
         volumes:
             - /etc/apps/rsa-private-key.pem:/apps/rsa-private-key.pem
-
-networks:
-    db_default:
-        driver: bridge
