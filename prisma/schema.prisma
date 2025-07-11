@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:bie8PC3illF1KhP28TgPH0vQevqOGn9GexgjC5Cwj3I75s0ZgG@45.251.114.243:5432/qini_db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
