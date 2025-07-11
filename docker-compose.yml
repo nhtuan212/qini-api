@@ -16,10 +16,10 @@ services:
             - NODE_ENV=production
         command: node dist/index.js
         networks:
-            - db_default
+            - postgres_qini
         volumes:
             - /etc/apps/rsa-private-key.pem:/apps/rsa-private-key.pem
 
 networks:
-    db_default:
+    postgres_qini:
         driver: bridge
