@@ -12,26 +12,8 @@ const port = process.env.PORT || 8000;
 router(app);
 
 cron.schedule(
-    "0 10 * * *",
+    "0 5 * * *",
     async () => {
-        console.log("Create target at 10:00 AM every day");
-        //** Create target at 5:00 AM every day */
-        await createTarget({
-            body: {
-                name: "Doanh số",
-                target_at: formatDate(new Date()),
-            } as any,
-        });
-    },
-    {
-        timezone: "Asia/Ho_Chi_Minh",
-    },
-);
-
-cron.schedule(
-    "0 8 * * *",
-    async () => {
-        console.log("Create target at 8:00 AM every day");
         //** Create target at 5:00 AM every day */
         await createTarget({
             body: {

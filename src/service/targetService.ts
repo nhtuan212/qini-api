@@ -255,8 +255,6 @@ export const createTarget = async ({
         };
     };
 }) => {
-    console.log("create target =>", body);
-
     const shifts =
         body.target_shift && !isEmpty(body.target_shift)
             ? body.target_shift
