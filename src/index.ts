@@ -12,9 +12,9 @@ const port = process.env.PORT || 8000;
 router(app);
 
 cron.schedule(
-    "30 9 * * *",
+    "0 10 * * *",
     async () => {
-        console.log("Create target at 9:30 AM every day");
+        console.log("Create target at 10:00 AM every day");
         //** Create target at 5:00 AM every day */
         await createTarget({
             body: {
@@ -29,9 +29,9 @@ cron.schedule(
 );
 
 cron.schedule(
-    "30 7 * * *",
+    "0 8 * * *",
     async () => {
-        console.log("Create target at 7:30 AM every day");
+        console.log("Create target at 8:00 AM every day");
         //** Create target at 5:00 AM every day */
         await createTarget({
             body: {
