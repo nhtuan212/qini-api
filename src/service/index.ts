@@ -55,3 +55,5 @@ export const dbConnection = async () => await client.$connect();
 //     console.log("Params: " + e.params);
 //     console.log("Duration: " + e.duration + "ms");
 // });
+
+export * from "./staff.service";

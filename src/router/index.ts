@@ -1,9 +1,9 @@
 import express, { Express } from "express";
 import cors from "cors";
-import { home } from "./home";
+import { homeRouter } from "./home.router";
 import { login } from "./login";
 import { user } from "./user";
-import { staff } from "./staff";
+import { staffRouter } from "./staff.router";
 import { shift } from "./shift";
 import { target } from "./target";
 import { targetShift } from "./targetShift";
@@ -27,10 +27,10 @@ export const router = (app: Express) => {
         app.use(cors());
     }
 
-    app.use("/", home);
+    app.use("/", homeRouter);
     app.use("/login", login);
     app.use("/user", user);
-    app.use("/staff", staff);
+    app.use("/staff", staffRouter);
     app.use("/target", target);
     app.use("/shift", shift);
     app.use("/target-shift", targetShift);
