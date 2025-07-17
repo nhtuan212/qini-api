@@ -5,7 +5,7 @@ import { loginRouter } from "./login.router";
 import { userRouter } from "./user.router";
 import { staffRouter } from "./staff.router";
 import { shiftRouter } from "./shift.router";
-import { target } from "./target";
+import { targetRouter } from "./target.router";
 import { targetShift } from "./targetShift";
 import { timeSheet } from "./timeSheet";
 import { invoiceRouter } from "./invoice.router";
@@ -32,7 +32,7 @@ export const router = (app: Express) => {
     app.use("/user", userRouter);
     app.use("/staff", staffRouter);
     app.use("/shift", shiftRouter);
-    app.use("/target", target);
+    app.use("/target", targetRouter);
     app.use("/target-shift", targetShift);
     app.use("/time-sheet", timeSheet);
     app.use("/invoice", invoiceRouter);
