@@ -1,14 +1,14 @@
 import express, { Express } from "express";
 import cors from "cors";
 import { homeRouter } from "./home.router";
-import { login } from "./login";
-import { user } from "./user";
+import { loginRouter } from "./login.router";
+import { userRouter } from "./user.router";
 import { staffRouter } from "./staff.router";
-import { shift } from "./shift";
+import { shiftRouter } from "./shift.router";
 import { target } from "./target";
 import { targetShift } from "./targetShift";
 import { timeSheet } from "./timeSheet";
-import { invoice } from "./invoice";
+import { invoiceRouter } from "./invoice.router";
 
 export const router = (app: Express) => {
     app.use(
@@ -28,12 +28,12 @@ export const router = (app: Express) => {
     }
 
     app.use("/", homeRouter);
-    app.use("/login", login);
-    app.use("/user", user);
+    app.use("/login", loginRouter);
+    app.use("/user", userRouter);
     app.use("/staff", staffRouter);
+    app.use("/shift", shiftRouter);
     app.use("/target", target);
-    app.use("/shift", shift);
     app.use("/target-shift", targetShift);
     app.use("/time-sheet", timeSheet);
-    app.use("/invoice", invoice);
+    app.use("/invoice", invoiceRouter);
 };

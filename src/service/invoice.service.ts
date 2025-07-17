@@ -1,5 +1,5 @@
 import { dataFetching } from "../utils/dataFetching";
-import { KIOT_URL } from "../constants";
+import { KIOT_URL, STATUS_CODE } from "../constants";
 
 interface Payment {
     id: number;
@@ -110,7 +110,7 @@ const processPayments = (
     return results;
 };
 
-export const getInvoice = async (req: { [key: string]: any }) => {
+export const getInvoiceByDate = async (req: { [key: string]: any }) => {
     const { targetAt, soldById } = req.query;
 
     return await dataFetching(
@@ -133,6 +133,8 @@ export const getInvoice = async (req: { [key: string]: any }) => {
         });
 
         return {
+            code: STATUS_CODE.SUCCESS,
+            message: "Get invoice successfully!",
             data,
         };
     });

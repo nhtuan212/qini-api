@@ -20,4 +20,4 @@ export const userTable = pgTable("user", {
     updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
 });
 
-export type User = typeof userTable.$inferSelect;
+export type UserType = typeof userTable.$inferSelect;

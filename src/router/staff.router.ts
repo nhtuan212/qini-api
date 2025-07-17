@@ -10,9 +10,10 @@ import {
 
 const router = express.Router();
 
-export const staffRouter = router.get("/", getStaff);
-router.get("/:id", getStaffById);
-router.post("/", createStaff);
-router.post("/:id/validate-password", validateStaffPassword);
-router.put("/:id", updateStaff);
-router.delete("/:id", deleteStaff);
+export const staffRouter = router
+    .get("/", getStaff)
+    .get("/:id", getStaffById)
+    .post("/", createStaff)
+    .post("/:id/validate-password", validateStaffPassword)
+    .put("/:id", updateStaff)
+    .delete("/:id", deleteStaff);
