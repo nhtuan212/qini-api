@@ -57,3 +57,9 @@ export const dbConnection = async () => await client.$connect();
 // });
 
 export * from "./staff.service";
+export * from "./shift.service";
+export * from "./user.service";
+export * from "./target.service";
+export * from "./targetShift.service";
+export * from "./invoice.service";
+export * from "./login.service";

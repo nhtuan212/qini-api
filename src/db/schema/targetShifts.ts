@@ -16,4 +16,4 @@ export const targetShiftTable = pgTable("target_shift", {
     updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
 });
 
-export type TargetShift = typeof targetShiftTable.$inferSelect;
+export type TargetShiftType = typeof targetShiftTable.$inferSelect;

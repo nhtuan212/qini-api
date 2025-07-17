@@ -1,10 +1,5 @@
 import express from "express";
-import {
-    getShift,
-    createShift,
-    updateShift,
-    deleteShift,
-} from "../controller/shift.controller";
+import { getShift, createShift, updateShift, deleteShift } from "../controller";
 
 const router = express.Router();
 

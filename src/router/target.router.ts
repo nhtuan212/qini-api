@@ -5,7 +5,7 @@ import {
     getTarget,
     getTargetById,
     updateTarget,
-} from "../controller/target.controller";
+} from "../controller";
 
 const router = express.Router();
 

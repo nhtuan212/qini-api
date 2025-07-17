@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { serviceHandler } from ".";
-import { handleLogin } from "../service/login.service";
+import { handleLogin } from "../service";
 
 export const login = serviceHandler(
     async (req: Request) =>

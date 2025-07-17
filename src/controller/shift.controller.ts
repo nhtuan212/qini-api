@@ -5,7 +5,7 @@ import {
     insertShift,
     updateShiftById,
     deleteShiftById,
-} from "../service/shift.service";
+} from "../service";
 
 export const getShift = serviceHandler(findAllShift);
 export const createShift = serviceHandler(insertShift);

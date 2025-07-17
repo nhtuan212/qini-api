@@ -1,12 +1,13 @@
 import { db, targetTable, TargetType } from "../db";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
-import { STATUS_CODE } from "../constants";
+import { LIMIT, STATUS_CODE } from "../constants";
 
 export const findAllTarget = async () => {
     return await db
         .select()
         .from(targetTable)
         .orderBy(desc(targetTable.targetAt))
+        .limit(LIMIT)
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,

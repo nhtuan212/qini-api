@@ -7,7 +7,7 @@ import {
     insertTarget,
     removeTargetById,
     updateTargetById,
-} from "../service/target.service";
+} from "../service";
 
 export const getTarget = serviceHandler(async (req: Request) => {
     const { startDate, endDate } = req.query;

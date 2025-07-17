@@ -1,10 +1,6 @@
 import { Request } from "express";
 import { serviceHandler } from ".";
-import {
-    findAllUser,
-    insertUser,
-    removeUserById,
-} from "../service/user.service";
+import { findAllUser, insertUser, removeUserById } from "../service";
 
 export const getUser = serviceHandler(findAllUser);
 export const createUser = serviceHandler(insertUser);

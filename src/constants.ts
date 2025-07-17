@@ -20,3 +20,5 @@ export const STATUS_CODE = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
 };
+
+export const LIMIT = 10;

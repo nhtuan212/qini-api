@@ -21,3 +21,9 @@ export const serviceHandler = (service: {
 
 export * from "./staff.controller";
 export * from "./home.controller";
+export * from "./shift.controller";
+export * from "./user.controller";
+export * from "./target.controller";
+export * from "./targetShift.controller";
+export * from "./login.controller";
+export * from "./invoice.controller";
