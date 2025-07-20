@@ -1,4 +1,14 @@
-import { and, countDistinct, desc, eq, gte, lte, sql, SQL } from "drizzle-orm";
+import {
+    and,
+    countDistinct,
+    desc,
+    eq,
+    gte,
+    inArray,
+    lte,
+    sql,
+    SQL,
+} from "drizzle-orm";
 import {
     db,
     shiftTable,
@@ -9,6 +19,7 @@ import {
     TimeSheetType,
 } from "../db";
 import { LIMIT, STATUS_CODE } from "../constants";
+import { getDefaultTargetAt } from "../utils";
 
 const timeSheetSelect = {
     id: timeSheetTable.id,
@@ -18,6 +29,32 @@ const timeSheetSelect = {
     checkIn: timeSheetTable.checkIn,
     checkOut: timeSheetTable.checkOut,
     workingHours: timeSheetTable.workingHours,
+};
+
+const getTimeSheetsWithRelations = async (
+    whereCondition: any,
+): Promise<any> => {
+    return await db
+        .select({
+            id: timeSheetTable.id,
+            staffId: timeSheetTable.staffId,
+            shiftId: shiftTable.id,
+            targetShiftId: timeSheetTable.targetShiftId,
+            date: timeSheetTable.date,
+            checkIn: timeSheetTable.checkIn,
+            checkOut: timeSheetTable.checkOut,
+            workingHours: timeSheetTable.workingHours,
+            shiftName: shiftTable.name,
+            staffName: staffTable.name,
+        })
+        .from(timeSheetTable)
+        .leftJoin(staffTable, eq(timeSheetTable.staffId, staffTable.id))
+        .leftJoin(
+            targetShiftTable,
+            eq(timeSheetTable.targetShiftId, targetShiftTable.id),
+        )
+        .leftJoin(shiftTable, eq(targetShiftTable.shiftId, shiftTable.id))
+        .where(whereCondition);
 };
 
 export const findAllTimeSheet = async () => {
@@ -131,29 +168,70 @@ export const findTimeSheetByStaffId = async (
     };
 };
 
-export const insertTimeSheet = async (body: TimeSheetType) => {
-    return await db
+export const insertTimeSheet = async (
+    body: TimeSheetType | TimeSheetType[],
+) => {
+    const bodyArray = Array.isArray(body) ? body : [body];
+    const isBodyArray = Array.isArray(body);
+
+    const insertData = bodyArray.map(item => ({
+        ...item,
+        workingHours: item.workingHours || 0,
+        date: item.date || getDefaultTargetAt().toISOString(),
+    }));
+
+    const inserted = await db
         .insert(timeSheetTable)
-        .values(body)
-        .returning()
-        .then(res => ({
+        .values(insertData)
+        .onConflictDoNothing()
+        .returning({ id: timeSheetTable.id });
+
+    if (inserted.length === 0) {
+        return {
             code: STATUS_CODE.SUCCESS,
-            message: "Create time sheet successfully!",
-            data: res,
-        }));
+            message: "No new TimeSheets created (all duplicates skipped)",
+            data: isBodyArray ? [] : {},
+        };
+    }
+
+    const result = await getTimeSheetsWithRelations(
+        inArray(
+            timeSheetTable.id,
+            inserted.map(item => item.id),
+        ),
+    );
+
+    return {
+        code: STATUS_CODE.SUCCESS,
+        message: "Create TimeSheets success!",
+        data: isBodyArray ? result : result[0],
+    };
 };
 
 export const updateTimeSheetById = async (id: string, body: TimeSheetType) => {
-    return await db
+    const updated = await db
         .update(timeSheetTable)
         .set(body)
         .where(eq(timeSheetTable.id, id))
-        .returning()
-        .then(res => ({
-            code: STATUS_CODE.SUCCESS,
-            message: "Update time sheet successfully!",
-            data: res,
-        }));
+        .returning({ id: timeSheetTable.id });
+
+    if (updated.length === 0) {
+        return {
+            code: STATUS_CODE.NOT_FOUND,
+            message: "TimeSheet not found",
+            data: null,
+        };
+    }
+
+    const result = await getTimeSheetsWithRelations(
+        eq(timeSheetTable.id, updated[0].id),
+    );
+
+    return {
+        code: STATUS_CODE.SUCCESS,
+        message: "Update TimeSheet success!",
+        data: result[0],
+    };
 };
 
 export const deleteTimeSheetById = async (id: TimeSheetType["id"]) => {
@@ -164,6 +242,6 @@ export const deleteTimeSheetById = async (id: TimeSheetType["id"]) => {
         .then(res => ({
             code: STATUS_CODE.SUCCESS,
             message: "Delete time sheet successfully!",
-            data: res,
+            data: res[0],
         }));
 };
