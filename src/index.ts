@@ -2,9 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cron from "node-cron";
 import { router } from "./router";
-// import { createTarget } from "./controller";
-import { dbConnection } from "./service";
-// import { formatDate } from "./utils";
+import { dbConnection, insertTarget } from "./service";
+import { formatDate } from "./utils";
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -14,12 +13,12 @@ router(app);
 cron.schedule(
     "0 5 * * *",
     async () => {
-        // //** Create target at 5:00 AM every day */
-        // await createTarget({
-        //     body: {
-        //         targetAt: formatDate(new Date()),
-        //     },
-        // });
+        //** Create target at 5:00 AM every day */
+        await insertTarget({
+            body: {
+                targetAt: formatDate(new Date()),
+            } as any,
+        });
     },
     {
         timezone: "Asia/Ho_Chi_Minh",
