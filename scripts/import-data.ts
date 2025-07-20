@@ -60,7 +60,7 @@ const importSingleTable = async (
     }
 
     // Import data in batches
-    const BATCH_SIZE = 100;
+    const BATCH_SIZE = 10;
     let imported = 0;
 
     for (let i = 0; i < data.length; i += BATCH_SIZE) {

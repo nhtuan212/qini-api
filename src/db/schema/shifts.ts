@@ -5,6 +5,8 @@ import {
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { targetShiftTable } from "./targetShifts";
 
 export const shiftTable = pgTable("shift", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
@@ -18,5 +20,10 @@ export const shiftTable = pgTable("shift", {
         .defaultNow(),
     updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
 });
+
+// 🎯 SHIFT RELATIONS
+export const shiftRelations = relations(shiftTable, ({ many }) => ({
+    targetShifts: many(targetShiftTable),
+}));
 
 export type ShiftType = typeof shiftTable.$inferSelect;

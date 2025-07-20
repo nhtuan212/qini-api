@@ -3,24 +3,14 @@ import { serviceHandler } from ".";
 import {
     findAllTarget,
     findTargetById,
-    findTargetWithFilter,
     insertTarget,
     removeTargetById,
     updateTargetById,
 } from "../service";
 
-export const getTarget = serviceHandler(async (req: Request) => {
-    const { startDate, endDate } = req.query;
-
-    if (startDate || endDate) {
-        return await findTargetWithFilter({
-            startDate: new Date(startDate as string) || null,
-            endDate: new Date(endDate as string) || null,
-        });
-    }
-
-    return await findAllTarget();
-});
+export const getTarget = serviceHandler(
+    async (req: Request) => await findAllTarget(req.query),
+);
 
 export const getTargetById = serviceHandler(
     async (req: Request) =>

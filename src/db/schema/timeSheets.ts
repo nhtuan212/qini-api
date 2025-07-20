@@ -6,12 +6,22 @@ import {
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
+import { targetShiftTable } from "./targetShifts";
+import { staffTable } from "./staffs";
+import { relations } from "drizzle-orm";
 
 export const timeSheetTable = pgTable("time_sheet", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
-    staffId: uuid("staff_id").notNull(),
-    shiftId: uuid("shift_id").notNull(),
-    targetShiftId: uuid("target_shift_id").notNull(),
+    targetShiftId: uuid("target_shift_id")
+        .notNull()
+        .references(() => targetShiftTable.id, {
+            onDelete: "cascade",
+        }),
+    staffId: uuid("staff_id")
+        .notNull()
+        .references(() => staffTable.id, {
+            onDelete: "cascade",
+        }),
     checkIn: varchar("check_in", { length: 10 }).default(""),
     checkOut: varchar("check_out", { length: 10 }).default(""),
     workingHours: real("working_hours").notNull().default(0),
@@ -22,4 +32,16 @@ export const timeSheetTable = pgTable("time_sheet", {
     updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
 });
 
-export type TimeSheet = typeof timeSheetTable.$inferSelect;
+// 🎯 TIME_SHEET RELATIONS
+export const timeSheetRelations = relations(timeSheetTable, ({ one }) => ({
+    targetShift: one(targetShiftTable, {
+        fields: [timeSheetTable.targetShiftId],
+        references: [targetShiftTable.id],
+    }),
+    staff: one(staffTable, {
+        fields: [timeSheetTable.staffId],
+        references: [staffTable.id],
+    }),
+}));
+
+export type TimeSheetType = typeof timeSheetTable.$inferSelect;

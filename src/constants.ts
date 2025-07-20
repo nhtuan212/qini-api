@@ -19,6 +19,7 @@ export const STATUS_CODE = {
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
+    ERROR: 500,
 };
 
-export const LIMIT = 10;
+export const LIMIT = 20;
