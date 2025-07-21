@@ -1,14 +1,18 @@
 import {
     db,
     shiftTable,
+    ShiftType,
     targetShiftTable,
+    TargetShiftType,
     targetTable,
     TargetType,
 } from "../db";
 import { and, desc, eq, gte, inArray, lte, sql, asc, SQL } from "drizzle-orm";
-import { LIMIT, STATUS_CODE } from "../constants";
 import { timeSheetTable } from "../db/schema/timeSheets";
 import { staffTable } from "../db/schema/staffs";
+import { findAllShift } from "./shift.service";
+import { insertTargetShift } from "./targetShift.service";
+import { LIMIT, STATUS_CODE } from "../constants";
 
 export const findAllTarget = async (query: Record<string, any>) => {
     const { page = 1, pageSize = LIMIT, startDate, endDate } = query;
@@ -263,17 +267,35 @@ export const findTargetById = async ({ id }: { id: string }) => {
 };
 
 export const insertTarget = async ({ body }: { body: TargetType }) => {
-    return await db
-        .insert(targetTable)
-        .values(body)
-        .returning()
-        .then(res => {
-            return {
-                code: STATUS_CODE.SUCCESS,
-                message: "Insert Target successfully!",
-                data: res,
-            };
-        });
+    // Insert target
+    const [newTarget] = await db.insert(targetTable).values(body).returning();
+
+    // Insert targetShifts with targetId
+    const result = await db.transaction(async () => {
+        const shifts = await findAllShift();
+
+        const targetShifts = await Promise.all(
+            shifts.data.map(async (ts: ShiftType) => {
+                return await insertTargetShift({
+                    body: {
+                        targetId: newTarget.id,
+                        shiftId: ts.id,
+                    } as TargetShiftType,
+                });
+            }),
+        );
+
+        return {
+            target: newTarget,
+            targetShifts,
+        };
+    });
+
+    return {
+        code: STATUS_CODE.SUCCESS,
+        message: "Created target and shifts successfully!",
+        data: result,
+    };
 };
 
 export const updateTargetById = async ({
