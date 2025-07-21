@@ -16,6 +16,7 @@ cron.schedule(
         //** Create target at 5:00 AM every day */
         await insertTarget({
             body: {
+                name: "Doanh số",
                 targetAt: formatDate(new Date()),
             } as any,
         });

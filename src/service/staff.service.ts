@@ -76,6 +76,7 @@ export const updateStaffById = async ({
 };
 
 export const removeStaffById = async ({ id }: { id: string }) => {
+    console.log("id", id);
     return await db
         .delete(staffTable)
         .where(eq(staffTable.id, id))
