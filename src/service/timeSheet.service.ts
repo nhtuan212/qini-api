@@ -23,6 +23,8 @@ import { getDefaultTargetAt } from "../utils";
 
 const timeSheetSelect = {
     id: timeSheetTable.id,
+    staffId: timeSheetTable.staffId,
+    shiftId: shiftTable.id,
     staffName: staffTable.name,
     shiftName: shiftTable.name,
     date: timeSheetTable.date,
