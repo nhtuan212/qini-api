@@ -65,7 +65,7 @@ export const updateTargetShiftById = async ({
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Update Target Shift successfully!",
-                data: res,
+                data: res[0],
             };
         });
 };
