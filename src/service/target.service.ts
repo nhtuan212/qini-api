@@ -3,7 +3,6 @@ import {
     shiftTable,
     ShiftType,
     targetShiftTable,
-    TargetShiftType,
     targetTable,
     TargetType,
 } from "../db";
@@ -11,7 +10,6 @@ import { and, desc, eq, gte, inArray, lte, sql, asc, SQL } from "drizzle-orm";
 import { timeSheetTable } from "../db/schema/timeSheets";
 import { staffTable } from "../db/schema/staffs";
 import { findAllShift } from "./shift.service";
-import { insertTargetShift } from "./targetShift.service";
 import { LIMIT, STATUS_CODE } from "../constants";
 
 export const findAllTarget = async (query: Record<string, any>) => {
@@ -267,35 +265,56 @@ export const findTargetById = async ({ id }: { id: string }) => {
 };
 
 export const insertTarget = async ({ body }: { body: TargetType }) => {
-    // Insert target
-    const [newTarget] = await db.insert(targetTable).values(body).returning();
+    return await db.transaction(async tx => {
+        // Step 1: Create target
+        const [newTarget] = await tx
+            .insert(targetTable)
+            .values(body)
+            .returning();
 
-    // Insert targetShifts with targetId
-    const result = await db.transaction(async () => {
+        // Step 2: Get all shifts
         const shifts = await findAllShift();
 
-        const targetShifts = await Promise.all(
-            shifts.data.map(async (ts: ShiftType) => {
-                return await insertTargetShift({
-                    body: {
-                        targetId: newTarget.id,
-                        shiftId: ts.id,
-                    } as TargetShiftType,
-                });
-            }),
-        );
+        if (shifts.data.length === 0) {
+            throw new Error("No shifts found");
+        }
+
+        // Step 3: Create targetShifts for all shifts
+        const targetShiftData = shifts.data.map((shift: ShiftType) => ({
+            targetId: newTarget.id,
+            shiftId: shift.id,
+        }));
+
+        await tx.insert(targetShiftTable).values(targetShiftData);
+
+        // Step 4: Get complete data with single join query
+        const result = await tx
+            .select({
+                id: targetTable.id,
+                targetShiftId: targetShiftTable.id,
+                shiftId: targetShiftTable.shiftId,
+
+                name: targetTable.name,
+                targetAt: targetTable.targetAt,
+
+                shiftName: shiftTable.name,
+                startTime: shiftTable.startTime,
+                endTime: shiftTable.endTime,
+            })
+            .from(targetTable)
+            .innerJoin(
+                targetShiftTable,
+                eq(targetShiftTable.targetId, targetTable.id),
+            )
+            .innerJoin(shiftTable, eq(shiftTable.id, targetShiftTable.shiftId))
+            .where(eq(targetTable.id, newTarget.id));
 
         return {
-            target: newTarget,
-            targetShifts,
+            code: STATUS_CODE.SUCCESS,
+            message: "Create Target with Shifts successfully!",
+            data: transformTargetResponse(result),
         };
     });
-
-    return {
-        code: STATUS_CODE.SUCCESS,
-        message: "Created target and shifts successfully!",
-        data: result,
-    };
 };
 
 export const updateTargetById = async ({
@@ -333,97 +352,25 @@ export const removeTargetById = async ({ id }: { id: string }) => {
         });
 };
 
-// export const findAllTargetWithRelations = async () => {
-//     const targets = await db.query.targetTable.findMany({
-//         columns: {
-//             id: true,
-//             name: true,
-//             targetAt: true,
-//         },
-//         with: {
-//             targetShifts: {
-//                 columns: {
-//                     id: true,
-//                     shiftId: true,
-//                     revenue: true,
-//                     cash: true,
-//                     transfer: true,
-//                     point: true,
-//                     deduction: true,
-//                     description: true,
-//                 },
-//                 with: {
-//                     shift: {
-//                         columns: {
-//                             kiotId: true,
-//                             name: true,
-//                             startTime: true,
-//                             endTime: true,
-//                         },
-//                     },
-//                     timeSheets: {
-//                         columns: {
-//                             id: true,
-//                             staffId: true,
-//                             checkIn: true,
-//                             checkOut: true,
-//                             workingHours: true,
-//                         },
-//                         with: {
-//                             staff: {
-//                                 columns: {
-//                                     name: true,
-//                                 },
-//                             },
-//                         },
-//                     },
-//                 },
-//             },
-//         },
-//         orderBy: [desc(targetTable.targetAt)],
-//         limit: LIMIT,
-//     });
+const transformTargetResponse = (data: any[]): any => {
+    if (data.length === 0) {
+        throw new Error("Target not found");
+    }
 
-//     // Transform to match Prisma structure
-//     const result = targets.map(target => {
-//         const { targetShifts, ...rest } = target;
+    const target = {
+        id: data[0].id,
+        name: data[0].name,
+        targetAt: data[0].targetAt,
+    };
 
-//         return {
-//             ...rest,
+    const targetShifts = data
+        .filter(row => row.targetShiftId !== null)
+        .map(row => ({
+            ...row,
+        }));
 
-//             revenue: targetShifts.reduce((acc, ts) => acc + ts.revenue, 0),
-//             cash: targetShifts.reduce((acc, ts) => acc + ts.cash, 0),
-//             transfer: targetShifts.reduce((acc, ts) => acc + ts.transfer, 0),
-//             deduction: targetShifts.reduce((acc, ts) => acc + ts.deduction, 0),
-//             point: targetShifts.reduce((acc, ts) => acc + ts.point, 0),
-
-//             targetShifts: targetShifts.map(ts => {
-//                 const { shift, timeSheets, ...rest } = ts;
-
-//                 return {
-//                     ...rest,
-
-//                     shiftName: shift?.name,
-//                     startTime: shift?.startTime,
-//                     endTime: shift?.endTime,
-
-//                     timeSheets: timeSheets.map(timeSheet => {
-//                         const { staff, ...rest } = timeSheet;
-
-//                         return {
-//                             ...rest,
-//                             staffName: staff?.name,
-//                         };
-//                     }),
-//                 };
-//             }),
-//         };
-//     });
-
-//     return {
-//         code: STATUS_CODE.SUCCESS,
-//         message: "Get Target successfully!",
-//         data: result,
-//         total: result.length,
-//     };
-// };
+    return {
+        ...target,
+        targetShifts,
+    };
+};
