@@ -26,7 +26,7 @@ export const findTargetShiftById = async ({ id }: { id: string }) => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Get Target Shift successfully!",
-                data: res,
+                data: res[0],
             };
         });
 };
