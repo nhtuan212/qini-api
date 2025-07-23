@@ -35,7 +35,7 @@ export const timeSheetTable = pgTable(
         updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
     },
     table => [
-        // UNIQUE CONSTRAINT: 1 employee chỉ có 1 record per shift per day
+        // UNIQUE CONSTRAINT: 1 employee only has 1 record per shift per day
         uniqueIndex("unique_staff_target_shift_date").on(
             table.staffId,
             table.targetShiftId,
