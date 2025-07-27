@@ -9,7 +9,7 @@
     ],
     "scripts": {
         "start": "node dist/index.js",
-        "dev": "NODE_ENV=development & yarn prisma generate & nodemon src/index.ts",
+        "dev": "NODE_ENV=development & nodemon src/index.ts",
         "build": "tsc",
         "prettier": "prettier --write \"**/*.{ts,tsx,json,scss}\"",
         "eslint": "tsc --noEmit && eslint --quiet \"src/**/*.{ts,tsx,json}\"",
