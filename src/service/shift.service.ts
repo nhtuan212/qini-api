@@ -1,11 +1,12 @@
 import { db, shiftTable, ShiftType } from "../db";
 import { STATUS_CODE } from "../constants";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 export const findAllShift = async () => {
     return await db
         .select()
         .from(shiftTable)
+        .orderBy(asc(shiftTable.name))
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
