@@ -22,7 +22,7 @@ export const router = (app: Express) => {
         }),
     );
 
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV === "production") {
         //** Cors */
         app.use(cors());
     }
