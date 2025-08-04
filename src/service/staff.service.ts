@@ -32,6 +32,11 @@ export const findStaffById = async ({ id }: { id: string }) => {
 };
 
 export const insertStaff = async ({ body }: { body: StaffType }) => {
+    if (body.password) {
+        const decryptedPassword = decryptPassword(body.password);
+        body.password = await hashPassword(decryptedPassword);
+    }
+
     return await db
         .insert(staffTable)
         .values(body)
