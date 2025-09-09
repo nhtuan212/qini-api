@@ -121,7 +121,7 @@ export const validateStaffPasswordById = async ({
                 };
             }
 
-            if (!res.active) {
+            if (!res.isActive) {
                 return {
                     code: STATUS_CODE.BAD_REQUEST,
                     message: "Staff account is inactive!",
