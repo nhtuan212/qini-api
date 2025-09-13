@@ -40,6 +40,30 @@ export const insertUser = async ({ body }: { body: UserType }) => {
         });
 };
 
+export const updateUserById = async ({
+    id,
+    body,
+}: {
+    id: string;
+    body: UserType;
+}) => {
+    return await db
+        .update(userTable)
+        .set({
+            ...body,
+            password: await hashPassword(body.password),
+        })
+        .where(eq(userTable.id, id))
+        .returning()
+        .then(res => {
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message: "Update User successfully!",
+                data: res,
+            };
+        });
+};
+
 export const removeUserById = async ({ id }: { id: string }) => {
     return await db
         .delete(userTable)

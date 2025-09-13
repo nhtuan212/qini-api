@@ -1,0 +1,521 @@
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "prevId": "",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.user": {
+            "name": "user",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "gen_random_uuid()"
+                },
+                "username": {
+                    "name": "username",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "password": {
+                    "name": "password",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "is_active": {
+                    "name": "is_active",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": true
+                },
+                "role": {
+                    "name": "role",
+                    "type": "role",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'REPORT'"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {},
+            "policies": {},
+            "isRLSEnabled": false
+        },
+        "public.target": {
+            "name": "target",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "gen_random_uuid()"
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "target_at": {
+                    "name": "target_at",
+                    "type": "date",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "target_target_at_unique": {
+                    "columns": ["target_at"],
+                    "nullsNotDistinct": false,
+                    "name": "target_target_at_unique"
+                }
+            },
+            "checkConstraints": {},
+            "policies": {},
+            "isRLSEnabled": false
+        },
+        "public.target_shift": {
+            "name": "target_shift",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "gen_random_uuid()"
+                },
+                "target_id": {
+                    "name": "target_id",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "shift_id": {
+                    "name": "shift_id",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "cash": {
+                    "name": "cash",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "transfer": {
+                    "name": "transfer",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "point": {
+                    "name": "point",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "deduction": {
+                    "name": "deduction",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "revenue": {
+                    "name": "revenue",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "description": {
+                    "name": "description",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "''"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "target_shift_target_id_target_id_fk": {
+                    "name": "target_shift_target_id_target_id_fk",
+                    "tableFrom": "target_shift",
+                    "tableTo": "target",
+                    "schemaTo": "public",
+                    "columnsFrom": ["target_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "target_shift_shift_id_shift_id_fk": {
+                    "name": "target_shift_shift_id_shift_id_fk",
+                    "tableFrom": "target_shift",
+                    "tableTo": "shift",
+                    "schemaTo": "public",
+                    "columnsFrom": ["shift_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {},
+            "policies": {},
+            "isRLSEnabled": false
+        },
+        "public.shift": {
+            "name": "shift",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "gen_random_uuid()"
+                },
+                "kiot_id": {
+                    "name": "kiot_id",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "start_time": {
+                    "name": "start_time",
+                    "type": "varchar(10)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "end_time": {
+                    "name": "end_time",
+                    "type": "varchar(10)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "is_target": {
+                    "name": "is_target",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {},
+            "policies": {},
+            "isRLSEnabled": false
+        },
+        "public.time_sheet": {
+            "name": "time_sheet",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "gen_random_uuid()"
+                },
+                "target_shift_id": {
+                    "name": "target_shift_id",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "staff_id": {
+                    "name": "staff_id",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "check_in": {
+                    "name": "check_in",
+                    "type": "varchar(10)",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "''"
+                },
+                "check_out": {
+                    "name": "check_out",
+                    "type": "varchar(10)",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "''"
+                },
+                "working_hours": {
+                    "name": "working_hours",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "date": {
+                    "name": "date",
+                    "type": "date",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "unique_staff_target_shift_date": {
+                    "name": "unique_staff_target_shift_date",
+                    "columns": [
+                        {
+                            "expression": "staff_id",
+                            "asc": true,
+                            "nulls": "last",
+                            "opclass": "date_ops",
+                            "isExpression": false
+                        },
+                        {
+                            "expression": "target_shift_id",
+                            "asc": true,
+                            "nulls": "last",
+                            "opclass": "uuid_ops",
+                            "isExpression": false
+                        },
+                        {
+                            "expression": "date",
+                            "asc": true,
+                            "nulls": "last",
+                            "opclass": "date_ops",
+                            "isExpression": false
+                        }
+                    ],
+                    "isUnique": true,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {
+                "time_sheet_target_shift_id_target_shift_id_fk": {
+                    "name": "time_sheet_target_shift_id_target_shift_id_fk",
+                    "tableFrom": "time_sheet",
+                    "tableTo": "target_shift",
+                    "schemaTo": "public",
+                    "columnsFrom": ["target_shift_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "time_sheet_staff_id_staff_id_fk": {
+                    "name": "time_sheet_staff_id_staff_id_fk",
+                    "tableFrom": "time_sheet",
+                    "tableTo": "staff",
+                    "schemaTo": "public",
+                    "columnsFrom": ["staff_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {},
+            "policies": {},
+            "isRLSEnabled": false
+        },
+        "public.staff": {
+            "name": "staff",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "gen_random_uuid()"
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(50)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "salary": {
+                    "name": "salary",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "is_target": {
+                    "name": "is_target",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "is_first_login": {
+                    "name": "is_first_login",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": true
+                },
+                "is_active": {
+                    "name": "is_active",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": true
+                },
+                "password": {
+                    "name": "password",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp(6)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "is_deleted": {
+                    "name": "is_deleted",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {},
+            "policies": {},
+            "isRLSEnabled": false
+        }
+    },
+    "enums": {
+        "public.role": {
+            "name": "role",
+            "values": ["ADMIN", "REPORT", "MANAGER", "STAFF"],
+            "schema": "public"
+        }
+    },
+    "schemas": {},
+    "sequences": {},
+    "roles": {},
+    "policies": {},
+    "views": {},
+    "_meta": {
+        "schemas": {},
+        "tables": {},
+        "columns": {}
+    },
+    "internal": {
+        "tables": {}
+    }
+}
