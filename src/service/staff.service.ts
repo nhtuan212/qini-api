@@ -7,6 +7,7 @@ export const findAllStaff = async () => {
     return await db
         .select()
         .from(staffTable)
+        .where(eq(staffTable.isActive, true))
         .orderBy(asc(staffTable.name))
         .then((res: StaffType[]) => {
             return {
@@ -80,8 +81,22 @@ export const updateStaffById = async ({
         });
 };
 
+export const softDeleteStaffById = async ({ id }: { id: string }) => {
+    return await db
+        .update(staffTable)
+        .set({ isActive: false })
+        .where(eq(staffTable.id, id))
+        .returning()
+        .then(res => {
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message: "Soft Delete Staff successfully!",
+                data: res,
+            };
+        });
+};
+
 export const removeStaffById = async ({ id }: { id: string }) => {
-    console.log("id", id);
     return await db
         .delete(staffTable)
         .where(eq(staffTable.id, id))
