@@ -4,6 +4,7 @@ import {
     deleteStaff,
     getStaff,
     getStaffById,
+    softDeleteStaff,
     updateStaff,
     validateStaffPassword,
 } from "../controller";
@@ -16,4 +17,5 @@ export const staffRouter = router
     .post("/", createStaff)
     .post("/:id/validate-password", validateStaffPassword)
     .put("/:id", updateStaff)
+    .put("/:id/in-active", softDeleteStaff)
     .delete("/:id", deleteStaff);
