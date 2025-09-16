@@ -15,7 +15,6 @@ export const staffTable = pgTable("staff", {
     salary: integer("salary").notNull().default(0),
     isTarget: boolean("is_target").notNull().default(false),
     isActive: boolean("is_active").notNull().default(true),
-    isDeleted: boolean("is_deleted").notNull().default(false),
     isFirstLogin: boolean("is_first_login").notNull().default(true),
     password: varchar("password", { length: 255 }),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
