@@ -1,8 +1,9 @@
 import express from "express";
 import {
     createSalary,
+    deleteSalary,
     getSalary,
-    getSalaryById,
+    getSalaryByStaffId,
     updateSalary,
 } from "../controller";
 
@@ -10,6 +11,7 @@ const router = express.Router();
 
 export const salaryRouter = router
     .get("/", getSalary)
-    .get("/:id", getSalaryById)
+    .get("/staff/:id", getSalaryByStaffId)
     .post("/", createSalary)
-    .put("/:id", updateSalary);
+    .put("/:id", updateSalary)
+    .delete("/:id", deleteSalary);

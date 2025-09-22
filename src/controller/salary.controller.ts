@@ -2,16 +2,22 @@ import { Request } from "express";
 import { serviceHandler } from ".";
 import {
     findAllSalary,
-    findSalaryById,
+    findSalaryByStaffId,
     insertSalary,
     updateSalaryById,
+    deleteSalaryById,
 } from "../service";
 
-export const getSalary = serviceHandler(findAllSalary);
+export const getSalary = serviceHandler((req: Request) =>
+    findAllSalary({
+        query: req.query,
+    }),
+);
 
-export const getSalaryById = serviceHandler((req: Request) =>
-    findSalaryById({
+export const getSalaryByStaffId = serviceHandler((req: Request) =>
+    findSalaryByStaffId({
         id: req?.params?.id,
+        query: req.query,
     }),
 );
 
@@ -25,5 +31,11 @@ export const updateSalary = serviceHandler((req: Request) =>
     updateSalaryById({
         id: req?.params?.id,
         body: req.body,
+    }),
+);
+
+export const deleteSalary = serviceHandler((req: Request) =>
+    deleteSalaryById({
+        id: req.params.id,
     }),
 );

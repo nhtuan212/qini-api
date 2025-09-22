@@ -23,10 +23,8 @@ import { getDefaultTargetAt } from "../utils";
 
 const timeSheetSelect = {
     id: timeSheetTable.id,
-    staffId: timeSheetTable.staffId,
     shiftId: shiftTable.id,
     targetShiftId: timeSheetTable.targetShiftId,
-    staffName: staffTable.name,
     shiftName: shiftTable.name,
     date: timeSheetTable.date,
     checkIn: timeSheetTable.checkIn,
@@ -107,12 +105,19 @@ export const findTimeSheetByStaffId = async (
     const { startDate, endDate } = query;
 
     const whereConditions: SQL[] = [];
+    if (id) {
+        whereConditions.push(eq(timeSheetTable.staffId, id));
+    }
     if (startDate) {
         whereConditions.push(gte(timeSheetTable.date, startDate));
     }
     if (endDate) {
         whereConditions.push(lte(timeSheetTable.date, endDate));
     }
+
+    const staffInfo = await db.query.staffTable.findFirst({
+        where: eq(staffTable.id, id),
+    });
 
     const totalCountSubquery = db
         .select({
@@ -133,7 +138,6 @@ export const findTimeSheetByStaffId = async (
             `,
         })
         .from(timeSheetTable)
-        .leftJoin(staffTable, eq(timeSheetTable.staffId, staffTable.id))
         .leftJoin(
             targetShiftTable,
             eq(timeSheetTable.targetShiftId, targetShiftTable.id),
@@ -143,7 +147,7 @@ export const findTimeSheetByStaffId = async (
             totalCountSubquery,
             eq(totalCountSubquery.targetShiftId, timeSheetTable.targetShiftId),
         )
-        .where(and(eq(staffTable.id, id), ...whereConditions))
+        .where(and(...whereConditions))
         .orderBy(desc(timeSheetTable.date));
 
     if (!startDate && !endDate) {
@@ -164,6 +168,8 @@ export const findTimeSheetByStaffId = async (
     return {
         code: STATUS_CODE.SUCCESS,
         message: "Get time sheet by staff id successfully!",
+        staffName: staffInfo?.name,
+        salary: staffInfo?.salary,
         total: data.length,
         totalWorkingHours,
         totalTarget,

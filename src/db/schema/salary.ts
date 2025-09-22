@@ -1,10 +1,11 @@
 import {
-    integer,
+    real,
     pgTable,
     timestamp,
     uuid,
     varchar,
     text,
+    integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { staffTable } from "./staffs";
@@ -17,8 +18,15 @@ export const salaryTable = pgTable("salary", {
             onDelete: "cascade",
         }),
     name: varchar("name", { length: 255 }).notNull(),
-    bonus: integer("bonus").notNull().default(0),
     salary: integer("salary").notNull().default(0),
+    workingHours: real("working_hours").notNull().default(0),
+    target: integer("target").notNull().default(0),
+    bonus: integer("bonus").notNull().default(0),
+    startDate: timestamp("start_date", {
+        precision: 6,
+        mode: "string",
+    }).notNull(),
+    endDate: timestamp("end_date", { precision: 6, mode: "string" }).notNull(),
     description: text("description").notNull().default(""),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
         .notNull()
@@ -28,7 +36,10 @@ export const salaryTable = pgTable("salary", {
 
 // 🎯 STAFF RELATIONS
 export const salaryRelations = relations(salaryTable, ({ one }) => ({
-    staffs: one(staffTable),
+    staff: one(staffTable, {
+        fields: [salaryTable.staffId],
+        references: [staffTable.id],
+    }),
 }));
 
 export type SalaryType = typeof salaryTable.$inferSelect;
