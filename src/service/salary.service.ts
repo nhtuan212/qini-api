@@ -49,17 +49,17 @@ export const findSalaryByStaffId = async ({
     const { page = 1, pageSize = LIMIT } = query;
     const offset = (page - 1) * pageSize;
 
-    const salary = (await db.query.salaryTable.findFirst({
+    const salary = await db.query.salaryTable.findMany({
         with: { staff: true },
         where: eq(salaryTable.staffId, id),
         limit: pageSize as never,
         offset: offset,
-    })) as SalaryWithStaff;
+    });
 
     return {
         code: STATUS_CODE.SUCCESS,
         message: "Get Salary by Staff Id successfully!",
-        data: formatResponse([salary])[0],
+        data: salary ? formatResponse(salary) : [],
         total: 1,
         pagination: {
             page,
