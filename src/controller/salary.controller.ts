@@ -8,11 +8,7 @@ import {
     deleteSalaryById,
 } from "../service";
 
-export const getSalary = serviceHandler((req: Request) =>
-    findAllSalary({
-        query: req.query,
-    }),
-);
+export const getSalary = serviceHandler((req: Request) => findAllSalary(req));
 
 export const getSalaryByStaffId = serviceHandler((req: Request) =>
     findSalaryByStaffId({

@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, gte, lte, SQL } from "drizzle-orm";
 import { db, salaryTable, SalaryType, StaffType } from "../db";
 import { LIMIT, STATUS_CODE } from "../constants";
 
@@ -12,9 +12,21 @@ const formatResponse = (res: SalaryWithStaff[]) => {
     }));
 };
 
-export const findAllSalary = async (query: Record<string, any>) => {
-    const { page = 1, pageSize = LIMIT } = query;
+export const findAllSalary = async ({
+    query,
+}: {
+    query: Record<string, any>;
+}) => {
+    const { page = 1, pageSize = LIMIT, startDate, endDate } = query;
     const offset = (page - 1) * pageSize;
+
+    const whereConditions: SQL[] = [];
+    if (startDate) {
+        whereConditions.push(gte(salaryTable.startDate, startDate));
+    }
+    if (endDate) {
+        whereConditions.push(lte(salaryTable.endDate, endDate));
+    }
 
     return await db.query.salaryTable
         .findMany({
@@ -22,8 +34,9 @@ export const findAllSalary = async (query: Record<string, any>) => {
                 staff: true,
             },
             orderBy: asc(salaryTable.name),
-            limit: pageSize,
-            offset: offset,
+            limit: Number(pageSize),
+            offset: Number(offset),
+            where: and(...whereConditions),
         })
         .then((res: SalaryWithStaff[]) => {
             return {
