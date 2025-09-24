@@ -7,7 +7,7 @@ import {
     varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { timeSheetTable } from "./timeSheets";
+import { timeSheetTable } from "./timeSheets.schema";
 
 export const staffTable = pgTable("staff", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),

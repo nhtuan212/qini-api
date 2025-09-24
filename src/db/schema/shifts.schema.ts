@@ -6,7 +6,7 @@ import {
     varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { targetShiftTable } from "./targetShifts";
+import { targetShiftTable } from "./targetShifts.schema";
 
 export const shiftTable = pgTable("shift", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),

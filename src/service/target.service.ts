@@ -7,8 +7,7 @@ import {
     TargetType,
 } from "../db";
 import { and, desc, eq, gte, inArray, lte, sql, asc, SQL } from "drizzle-orm";
-import { timeSheetTable } from "../db/schema/timeSheets";
-import { staffTable } from "../db/schema/staffs";
+import { staffTable, timeSheetTable } from "../db/schema";
 import { findAllShift } from "./shift.service";
 import { LIMIT, STATUS_CODE } from "../constants";
 

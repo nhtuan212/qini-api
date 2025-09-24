@@ -1,8 +1,8 @@
 import { pgTable, real, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { targetTable } from "./targets";
-import { shiftTable } from "./shifts";
+import { targetTable } from "./targets.schema";
+import { shiftTable } from "./shifts.schema";
 import { relations } from "drizzle-orm";
-import { timeSheetTable } from "./timeSheets";
+import { timeSheetTable } from "./timeSheets.schema";
 
 export const targetShiftTable = pgTable("target_shift", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),

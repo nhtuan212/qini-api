@@ -8,7 +8,7 @@ import {
     integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { staffTable } from "./staffs";
+import { staffTable } from "./staffs.schema";
 
 export const salaryTable = pgTable("salary", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
