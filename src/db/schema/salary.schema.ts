@@ -19,6 +19,14 @@ export const salaryTable = pgTable("salary", {
         }),
     name: varchar("name", { length: 255 }).notNull(),
     salary: integer("salary").notNull().default(0),
+    lunchAllowancePerDay: integer("lunch_allowance_per_day")
+        .notNull()
+        .default(0),
+    gasolineAllowancePerDay: integer("gasoline_allowance_per_day")
+        .notNull()
+        .default(0),
+    workingDays: integer("working_days").notNull().default(0),
+    actualWorkingDays: integer("actual_working_days").notNull().default(0),
     workingHours: real("working_hours").notNull().default(0),
     target: integer("target").notNull().default(0),
     bonus: integer("bonus").notNull().default(0),

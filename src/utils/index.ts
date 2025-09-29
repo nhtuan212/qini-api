@@ -89,3 +89,6 @@ export const formatDate = (date: Date) => {
 
 // Crypto
 export { generateRSAKeyPair, decryptPassword } from "./crypto";
+
+// Salary Calculation
+export { calculateTotalSalary } from "./salaryCalculation";

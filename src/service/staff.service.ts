@@ -66,7 +66,6 @@ export const updateStaffById = async ({
         .update(staffTable)
         .set({
             ...body,
-            isFirstLogin: false,
             updatedAt: new Date().toISOString(),
         })
         .where(eq(staffTable.id, id))

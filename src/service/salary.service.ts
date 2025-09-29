@@ -1,15 +1,31 @@
 import { and, asc, eq, gte, lte, SQL } from "drizzle-orm";
 import { db, salaryTable, SalaryType, StaffType } from "../db";
 import { LIMIT, STATUS_CODE } from "../constants";
+import { calculateTotalSalary } from "../utils";
 
 type SalaryWithStaff = SalaryType & { staff: StaffType };
 
 const formatResponse = (res: SalaryWithStaff[]) => {
-    return res.map(({ staff, ...item }) => ({
+    const result = res.map(({ staff, ...item }) => ({
         ...item,
         staffName: staff?.name,
+        salaryType: staff?.salaryType,
         totalSalary: item.salary * item.workingHours + item.target + item.bonus,
+        ...(staff?.salaryType === "MONTHLY" && {
+            workingDays: item.workingDays,
+            actualWorkingDays: item.actualWorkingDays,
+            totalSalary: calculateTotalSalary({
+                salary: item.salary,
+                workingDays: item.workingDays,
+                workingHours: item.workingHours,
+                lunchAllowancePerDay: item.lunchAllowancePerDay,
+                gasolineAllowancePerDay: item.gasolineAllowancePerDay,
+                bonus: item.bonus,
+            }),
+        }),
     }));
+
+    return result;
 };
 
 export const findAllSalary = async ({
