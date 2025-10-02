@@ -119,6 +119,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
                 endTime: shiftTable.endTime,
                 kiotId: shiftTable.kiotId,
                 shiftIsTarget: shiftTable.isTarget,
+                isTarget: shiftTable.isTarget,
             })
             .from(targetShiftTable)
             .leftJoin(shiftTable, eq(targetShiftTable.shiftId, shiftTable.id))
@@ -200,6 +201,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
                 startTime: ts.startTime,
                 endTime: ts.endTime,
                 kiotId: ts.kiotId,
+                isTarget: ts.isTarget,
                 timeSheets: timeSheetsMap.get(ts.id) || [],
             };
 
