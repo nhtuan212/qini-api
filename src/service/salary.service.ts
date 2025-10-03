@@ -16,6 +16,7 @@ const formatResponse = (res: SalaryWithStaff[]) => {
             actualWorkingDays: item.actualWorkingDays,
             totalSalary: calculateTotalSalary({
                 salary: item.salary,
+                paidLeave: item.paidLeave || 0,
                 workingDays: item.workingDays,
                 workingHours: item.workingHours,
                 lunchAllowancePerDay: item.lunchAllowancePerDay,

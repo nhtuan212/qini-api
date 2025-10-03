@@ -1,5 +1,6 @@
 type CalculateTotalSalaryProps = {
     salary: number;
+    paidLeave: number;
     workingDays: number;
     lunchAllowancePerDay: number;
     gasolineAllowancePerDay: number;
@@ -9,6 +10,7 @@ type CalculateTotalSalaryProps = {
 
 const calculateTotalSalary = ({
     salary,
+    paidLeave = 0,
     workingDays,
     lunchAllowancePerDay,
     gasolineAllowancePerDay,
@@ -18,8 +20,8 @@ const calculateTotalSalary = ({
     const hourlySalaryRate = salary / (workingDays * 7.5);
     const calculatedTotal = Math.floor(hourlySalaryRate * workingHours);
 
-    const totalLunch = lunchAllowancePerDay * workingDays;
-    const totalTransport = gasolineAllowancePerDay * workingDays;
+    const totalLunch = lunchAllowancePerDay * (workingDays - paidLeave);
+    const totalTransport = gasolineAllowancePerDay * (workingDays - paidLeave);
     const totalBonus = totalLunch + totalTransport + bonus;
 
     const calculatedSalary =
