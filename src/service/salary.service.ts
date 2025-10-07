@@ -17,8 +17,8 @@ const formatResponse = (res: SalaryWithStaff[]) => {
             total: calculateTotalSalary({
                 salary: item.salary,
                 paidLeave: Number(item.paidLeave) || 0,
-                workingDays: item.workingDays,
-                actualWorkingDays: item.actualWorkingDays,
+                workingMonth: item.workingMonth,
+                workingDay: item.workingDay,
                 workingHours: item.workingHours,
                 lunchAllowancePerDay: item.lunchAllowancePerDay,
                 gasolineAllowancePerDay: item.gasolineAllowancePerDay,
@@ -43,8 +43,8 @@ const salaryWithStaffSelect = {
     bonus: salaryTable.bonus,
 
     // MONTHLY
-    workingDays: salaryTable.workingDays,
-    actualWorkingDays: salaryTable.actualWorkingDays,
+    workingMonth: salaryTable.workingMonth,
+    workingDay: salaryTable.workingDay,
     lunchAllowancePerDay: salaryTable.lunchAllowancePerDay,
     gasolineAllowancePerDay: salaryTable.gasolineAllowancePerDay,
     paidLeave: salaryTable.paidLeave,

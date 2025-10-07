@@ -26,8 +26,8 @@ export const salaryTable = pgTable("salary", {
     gasolineAllowancePerDay: integer("gasoline_allowance_per_day")
         .notNull()
         .default(0),
-    workingDays: integer("working_days").notNull().default(0),
-    actualWorkingDays: integer("actual_working_days").notNull().default(0),
+    workingMonth: integer("working_month").notNull().default(0),
+    workingDay: integer("working_day").notNull().default(0),
     workingHours: real("working_hours").notNull().default(0),
     target: integer("target").notNull().default(0),
     bonus: integer("bonus").notNull().default(0),
