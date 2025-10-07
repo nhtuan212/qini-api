@@ -18,6 +18,7 @@ const formatResponse = (res: SalaryWithStaff[]) => {
                 salary: item.salary,
                 paidLeave: Number(item.paidLeave) || 0,
                 workingDays: item.workingDays,
+                actualWorkingDays: item.actualWorkingDays,
                 workingHours: item.workingHours,
                 lunchAllowancePerDay: item.lunchAllowancePerDay,
                 gasolineAllowancePerDay: item.gasolineAllowancePerDay,
@@ -118,23 +119,17 @@ export const findSalaryByStaffId = async ({
 };
 
 export const insertSalary = async ({ body }: { body: SalaryType }) => {
-    return await db.transaction(async tx => {
-        const [insertedSalary] = await tx
-            .insert(salaryTable)
-            .values(body)
-            .returning();
-
-        const salaryWithStaff = (await tx.query.salaryTable.findFirst({
-            with: { staff: true },
-            where: eq(salaryTable.id, insertedSalary.id),
-        })) as SalaryWithStaff;
-
-        return {
-            code: STATUS_CODE.SUCCESS,
-            message: "Insert Salary successfully!",
-            data: formatResponse([salaryWithStaff])[0],
-        };
-    });
+    return await db
+        .insert(salaryTable)
+        .values(body)
+        .returning()
+        .then(res => {
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message: "Create Salary successfully!",
+                data: res,
+            };
+        });
 };
 
 export const updateSalaryById = async ({
