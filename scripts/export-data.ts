@@ -20,6 +20,7 @@ const TABLES_TO_EXPORT = [
     { table: schema.targetTable, name: "targets" },
     { table: schema.targetShiftTable, name: "target_shifts" },
     { table: schema.timeSheetTable, name: "time_sheets" },
+    { table: schema.salaryTable, name: "salary" },
 ];
 
 const BACKUP_DIR = "backup";

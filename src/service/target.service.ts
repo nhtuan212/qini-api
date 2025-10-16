@@ -7,8 +7,7 @@ import {
     TargetType,
 } from "../db";
 import { and, desc, eq, gte, inArray, lte, sql, asc, SQL } from "drizzle-orm";
-import { timeSheetTable } from "../db/schema/timeSheets";
-import { staffTable } from "../db/schema/staffs";
+import { staffTable, timeSheetTable } from "../db/schema";
 import { findAllShift } from "./shift.service";
 import { LIMIT, STATUS_CODE } from "../constants";
 
@@ -120,6 +119,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
                 endTime: shiftTable.endTime,
                 kiotId: shiftTable.kiotId,
                 shiftIsTarget: shiftTable.isTarget,
+                isTarget: shiftTable.isTarget,
             })
             .from(targetShiftTable)
             .leftJoin(shiftTable, eq(targetShiftTable.shiftId, shiftTable.id))
@@ -201,6 +201,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
                 startTime: ts.startTime,
                 endTime: ts.endTime,
                 kiotId: ts.kiotId,
+                isTarget: ts.isTarget,
                 timeSheets: timeSheetsMap.get(ts.id) || [],
             };
 

@@ -7,15 +7,17 @@ import {
     varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { timeSheetTable } from "./timeSheets";
+import { timeSheetTable } from "./timeSheets.schema";
+import { salaryTypeEnum } from "./enum.schema";
 
 export const staffTable = pgTable("staff", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
     name: varchar("name", { length: 50 }).notNull(),
     salary: integer("salary").notNull().default(0),
+    salaryType: salaryTypeEnum("salary_type").notNull().default("HOURLY"),
     isTarget: boolean("is_target").notNull().default(false),
+    isActive: boolean("is_active").notNull().default(true),
     isFirstLogin: boolean("is_first_login").notNull().default(true),
-    active: boolean("active").notNull().default(true),
     password: varchar("password", { length: 255 }),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
         .notNull()

@@ -66,7 +66,6 @@ export const updateStaffById = async ({
         .update(staffTable)
         .set({
             ...body,
-            isFirstLogin: false,
             updatedAt: new Date().toISOString(),
         })
         .where(eq(staffTable.id, id))
@@ -80,8 +79,22 @@ export const updateStaffById = async ({
         });
 };
 
+export const softDeleteStaffById = async ({ id }: { id: string }) => {
+    return await db
+        .update(staffTable)
+        .set({ isActive: false, updatedAt: new Date().toISOString() })
+        .where(eq(staffTable.id, id))
+        .returning()
+        .then(res => {
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message: "Soft Delete Staff successfully!",
+                data: res,
+            };
+        });
+};
+
 export const removeStaffById = async ({ id }: { id: string }) => {
-    console.log("id", id);
     return await db
         .delete(staffTable)
         .where(eq(staffTable.id, id))
@@ -121,7 +134,7 @@ export const validateStaffPasswordById = async ({
                 };
             }
 
-            if (!res.active) {
+            if (!res.isActive) {
                 return {
                     code: STATUS_CODE.BAD_REQUEST,
                     message: "Staff account is inactive!",

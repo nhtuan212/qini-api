@@ -1,5 +1,5 @@
 import { date, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { targetShiftTable } from "./targetShifts";
+import { targetShiftTable } from "./targetShifts.schema";
 import { relations } from "drizzle-orm";
 
 export const targetTable = pgTable("target", {

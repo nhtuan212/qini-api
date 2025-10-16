@@ -28,3 +28,4 @@ export * from "./targetShift.controller";
 export * from "./timeSheet.controller";
 export * from "./login.controller";
 export * from "./invoice.controller";
+export * from "./salary.controller";

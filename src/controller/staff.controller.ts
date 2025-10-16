@@ -5,6 +5,7 @@ import {
     findStaffById,
     insertStaff,
     removeStaffById,
+    softDeleteStaffById,
     updateStaffById,
     validateStaffPasswordById,
 } from "../service";
@@ -26,6 +27,12 @@ export const updateStaff = serviceHandler((req: Request) =>
     updateStaffById({
         id: req.params.id,
         body: req.body,
+    }),
+);
+
+export const softDeleteStaff = serviceHandler((req: Request) =>
+    softDeleteStaffById({
+        id: req.params.id,
     }),
 );
 

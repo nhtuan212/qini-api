@@ -8,8 +8,8 @@ import {
     varchar,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { targetShiftTable } from "./targetShifts";
-import { staffTable } from "./staffs";
+import { targetShiftTable } from "./targetShifts.schema";
+import { staffTable } from "./staffs.schema";
 
 export const timeSheetTable = pgTable(
     "time_sheet",

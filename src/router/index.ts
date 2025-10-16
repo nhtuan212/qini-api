@@ -9,6 +9,7 @@ import { targetRouter } from "./target.router";
 import { targetShiftRouter } from "./targetShift.router";
 import { timeSheetRouter } from "./timeSheet.router";
 import { invoiceRouter } from "./invoice.router";
+import { salaryRouter } from "./salary.router";
 
 export const router = (app: Express) => {
     app.use(
@@ -36,4 +37,5 @@ export const router = (app: Express) => {
     app.use("/target-shift", targetShiftRouter);
     app.use("/time-sheet", timeSheetRouter);
     app.use("/invoice", invoiceRouter);
+    app.use("/salary", salaryRouter);
 };
