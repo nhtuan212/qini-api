@@ -29,3 +29,4 @@ export * from "./timeSheet.controller";
 export * from "./login.controller";
 export * from "./invoice.controller";
 export * from "./salary.controller";
+export * from "./worktype.controller";

@@ -11,3 +11,4 @@ export * from "./timeSheet.service";
 export * from "./invoice.service";
 export * from "./login.service";
 export * from "./salary.service";
+export * from "./workType.service";
