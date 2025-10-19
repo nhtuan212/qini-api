@@ -77,15 +77,25 @@ export const insertWorkAssignment = async ({
 }: {
     body: WorkAssignmentType;
 }) => {
-    return await db
+    const insertedData = await db
         .insert(workAssignmentTable)
         .values(body)
-        .returning()
+        .returning();
+
+    return await db
+        .select(workAssignmentSelect)
+        .from(workAssignmentTable)
+        .leftJoin(
+            workTypeTable,
+            eq(workAssignmentTable.workTypeId, workTypeTable.id),
+        )
+        .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
+        .where(eq(workAssignmentTable.id, insertedData[0].id))
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Create Work Assignment successfully!",
-                data: res,
+                data: res[0],
             };
         });
 };
@@ -97,16 +107,26 @@ export const updateWorkAssignmentById = async ({
     id: string;
     body: WorkAssignmentType;
 }) => {
-    return await db
+    const updatedData = await db
         .update(workAssignmentTable)
         .set(body)
         .where(eq(workAssignmentTable.id, id))
-        .returning()
+        .returning();
+
+    return await db
+        .select(workAssignmentSelect)
+        .from(workAssignmentTable)
+        .leftJoin(
+            workTypeTable,
+            eq(workAssignmentTable.workTypeId, workTypeTable.id),
+        )
+        .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
+        .where(eq(workAssignmentTable.id, updatedData[0].id))
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Update Work Assignment successfully!",
-                data: res,
+                data: res[0],
             };
         });
 };
