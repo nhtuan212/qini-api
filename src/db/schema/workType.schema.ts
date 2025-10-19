@@ -10,7 +10,7 @@ export const workTypeTable = pgTable("work_type", {
     updatedAt: timestamp("updated_at", {
         precision: 6,
         mode: "string",
-    }).defaultNow(),
+    }),
 });
 
 export type WorkTypeType = typeof workTypeTable.$inferSelect;
