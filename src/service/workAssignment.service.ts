@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import {
     db,
+    shiftTable,
     staffTable,
     workAssignmentTable,
     WorkAssignmentType,
@@ -15,6 +16,7 @@ const workAssignmentSelect = {
 
     workTypeName: workTypeTable.name,
     staffName: staffTable.name,
+    shiftName: shiftTable.name,
 
     description: workAssignmentTable.description,
     isCompleted: workAssignmentTable.isCompleted,
@@ -37,6 +39,7 @@ export const findAllWorkAssignment = async ({
             workTypeTable,
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
+        .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
         .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
         .limit(Number(pageSize))
         .offset(Number(offset))
@@ -59,6 +62,7 @@ export const findWorkAssignmentById = async ({ id }: { id: string }) => {
             workTypeTable,
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
+        .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
         .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
         .where(eq(workAssignmentTable.id, id))
         .then(res => {
@@ -89,6 +93,7 @@ export const insertWorkAssignment = async ({
             workTypeTable,
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
+        .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
         .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
         .where(eq(workAssignmentTable.id, insertedData[0].id))
         .then(res => {
@@ -120,6 +125,7 @@ export const updateWorkAssignmentById = async ({
             workTypeTable,
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
+        .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
         .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
         .where(eq(workAssignmentTable.id, updatedData[0].id))
         .then(res => {

@@ -9,6 +9,7 @@ import {
 import { workTypeTable, WorkTypeType } from "./workType.schema";
 import { staffTable, StaffType } from "./staffs.schema";
 import { relations } from "drizzle-orm";
+import { shiftTable, ShiftType } from "./shifts.schema";
 
 export const workAssignmentTable = pgTable("work_assignment", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
@@ -20,6 +21,11 @@ export const workAssignmentTable = pgTable("work_assignment", {
     staffId: uuid("staff_id")
         .notNull()
         .references(() => staffTable.id, {
+            onDelete: "cascade",
+        }),
+    shiftId: uuid("shift_id")
+        .notNull()
+        .references(() => shiftTable.id, {
             onDelete: "cascade",
         }),
     description: varchar("description", { length: 255 }),
@@ -45,10 +51,15 @@ export const workAssignmentWithRelations = relations(
             fields: [workAssignmentTable.staffId],
             references: [staffTable.id],
         }),
+        shift: one(shiftTable, {
+            fields: [workAssignmentTable.shiftId],
+            references: [shiftTable.id],
+        }),
     }),
 );
 
 export type WorkAssignmentType = typeof workAssignmentTable.$inferSelect & {
     workType: WorkTypeType;
     staff: StaffType;
+    shift: ShiftType;
 };
