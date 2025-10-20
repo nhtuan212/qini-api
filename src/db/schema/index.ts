@@ -8,4 +8,3 @@ export * from "./salary.schema";
 export * from "./workType.schema";
 export * from "./workAssignment.schema";
 export * from "./users.schema";
-export * from "./workType.schema";
