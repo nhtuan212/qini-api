@@ -21,6 +21,7 @@ const workAssignmentSelect = {
     description: workAssignmentTable.description,
     isCompleted: workAssignmentTable.isCompleted,
     date: workAssignmentTable.date,
+    updatedAt: workAssignmentTable.updatedAt,
 };
 
 export const findAllWorkAssignment = async ({
@@ -114,7 +115,10 @@ export const updateWorkAssignmentById = async ({
 }) => {
     const updatedData = await db
         .update(workAssignmentTable)
-        .set(body)
+        .set({
+            ...body,
+            ...(body.isCompleted && { updatedAt: new Date().toISOString() }),
+        })
         .where(eq(workAssignmentTable.id, id))
         .returning();
 
