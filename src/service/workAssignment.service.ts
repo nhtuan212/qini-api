@@ -12,6 +12,7 @@ import { LIMIT, STATUS_CODE } from "../constants";
 const workAssignmentSelect = {
     id: workAssignmentTable.id,
     workTypeId: workAssignmentTable.workTypeId,
+    shiftId: workAssignmentTable.shiftId,
     staffId: workAssignmentTable.staffId,
 
     workTypeName: workTypeTable.name,
