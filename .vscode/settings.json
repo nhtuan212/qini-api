@@ -10,6 +10,7 @@
         "qini",
         "Timestamptz",
         "Tuan",
-        "uuidv"
+        "uuidv",
+        "worktype"
     ]
 }
