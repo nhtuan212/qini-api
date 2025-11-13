@@ -6,7 +6,6 @@ import {
     timestamp,
     uuid,
     varchar,
-    uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { targetShiftTable } from "./targetShifts.schema";
 import { staffTable } from "./staffs.schema";
@@ -34,14 +33,14 @@ export const timeSheetTable = pgTable(
             .defaultNow(),
         updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
     },
-    table => [
-        // UNIQUE CONSTRAINT: 1 employee only has 1 record per shift per day
-        uniqueIndex("unique_staff_target_shift_date").on(
-            table.staffId,
-            table.targetShiftId,
-            table.date,
-        ),
-    ],
+    // table => [
+    //     // UNIQUE CONSTRAINT: 1 employee only has 1 record per shift per day
+    //     uniqueIndex("unique_staff_target_shift_date").on(
+    //         table.staffId,
+    //         table.targetShiftId,
+    //         table.date,
+    //     ),
+    // ],
 );
 
 // 🎯 TIME_SHEET RELATIONS
