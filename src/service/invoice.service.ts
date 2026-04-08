@@ -114,7 +114,7 @@ export const getInvoiceByDate = async (req: { [key: string]: any }) => {
     const { targetAt, soldById } = req.query;
 
     return await dataFetching(
-        `${KIOT_URL}/invoices?createdDate=${targetAt}&includePayment=true&pageSize=100`,
+        `${KIOT_URL}/invoices?createdDate=${targetAt}&status=1&includePayment=true&pageSize=100`,
     ).then(res => {
         const processedData = processPayments(res.data, Number(soldById));
 
