@@ -19,7 +19,7 @@ import {
     TimeSheetType,
 } from "../db";
 import { LIMIT, STATUS_CODE } from "../constants";
-import { getDefaultTargetAt } from "../utils";
+import { getDateRange, getDefaultTargetAt } from "../utils";
 
 const timeSheetSelect = {
     id: timeSheetTable.id,
@@ -103,18 +103,15 @@ export const findTimeSheetByStaffId = async (
     id: StaffType["id"],
     query: Record<string, any>,
 ) => {
-    const { startDate, endDate } = query;
+    const { startDate, endDate } = getDateRange(query.startDate, query.endDate);
 
     const whereConditions: SQL[] = [];
     if (id) {
         whereConditions.push(eq(timeSheetTable.staffId, id));
     }
-    if (startDate) {
-        whereConditions.push(gte(timeSheetTable.date, startDate));
-    }
-    if (endDate) {
-        whereConditions.push(lte(timeSheetTable.date, endDate));
-    }
+
+    whereConditions.push(gte(timeSheetTable.date, startDate));
+    whereConditions.push(lte(timeSheetTable.date, endDate));
 
     const staffInfo = await db.query.staffTable.findFirst({
         where: eq(staffTable.id, id),

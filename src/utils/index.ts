@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { Pagination } from "../constants";
+import dayjs from "dayjs";
 
 export const hashPassword = async (
     password: string,
@@ -85,6 +86,15 @@ export const formatDate = (date: Date) => {
     const year = vnDate.getFullYear();
 
     return `${year}-${month}-${day}`;
+};
+
+export const getDateRange = (startDate?: string, endDate?: string) => {
+    const now = dayjs();
+
+    return {
+        startDate: startDate || now.startOf("month").format("YYYY-MM-DD"),
+        endDate: endDate || now.endOf("month").format("YYYY-MM-DD"),
+    };
 };
 
 // Crypto

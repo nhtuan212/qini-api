@@ -10,10 +10,13 @@ import { and, desc, eq, gte, inArray, lte, sql, asc, SQL } from "drizzle-orm";
 import { staffTable, timeSheetTable } from "../db/schema";
 import { findAllShift } from "./shift.service";
 import { LIMIT, STATUS_CODE } from "../constants";
+import { getDateRange } from "../utils";
 
 export const findAllTarget = async (query: Record<string, any>) => {
-    const { page = 1, pageSize = LIMIT, startDate, endDate } = query;
+    const { page = 1, pageSize = LIMIT } = query;
     const offset = (page - 1) * pageSize;
+
+    const { startDate, endDate } = getDateRange(query.startDate, query.endDate);
 
     try {
         // STEP 1: Get targets
@@ -62,16 +65,11 @@ export const findAllTarget = async (query: Record<string, any>) => {
 
         // Apply filters
         const whereConditions: SQL[] = [];
-        if (startDate) {
-            whereConditions.push(
-                gte(targetTable.targetAt, new Date(startDate).toISOString()),
-            );
-        }
-        if (endDate) {
-            whereConditions.push(
-                lte(targetTable.targetAt, new Date(endDate).toISOString()),
-            );
-        }
+
+        whereConditions.push(
+            gte(targetTable.targetAt, new Date(startDate).toISOString()),
+            lte(targetTable.targetAt, new Date(endDate).toISOString()),
+        );
 
         // Build final query
         const targetsQuery =
@@ -368,6 +366,7 @@ const transformTargetResponse = (data: any[]): any => {
         .filter(row => row.targetShiftId !== null)
         .map(row => ({
             ...row,
+            id: row.targetShiftId,
         }));
 
     return {
