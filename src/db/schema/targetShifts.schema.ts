@@ -1,4 +1,11 @@
-import { pgTable, real, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+    boolean,
+    pgTable,
+    real,
+    timestamp,
+    uuid,
+    varchar,
+} from "drizzle-orm/pg-core";
 import { targetTable } from "./targets.schema";
 import { shiftTable } from "./shifts.schema";
 import { relations } from "drizzle-orm";
@@ -22,6 +29,7 @@ export const targetShiftTable = pgTable("target_shift", {
     deduction: real("deduction").notNull().default(0),
     revenue: real("revenue").notNull().default(0),
     description: varchar("description", { length: 255 }).default(""),
+    isCollectMoney: boolean().default(false),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
         .notNull()
         .defaultNow(),

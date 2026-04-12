@@ -108,6 +108,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
                 point: targetShiftTable.point,
                 deduction: targetShiftTable.deduction,
                 description: targetShiftTable.description,
+                isCollectMoney: targetShiftTable.isCollectMoney,
                 createdAt: targetShiftTable.createdAt,
                 updatedAt: targetShiftTable.updatedAt,
 
@@ -200,6 +201,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
                 endTime: ts.endTime,
                 kiotId: ts.kiotId,
                 isTarget: ts.isTarget,
+                isCollectMoney: ts.isCollectMoney,
                 timeSheets: timeSheetsMap.get(ts.id) || [],
             };
 
