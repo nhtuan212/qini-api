@@ -29,7 +29,7 @@ export const targetShiftTable = pgTable("target_shift", {
     deduction: real("deduction").notNull().default(0),
     revenue: real("revenue").notNull().default(0),
     description: varchar("description", { length: 255 }).default(""),
-    isCollectMoney: boolean().default(false),
+    isCollectMoney: boolean("is_collect_money").default(false),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
         .notNull()
         .defaultNow(),
