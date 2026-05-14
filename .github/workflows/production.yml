@@ -36,9 +36,17 @@ jobs:
 
               run: |
                   mkdir -p ~/.ssh
-                  echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+                  echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
                   chmod 700 ~/.ssh/id_rsa
                   eval $(ssh-agent -s)
 
-                  sshpass -p $PASSWORD rsync -avzr --rsync-path="mkdir -p /apps/qini-api && rsync" --delete -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ./ $USER_NAME@$IP:/apps/qini-api
-                  sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER_NAME@$IP "cd /apps/qini-api && docker compose up -d --build && docker system prune -f -a"
+                  # Rsync: --timeout and ignore the unnecessary files
+                  rsync -avz --exclude='.git/' --exclude='node_modules/' --exclude='.dist/' --exclude='*.md/' --exclude='.github/' \
+                    --rsync-path="mkdir -p /apps/qini-api && rsync" \
+                    --delete \
+                    -e 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=30' \
+                    ./ $USER_NAME@$IP:/apps/qini-api
+
+                  # SSH build
+                  ssh -o ServerAliveInterval=60 -o ServerAlivecountMax=1000 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                  $USER_NAME@$IP "cd /apps/qini-api && docker compose up -d --build && docker system prune -f -a"

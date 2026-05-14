@@ -11,6 +11,7 @@
         "Timestamptz",
         "Tuan",
         "uuidv",
-        "worktype"
+        "worktype",
+        "ServerAlivecountMax"
     ]
 }

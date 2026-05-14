@@ -103,7 +103,7 @@ export const removeStaffById = async ({ id }: { id: string }) => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Delete Staff successfully!",
-                data: res,
+                data: res[0],
             };
         });
 };
