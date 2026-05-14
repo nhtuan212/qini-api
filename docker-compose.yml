@@ -16,4 +16,4 @@ services:
             - NODE_ENV=production
         command: node dist/index.js
         volumes:
-            - /etc/apps/rsa-private-key.pem:/apps/rsa-private-key.pem
+            - /etc/apps/rsa-private-key.pem:/app/rsa-private-key.pem
