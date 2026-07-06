@@ -75,7 +75,7 @@ export const findAllSalary = async ({
         .from(salaryTable)
         .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
         .where(and(...whereConditions))
-        .orderBy(asc(staffTable.name))
+        .orderBy(desc(salaryTable.startDate), asc(staffTable.name))
         .limit(Number(pageSize))
         .offset(Number(offset))
         .then(res => {
