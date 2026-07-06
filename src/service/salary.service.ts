@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, lte, SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gte, lte, SQL } from "drizzle-orm";
 import { db, salaryTable, SalaryType, staffTable, StaffType } from "../db";
 import { calculateTotalSalary } from "../utils";
 import { LIMIT, STATUS_CODE } from "../constants";
@@ -99,12 +99,14 @@ export const findSalaryByStaffId = async ({
     const { page = 1, pageSize = LIMIT } = query;
     const offset = (page - 1) * pageSize;
 
+    console.log("object");
+
     return await db
         .select(salaryWithStaffSelect)
         .from(salaryTable)
         .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
         .where(eq(salaryTable.staffId, id))
-        .orderBy(asc(staffTable.name))
+        .orderBy(desc(salaryTable.startDate))
         .limit(Number(pageSize))
         .offset(Number(offset))
         .then(res => {
