@@ -70,23 +70,25 @@ export const findAllSalary = async ({
         whereConditions.push(lte(salaryTable.endDate, endDate));
     }
 
-    return await db
+    const res = await db
         .select(salaryWithStaffSelect)
         .from(salaryTable)
         .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
         .where(and(...whereConditions))
         .orderBy(desc(salaryTable.startDate), asc(staffTable.name))
         .limit(Number(pageSize))
-        .offset(Number(offset))
-        .then(res => {
-            return {
-                code: STATUS_CODE.SUCCESS,
-                message: "Get Salary successfully!",
-                data: formatResponse(res as SalaryWithStaff[]),
-                total: res.length,
-                pagination: { page, pageSize },
-            };
-        });
+        .offset(Number(offset));
+
+    const data = formatResponse(res as SalaryWithStaff[]);
+
+    return {
+        code: STATUS_CODE.SUCCESS,
+        message: "Get Salary successfully!",
+        data,
+        totalAmount: data.reduce((sum, item) => sum + item.total, 0),
+        total: res.length,
+        pagination: { page, pageSize },
+    };
 };
 
 export const findSalaryByStaffId = async ({
@@ -99,25 +101,25 @@ export const findSalaryByStaffId = async ({
     const { page = 1, pageSize = LIMIT } = query;
     const offset = (page - 1) * pageSize;
 
-    console.log("object");
-
-    return await db
+    const res = await db
         .select(salaryWithStaffSelect)
         .from(salaryTable)
         .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
         .where(eq(salaryTable.staffId, id))
         .orderBy(desc(salaryTable.startDate))
         .limit(Number(pageSize))
-        .offset(Number(offset))
-        .then(res => {
-            return {
-                code: STATUS_CODE.SUCCESS,
-                message: "Get Salary by Staff Id successfully!",
-                data: formatResponse(res as SalaryWithStaff[]),
-                total: res.length,
-                pagination: { page, pageSize },
-            };
-        });
+        .offset(Number(offset));
+
+    const data = formatResponse(res as SalaryWithStaff[]);
+
+    return {
+        code: STATUS_CODE.SUCCESS,
+        message: "Get Salary by Staff Id successfully!",
+        data,
+        totalAmount: data.reduce((sum, item) => sum + item.total, 0),
+        total: res.length,
+        pagination: { page, pageSize },
+    };
 };
 
 export const insertSalary = async ({ body }: { body: SalaryType }) => {
