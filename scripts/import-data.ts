@@ -28,9 +28,7 @@ const DB_URL = process.env.DATABASE_URL;
 type Sql = ReturnType<typeof postgres>;
 
 const fmtDate = (v: unknown) =>
-    v instanceof Date
-        ? v.toISOString().slice(0, 10)
-        : String(v).slice(0, 10);
+    v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10);
 
 const loadBackup = (tableName: string) => {
     const filePath = path.join(BACKUP_DIR, `${tableName}.json`);
@@ -151,7 +149,9 @@ const importTargetShifts = async (sql: Sql) => {
 
     for (let i = 0; i < toInsert.length; i += BATCH_SIZE) {
         const batch = toInsert.slice(i, i + BATCH_SIZE);
-        await sql`insert into target_shift ${sql(batch)} on conflict do nothing`;
+        await sql`insert into target_shift ${sql(
+            batch,
+        )} on conflict do nothing`;
         imported += batch.length;
         logProgress(imported, toInsert.length);
     }
