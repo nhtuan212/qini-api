@@ -1,4 +1,5 @@
-import { and, asc, desc, eq, gte, lte, SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gte, lt, lte, SQL } from "drizzle-orm";
+import dayjs from "dayjs";
 import { db, salaryTable, SalaryType, staffTable, StaffType } from "../db";
 import { calculateTotalSalary } from "../utils";
 import { LIMIT, STATUS_CODE } from "../constants";
@@ -63,11 +64,51 @@ export const findAllSalary = async ({
     const offset = (page - 1) * pageSize;
 
     const whereConditions: SQL[] = [];
-    if (startDate) {
-        whereConditions.push(gte(salaryTable.startDate, startDate));
-    }
-    if (endDate) {
-        whereConditions.push(lte(salaryTable.endDate, endDate));
+    let periodStartDate: string | null = null;
+    let periodEndDate: string | null = null;
+
+    if (startDate || endDate) {
+        if (startDate) {
+            whereConditions.push(gte(salaryTable.startDate, startDate));
+        }
+        if (endDate) {
+            whereConditions.push(lte(salaryTable.endDate, endDate));
+        }
+        periodStartDate = startDate ?? null;
+        periodEndDate = endDate ?? null;
+    } else {
+        // Default: only show the month of the most recent salary period
+        const [latest] = await db
+            .select({ startDate: salaryTable.startDate })
+            .from(salaryTable)
+            .orderBy(desc(salaryTable.startDate))
+            .limit(1);
+
+        if (!latest) {
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message: "Get Salary successfully!",
+                data: [],
+                startDate: null,
+                endDate: null,
+                totalAmount: 0,
+                total: 0,
+                pagination: { page, pageSize },
+            };
+        }
+
+        const latestMonth = dayjs(latest.startDate);
+        const monthStart = latestMonth.startOf("month").format("YYYY-MM-DD");
+        const monthEnd = latestMonth.endOf("month").format("YYYY-MM-DD");
+        const nextMonthStart = latestMonth
+            .add(1, "month")
+            .startOf("month")
+            .format("YYYY-MM-DD");
+
+        whereConditions.push(gte(salaryTable.startDate, monthStart));
+        whereConditions.push(lt(salaryTable.startDate, nextMonthStart));
+        periodStartDate = monthStart;
+        periodEndDate = monthEnd;
     }
 
     const res = await db
@@ -75,18 +116,23 @@ export const findAllSalary = async ({
         .from(salaryTable)
         .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
         .where(and(...whereConditions))
-        .orderBy(desc(salaryTable.startDate), asc(staffTable.name))
-        .limit(Number(pageSize))
-        .offset(Number(offset));
+        .orderBy(desc(salaryTable.startDate), asc(staffTable.name));
 
-    const data = formatResponse(res as SalaryWithStaff[]);
+    const allData = formatResponse(res as SalaryWithStaff[]);
+    const data = allData.slice(
+        Number(offset),
+        Number(offset) + Number(pageSize),
+    );
 
     return {
         code: STATUS_CODE.SUCCESS,
         message: "Get Salary successfully!",
         data,
-        totalAmount: data.reduce((sum, item) => sum + item.total, 0),
-        total: res.length,
+        startDate: periodStartDate,
+        endDate: periodEndDate,
+        // Sum over every record matching the filter, not just the current page
+        totalAmount: allData.reduce((sum, item) => sum + item.total, 0),
+        total: data.length,
         pagination: { page, pageSize },
     };
 };
@@ -106,18 +152,22 @@ export const findSalaryByStaffId = async ({
         .from(salaryTable)
         .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
         .where(eq(salaryTable.staffId, id))
-        .orderBy(desc(salaryTable.startDate))
-        .limit(Number(pageSize))
-        .offset(Number(offset));
+        .orderBy(desc(salaryTable.startDate));
 
-    const data = formatResponse(res as SalaryWithStaff[]);
+    const allData = formatResponse(res as SalaryWithStaff[]);
+    const data = allData.slice(
+        Number(offset),
+        Number(offset) + Number(pageSize),
+    );
 
     return {
         code: STATUS_CODE.SUCCESS,
         message: "Get Salary by Staff Id successfully!",
         data,
-        totalAmount: data.reduce((sum, item) => sum + item.total, 0),
-        total: res.length,
+        startDate: null as string | null,
+        endDate: null as string | null,
+        totalAmount: allData.reduce((sum, item) => sum + item.total, 0),
+        total: data.length,
         pagination: { page, pageSize },
     };
 };
