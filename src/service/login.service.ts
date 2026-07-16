@@ -23,6 +23,7 @@ export const handleLogin = async ({
             }
 
             const passwordValid = await comparePassword(password, res.password);
+
             if (!passwordValid) {
                 return {
                     code: STATUS_CODE.UNAUTHORIZED,
