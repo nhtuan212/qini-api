@@ -13,6 +13,7 @@ export const userTable = pgTable("user", {
     password: varchar("password", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }),
     isActive: boolean("is_active").notNull().default(true),
+    isFirstLogin: boolean("is_first_login").notNull().default(true),
     role: roleEnum("role").default("REPORT").notNull(),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
         .notNull()
