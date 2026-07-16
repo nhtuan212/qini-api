@@ -1,5 +1,6 @@
 import express, { Express } from "express";
 import cors from "cors";
+import { authMiddleware } from "../middleware";
 import { homeRouter } from "./home.router";
 import { loginRouter } from "./login.router";
 import { userRouter } from "./user.router";
@@ -30,8 +31,14 @@ export const router = (app: Express) => {
         app.use(cors());
     }
 
+    //** Public routes — reachable without a token */
     app.use("/", homeRouter);
     app.use("/login", loginRouter);
+
+    //** Auth Middleware */
+    app.use(authMiddleware);
+
+    //** Protected routes */
     app.use("/user", userRouter);
     app.use("/staff", staffRouter);
     app.use("/shift", shiftRouter);

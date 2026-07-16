@@ -1,6 +1,7 @@
 import { db, userTable } from "../db";
 import { eq } from "drizzle-orm";
-import { comparePassword } from "../utils";
+import { comparePassword, generateToken } from "../utils";
+import { STATUS_CODE } from "../constants";
 
 export const handleLogin = async ({
     username,
@@ -16,7 +17,7 @@ export const handleLogin = async ({
         .then(async res => {
             if (!res) {
                 return {
-                    code: 401,
+                    code: STATUS_CODE.UNAUTHORIZED,
                     message: "User or Password incorrectly!",
                 };
             }
@@ -24,15 +25,26 @@ export const handleLogin = async ({
             const passwordValid = await comparePassword(password, res.password);
             if (!passwordValid) {
                 return {
-                    code: 401,
+                    code: STATUS_CODE.UNAUTHORIZED,
                     message: "User or Password incorrectly!",
                 };
             }
 
+            const accessToken = generateToken({
+                id: res.id,
+                username: res.username,
+                role: res.role,
+            });
+
+            const { password: _password, ...user } = res;
+
             return {
-                code: 200,
+                code: STATUS_CODE.SUCCESS,
                 message: "Login successfully!",
-                data: res,
+                data: {
+                    accessToken,
+                    ...user,
+                },
             };
         });
 };

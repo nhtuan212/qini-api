@@ -46,7 +46,15 @@
             }
         ],
         // Resolved no-unused-vars Typescript such as declare enum type ...
-        "@typescript-eslint/no-unused-vars": "error"
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "ignoreRestSiblings": true,
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_"
+            }
+        ]
         // "no-console": "error" // Uncomment this line if you want to disallow console.log
     },
     "ignorePatterns": ["**/*.css", "**/*.scss"]
