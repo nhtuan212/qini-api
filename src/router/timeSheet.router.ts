@@ -7,12 +7,18 @@ import {
     getTimeSheetById,
     getTimeSheetByStaffId,
 } from "../controller";
+import { requireRole } from "../middleware";
+import { ROLE } from "../db/schema/enum.schema";
 
 const router = express.Router();
 export const timeSheetRouter = router
-    .get("/", getTimeSheet)
-    .get("/:id", getTimeSheetById)
-    .get("/staff/:id", getTimeSheetByStaffId)
-    .post("/", createTimeSheet)
-    .put("/:id", updateTimeSheet)
-    .delete("/:id", deleteTimeSheet);
+    .get("/", requireRole(ROLE.ADMIN, ROLE.MANAGER), getTimeSheet)
+    .get("/:id", requireRole(ROLE.ADMIN, ROLE.MANAGER), getTimeSheetById)
+    .get(
+        "/staff/:id",
+        requireRole(ROLE.ADMIN, ROLE.MANAGER),
+        getTimeSheetByStaffId,
+    )
+    .post("/", requireRole(ROLE.ADMIN), createTimeSheet)
+    .put("/:id", requireRole(ROLE.ADMIN), updateTimeSheet)
+    .delete("/:id", requireRole(ROLE.ADMIN), deleteTimeSheet);

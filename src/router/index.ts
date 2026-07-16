@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import cors from "cors";
-import { authMiddleware } from "../middleware";
+import { authMiddleware, requireRole } from "../middleware";
+import { ROLE } from "../db/schema/enum.schema";
 import { homeRouter } from "./home.router";
 import { loginRouter } from "./login.router";
 import { userRouter } from "./user.router";
@@ -38,15 +39,20 @@ export const router = (app: Express) => {
     //** Auth Middleware */
     app.use(authMiddleware);
 
-    //** Protected routes */
+    app.use("/target", targetRouter);
+    app.use("/invoice", invoiceRouter);
+
+    //** Routes with their own per-role authorization */
+    app.use("/time-sheet", timeSheetRouter);
+
+    //** Permission role to call APIs */
+    app.use(requireRole(ROLE.ADMIN));
+
     app.use("/user", userRouter);
     app.use("/staff", staffRouter);
     app.use("/shift", shiftRouter);
-    app.use("/target", targetRouter);
-    app.use("/target-shift", targetShiftRouter);
-    app.use("/time-sheet", timeSheetRouter);
-    app.use("/invoice", invoiceRouter);
     app.use("/salary", salaryRouter);
+    app.use("/target-shift", targetShiftRouter);
     app.use("/work-type", workTypeRouter);
     app.use("/work-assignment", workAssignmentRouter);
 };

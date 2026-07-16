@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../constants";
+import { Role } from "../db/schema/enum.schema";
 
 export interface TokenPayload {
     id: string;
     username: string;
-    role: string;
+    role: Role;
 }
 
 export const generateToken = (payload: TokenPayload): string => {
