@@ -29,13 +29,14 @@ export const insertUser = async ({ body }: { body: UserType }) => {
         .values({
             ...body,
             password: await hashPassword(body.password),
+            isFirstLogin: true,
         })
         .returning()
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Create User successfully!",
-                data: res,
+                data: res.map(({ password: _password, ...user }) => user),
             };
         });
 };
@@ -51,7 +52,9 @@ export const updateUserById = async ({
         .update(userTable)
         .set({
             ...body,
-            password: await hashPassword(body.password),
+            ...(body.password && {
+                password: await hashPassword(body.password),
+            }),
         })
         .where(eq(userTable.id, id))
         .returning()
@@ -59,7 +62,7 @@ export const updateUserById = async ({
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Update User successfully!",
-                data: res,
+                data: res.map(({ password: _password, ...user }) => user),
             };
         });
 };
