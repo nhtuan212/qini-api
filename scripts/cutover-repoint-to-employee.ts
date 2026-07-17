@@ -64,7 +64,9 @@ const main = async () => {
                  WHERE e.id IS NULL`,
             );
             console.log(
-                `   ${table.padEnd(16)} rows: ${total}, unmapped staff_id: ${unmapped}`,
+                `   ${table.padEnd(
+                    16,
+                )} rows: ${total}, unmapped staff_id: ${unmapped}`,
             );
             if (unmapped > 0 && !DRY_RUN) {
                 throw new Error(
