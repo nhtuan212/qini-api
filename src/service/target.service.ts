@@ -7,7 +7,7 @@ import {
     TargetType,
 } from "../db";
 import { and, desc, eq, gte, inArray, lte, sql, asc, SQL } from "drizzle-orm";
-import { staffTable, timeSheetTable } from "../db/schema";
+import { employeeTable, timeSheetTable } from "../db/schema";
 import { findAllShift } from "./shift.service";
 import { LIMIT, STATUS_CODE } from "../constants";
 import { getDateRange } from "../utils";
@@ -127,33 +127,36 @@ export const findAllTarget = async (query: Record<string, any>) => {
 
         // STEP 3: Get timeSheets
         const targetShiftIds = targetShiftsWithShifts.map(ts => ts.id);
-        let timeSheetsWithStaff: Array<{
+        let timeSheetsWithUser: Array<{
             id: string;
             targetShiftId: string;
-            staffId: string;
+            userId: string;
             checkIn: string | null;
             checkOut: string | null;
             workingHours: number | null;
             createdAt: string;
             updatedAt: string | null;
-            staffName: string | null;
+            name: string | null;
         }> = [];
 
         if (targetShiftIds.length > 0) {
-            timeSheetsWithStaff = await db
+            timeSheetsWithUser = await db
                 .select({
                     id: timeSheetTable.id,
                     targetShiftId: timeSheetTable.targetShiftId,
-                    staffId: timeSheetTable.staffId,
+                    userId: timeSheetTable.userId,
                     checkIn: timeSheetTable.checkIn,
                     checkOut: timeSheetTable.checkOut,
                     workingHours: timeSheetTable.workingHours,
                     createdAt: timeSheetTable.createdAt,
                     updatedAt: timeSheetTable.updatedAt,
-                    staffName: staffTable.name,
+                    name: employeeTable.name,
                 })
                 .from(timeSheetTable)
-                .leftJoin(staffTable, eq(timeSheetTable.staffId, staffTable.id))
+                .leftJoin(
+                    employeeTable,
+                    eq(timeSheetTable.userId, employeeTable.userId),
+                )
                 .where(inArray(timeSheetTable.targetShiftId, targetShiftIds))
                 .orderBy(asc(timeSheetTable.checkIn));
         }
@@ -161,7 +164,7 @@ export const findAllTarget = async (query: Record<string, any>) => {
         // STEP 4: Group data efficiently
         const timeSheetsMap = new Map();
 
-        timeSheetsWithStaff.forEach(ts => {
+        timeSheetsWithUser.forEach(ts => {
             const key = ts.targetShiftId;
             if (!timeSheetsMap.has(key)) {
                 timeSheetsMap.set(key, []);
@@ -169,11 +172,11 @@ export const findAllTarget = async (query: Record<string, any>) => {
 
             const timeSheetData = {
                 id: ts.id,
-                staffId: ts.staffId,
+                userId: ts.userId,
                 checkIn: ts.checkIn,
                 checkOut: ts.checkOut,
                 workingHours: ts.workingHours,
-                staffName: ts.staffName,
+                name: ts.name,
             };
 
             timeSheetsMap.get(key)!.push(timeSheetData);

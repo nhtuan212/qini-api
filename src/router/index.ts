@@ -5,7 +5,7 @@ import { ROLE } from "../db/schema/enum.schema";
 import { homeRouter } from "./home.router";
 import { loginRouter } from "./login.router";
 import { userRouter } from "./user.router";
-import { staffRouter } from "./staff.router";
+import { employeeRouter } from "./employee.router";
 import { shiftRouter } from "./shift.router";
 import { targetRouter } from "./target.router";
 import { targetShiftRouter } from "./targetShift.router";
@@ -35,11 +35,11 @@ export const router = (app: Express) => {
     //** Public routes — reachable without a token */
     app.use("/", homeRouter);
     app.use("/login", loginRouter);
+    app.use("/target", targetRouter);
 
     //** Auth Middleware */
     app.use(authMiddleware);
 
-    app.use("/target", targetRouter);
     app.use("/invoice", invoiceRouter);
 
     //** Routes with their own per-role authorization */
@@ -49,7 +49,7 @@ export const router = (app: Express) => {
     app.use(requireRole(ROLE.ADMIN));
 
     app.use("/user", userRouter);
-    app.use("/staff", staffRouter);
+    app.use("/employee", employeeRouter);
     app.use("/shift", shiftRouter);
     app.use("/salary", salaryRouter);
     app.use("/target-shift", targetShiftRouter);

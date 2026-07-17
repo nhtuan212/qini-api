@@ -4,11 +4,12 @@ import {
     pgTable,
     real,
     timestamp,
+    uniqueIndex,
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
 import { targetShiftTable } from "./targetShifts.schema";
-import { staffTable } from "./staffs.schema";
+import { userTable } from "./users.schema";
 
 export const timeSheetTable = pgTable(
     "time_sheet",
@@ -19,9 +20,9 @@ export const timeSheetTable = pgTable(
             .references(() => targetShiftTable.id, {
                 onDelete: "cascade",
             }),
-        staffId: uuid("staff_id")
+        userId: uuid("user_id")
             .notNull()
-            .references(() => staffTable.id, {
+            .references(() => userTable.id, {
                 onDelete: "cascade",
             }),
         checkIn: varchar("check_in", { length: 10 }).default(""),
@@ -33,14 +34,19 @@ export const timeSheetTable = pgTable(
             .defaultNow(),
         updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
     },
-    // table => [
-    //     // UNIQUE CONSTRAINT: 1 employee only has 1 record per shift per day
-    //     uniqueIndex("unique_staff_target_shift_date").on(
-    //         table.staffId,
-    //         table.targetShiftId,
-    //         table.date,
-    //     ),
-    // ],
+    table => [
+        // UNIQUE CONSTRAINT for insertTimeSheet's onConflictDoNothing dedupe.
+        // check_in is part of the key on purpose: a person can legitimately have
+        // multiple sessions (split shifts) for the same target shift on the same
+        // day, so the key is (user, shift, date, check_in) — it blocks exact
+        // re-submissions without collapsing real split-shift records.
+        uniqueIndex("unique_user_target_shift_date").on(
+            table.userId,
+            table.targetShiftId,
+            table.date,
+            table.checkIn,
+        ),
+    ],
 );
 
 // 🎯 TIME_SHEET RELATIONS
@@ -49,9 +55,9 @@ export const timeSheetRelations = relations(timeSheetTable, ({ one }) => ({
         fields: [timeSheetTable.targetShiftId],
         references: [targetShiftTable.id],
     }),
-    staff: one(staffTable, {
-        fields: [timeSheetTable.staffId],
-        references: [staffTable.id],
+    user: one(userTable, {
+        fields: [timeSheetTable.userId],
+        references: [userTable.id],
     }),
 }));
 

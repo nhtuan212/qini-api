@@ -7,7 +7,7 @@ import {
     varchar,
 } from "drizzle-orm/pg-core";
 import { workTypeTable, WorkTypeType } from "./workType.schema";
-import { staffTable, StaffType } from "./staffs.schema";
+import { userTable, UserType } from "./users.schema";
 import { relations } from "drizzle-orm";
 import { shiftTable, ShiftType } from "./shifts.schema";
 
@@ -18,9 +18,9 @@ export const workAssignmentTable = pgTable("work_assignment", {
         .references(() => workTypeTable.id, {
             onDelete: "cascade",
         }),
-    staffId: uuid("staff_id")
+    userId: uuid("user_id")
         .notNull()
-        .references(() => staffTable.id, {
+        .references(() => userTable.id, {
             onDelete: "cascade",
         }),
     shiftId: uuid("shift_id")
@@ -47,9 +47,9 @@ export const workAssignmentWithRelations = relations(
             fields: [workAssignmentTable.workTypeId],
             references: [workTypeTable.id],
         }),
-        staff: one(staffTable, {
-            fields: [workAssignmentTable.staffId],
-            references: [staffTable.id],
+        user: one(userTable, {
+            fields: [workAssignmentTable.userId],
+            references: [userTable.id],
         }),
         shift: one(shiftTable, {
             fields: [workAssignmentTable.shiftId],
@@ -60,6 +60,6 @@ export const workAssignmentWithRelations = relations(
 
 export type WorkAssignmentType = typeof workAssignmentTable.$inferSelect & {
     workType: WorkTypeType;
-    staff: StaffType;
+    user: UserType;
     shift: ShiftType;
 };

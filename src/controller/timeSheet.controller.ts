@@ -3,7 +3,7 @@ import {
     deleteTimeSheetById,
     findAllTimeSheet,
     findTimeSheetById,
-    findTimeSheetByStaffId,
+    findTimeSheetByUserId,
     insertTimeSheet,
     updateTimeSheetById,
 } from "../service";
@@ -15,9 +15,9 @@ export const getTimeSheetById = serviceHandler(
     async (req: Request) => await findTimeSheetById(req.params.id),
 );
 
-export const getTimeSheetByStaffId = serviceHandler(
+export const getTimeSheetByUserId = serviceHandler(
     async (req: Request) =>
-        await findTimeSheetByStaffId(req.params.id, req.query),
+        await findTimeSheetByUserId(req.params.id, req.query),
 );
 
 export const createTimeSheet = serviceHandler(

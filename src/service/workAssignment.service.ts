@@ -2,7 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import {
     db,
     shiftTable,
-    staffTable,
+    employeeTable,
     workAssignmentTable,
     WorkAssignmentType,
     workTypeTable,
@@ -13,10 +13,10 @@ const workAssignmentSelect = {
     id: workAssignmentTable.id,
     workTypeId: workAssignmentTable.workTypeId,
     shiftId: workAssignmentTable.shiftId,
-    staffId: workAssignmentTable.staffId,
+    userId: workAssignmentTable.userId,
 
     workTypeName: workTypeTable.name,
-    staffName: staffTable.name,
+    name: employeeTable.name,
     shiftName: shiftTable.name,
 
     description: workAssignmentTable.description,
@@ -42,7 +42,10 @@ export const findAllWorkAssignment = async ({
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
         .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
-        .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
+        .leftJoin(
+            employeeTable,
+            eq(workAssignmentTable.userId, employeeTable.userId),
+        )
         .limit(Number(pageSize))
         .offset(Number(offset))
         .then(res => {
@@ -65,7 +68,10 @@ export const findWorkAssignmentById = async ({ id }: { id: string }) => {
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
         .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
-        .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
+        .leftJoin(
+            employeeTable,
+            eq(workAssignmentTable.userId, employeeTable.userId),
+        )
         .where(eq(workAssignmentTable.id, id))
         .then(res => {
             return {
@@ -96,7 +102,10 @@ export const insertWorkAssignment = async ({
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
         .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
-        .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
+        .leftJoin(
+            employeeTable,
+            eq(workAssignmentTable.userId, employeeTable.userId),
+        )
         .where(eq(workAssignmentTable.id, insertedData[0].id))
         .then(res => {
             return {
@@ -131,7 +140,10 @@ export const updateWorkAssignmentById = async ({
             eq(workAssignmentTable.workTypeId, workTypeTable.id),
         )
         .leftJoin(shiftTable, eq(workAssignmentTable.shiftId, shiftTable.id))
-        .leftJoin(staffTable, eq(workAssignmentTable.staffId, staffTable.id))
+        .leftJoin(
+            employeeTable,
+            eq(workAssignmentTable.userId, employeeTable.userId),
+        )
         .where(eq(workAssignmentTable.id, updatedData[0].id))
         .then(res => {
             return {

@@ -1,6 +1,6 @@
 export * from "./enum.schema";
 export * from "./shifts.schema";
-export * from "./staffs.schema";
+export * from "./employees.schema";
 export * from "./targets.schema";
 export * from "./targetShifts.schema";
 export * from "./timeSheets.schema";
@@ -8,4 +8,3 @@ export * from "./salary.schema";
 export * from "./workType.schema";
 export * from "./workAssignment.schema";
 export * from "./users.schema";
-export * from "./employees.schema";

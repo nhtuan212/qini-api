@@ -1,15 +1,21 @@
 import { and, asc, desc, eq, gte, lt, lte, SQL } from "drizzle-orm";
 import dayjs from "dayjs";
-import { db, salaryTable, SalaryType, staffTable, StaffType } from "../db";
+import {
+    db,
+    salaryTable,
+    SalaryType,
+    employeeTable,
+    EmployeeType,
+} from "../db";
 import { calculateTotalSalary } from "../utils";
 import { LIMIT, STATUS_CODE } from "../constants";
 
-type SalaryWithStaff = SalaryType & {
-    staffName?: StaffType["name"];
-    salaryType?: StaffType["salaryType"];
+type SalaryWithEmployee = SalaryType & {
+    employeeName?: EmployeeType["name"];
+    salaryType?: EmployeeType["salaryType"];
 };
 
-const formatResponse = (res: SalaryWithStaff[]) => {
+const formatResponse = (res: SalaryWithEmployee[]) => {
     const result = res.map(item => ({
         ...item,
         total: item.salary * item.workingHours + item.target + item.bonus,
@@ -31,12 +37,12 @@ const formatResponse = (res: SalaryWithStaff[]) => {
     return result;
 };
 
-const salaryWithStaffSelect = {
+const salaryWithEmployeeSelect = {
     id: salaryTable.id,
-    staffName: staffTable.name,
+    employeeName: employeeTable.name,
     name: salaryTable.name,
     salary: salaryTable.salary,
-    salaryType: staffTable.salaryType,
+    salaryType: employeeTable.salaryType,
 
     // HOURLY
     workingHours: salaryTable.workingHours,
@@ -112,13 +118,13 @@ export const findAllSalary = async ({
     }
 
     const res = await db
-        .select(salaryWithStaffSelect)
+        .select(salaryWithEmployeeSelect)
         .from(salaryTable)
-        .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
+        .leftJoin(employeeTable, eq(salaryTable.userId, employeeTable.userId))
         .where(and(...whereConditions))
-        .orderBy(desc(salaryTable.startDate), asc(staffTable.name));
+        .orderBy(desc(salaryTable.startDate), asc(employeeTable.name));
 
-    const allData = formatResponse(res as SalaryWithStaff[]);
+    const allData = formatResponse(res as SalaryWithEmployee[]);
     const data = allData.slice(
         Number(offset),
         Number(offset) + Number(pageSize),
@@ -137,7 +143,7 @@ export const findAllSalary = async ({
     };
 };
 
-export const findSalaryByStaffId = async ({
+export const findSalaryByUserId = async ({
     id,
     query,
 }: {
@@ -148,13 +154,13 @@ export const findSalaryByStaffId = async ({
     const offset = (page - 1) * pageSize;
 
     const res = await db
-        .select(salaryWithStaffSelect)
+        .select(salaryWithEmployeeSelect)
         .from(salaryTable)
-        .leftJoin(staffTable, eq(salaryTable.staffId, staffTable.id))
-        .where(eq(salaryTable.staffId, id))
+        .leftJoin(employeeTable, eq(salaryTable.userId, employeeTable.userId))
+        .where(eq(salaryTable.userId, id))
         .orderBy(desc(salaryTable.startDate));
 
-    const allData = formatResponse(res as SalaryWithStaff[]);
+    const allData = formatResponse(res as SalaryWithEmployee[]);
     const data = allData.slice(
         Number(offset),
         Number(offset) + Number(pageSize),
@@ -162,7 +168,7 @@ export const findSalaryByStaffId = async ({
 
     return {
         code: STATUS_CODE.SUCCESS,
-        message: "Get Salary by Staff Id successfully!",
+        message: "Get Salary by User Id successfully!",
         data,
         startDate: null as string | null,
         endDate: null as string | null,
@@ -196,15 +202,19 @@ export const updateSalaryById = async ({
     return await db.transaction(async tx => {
         await tx.update(salaryTable).set(body).where(eq(salaryTable.id, id));
 
-        const updatedSalary = (await tx.query.salaryTable.findFirst({
-            with: { staff: true },
-            where: eq(salaryTable.id, id),
-        })) as SalaryWithStaff;
+        const [updatedSalary] = await tx
+            .select(salaryWithEmployeeSelect)
+            .from(salaryTable)
+            .leftJoin(
+                employeeTable,
+                eq(salaryTable.userId, employeeTable.userId),
+            )
+            .where(eq(salaryTable.id, id));
 
         return {
             code: STATUS_CODE.SUCCESS,
             message: "Update Salary by Id successfully!",
-            data: formatResponse([updatedSalary])[0],
+            data: formatResponse([updatedSalary as SalaryWithEmployee])[0],
         };
     });
 };

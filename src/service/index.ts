@@ -2,7 +2,7 @@ import { db } from "../db";
 
 export const dbConnection = async () => db;
 
-export * from "./staff.service";
+export * from "./employee.service";
 export * from "./shift.service";
 export * from "./user.service";
 export * from "./target.service";
