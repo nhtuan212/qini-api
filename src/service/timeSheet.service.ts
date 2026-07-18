@@ -9,7 +9,11 @@ import {
     UserType,
 } from "../db";
 import { LIMIT, STATUS_CODE } from "../constants";
-import { getDateRange, getDefaultTargetAt } from "../utils";
+import {
+    calculateWorkingHours,
+    getDateRange,
+    getDefaultTargetAt,
+} from "../utils";
 
 export type InsertTimeSheetBody = {
     userId: string; // the person (user.id, matches the JWT id)
@@ -195,7 +199,10 @@ export const insertTimeSheet = async (body: InsertTimeSheetBody) => {
 
     const insertData = {
         ...body,
-        workingHours: body.workingHours || 0,
+        workingHours:
+            body.checkIn && body.checkOut
+                ? calculateWorkingHours(body.checkIn, body.checkOut)
+                : body.workingHours || 0,
         date: body.date || getDefaultTargetAt().toISOString(),
     };
 
@@ -255,9 +262,20 @@ export const insertTimeSheet = async (body: InsertTimeSheetBody) => {
 };
 
 export const updateTimeSheetById = async (id: string, body: TimeSheetType) => {
+    const updateData =
+        body.checkIn && body.checkOut
+            ? {
+                  ...body,
+                  workingHours: calculateWorkingHours(
+                      body.checkIn,
+                      body.checkOut,
+                  ),
+              }
+            : body;
+
     const updated = await db
         .update(timeSheetTable)
-        .set(body)
+        .set(updateData)
         .where(eq(timeSheetTable.id, id))
         .returning({ id: timeSheetTable.id });
 
