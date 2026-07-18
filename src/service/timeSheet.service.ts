@@ -199,10 +199,9 @@ export const insertTimeSheet = async (body: InsertTimeSheetBody) => {
 
     const insertData = {
         ...body,
-        workingHours:
-            body.checkIn && body.checkOut
-                ? calculateWorkingHours(body.checkIn, body.checkOut)
-                : body.workingHours || 0,
+        workingHours: body.checkOut
+            ? calculateWorkingHours(body.checkIn, body.checkOut)
+            : body.workingHours || 0,
         date: body.date || getDefaultTargetAt().toISOString(),
     };
 
@@ -262,16 +261,25 @@ export const insertTimeSheet = async (body: InsertTimeSheetBody) => {
 };
 
 export const updateTimeSheetById = async (id: string, body: TimeSheetType) => {
-    const updateData =
-        body.checkIn && body.checkOut
-            ? {
-                  ...body,
-                  workingHours: calculateWorkingHours(
-                      body.checkIn,
-                      body.checkOut,
-                  ),
-              }
-            : body;
+    let updateData = body;
+
+    if (body.checkOut) {
+        let checkIn: string | null | undefined = body.checkIn;
+
+        if (!checkIn) {
+            const [existing] = await db
+                .select({ checkIn: timeSheetTable.checkIn })
+                .from(timeSheetTable)
+                .where(eq(timeSheetTable.id, id));
+
+            checkIn = existing?.checkIn;
+        }
+
+        updateData = {
+            ...body,
+            workingHours: calculateWorkingHours(checkIn, body.checkOut),
+        };
+    }
 
     const updated = await db
         .update(timeSheetTable)
