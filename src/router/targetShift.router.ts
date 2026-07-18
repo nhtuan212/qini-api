@@ -6,12 +6,14 @@ import {
     getTargetShiftById,
     updateTargetShift,
 } from "../controller";
+import { requireRole } from "../middleware";
+import { ROLE } from "../db";
 
 const router = express.Router();
 
 export const targetShiftRouter = router
-    .get("/", getTargetShift)
-    .get("/:id", getTargetShiftById)
-    .post("/", createTargetShift)
+    .get("/", requireRole(ROLE.ADMIN), getTargetShift)
+    .get("/:id", requireRole(ROLE.ADMIN), getTargetShiftById)
+    .post("/", requireRole(ROLE.ADMIN), createTargetShift)
     .put("/:id", updateTargetShift)
-    .delete("/:id", deleteTargetShift);
+    .delete("/:id", requireRole(ROLE.ADMIN), deleteTargetShift);

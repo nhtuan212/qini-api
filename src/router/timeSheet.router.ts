@@ -16,5 +16,5 @@ export const timeSheetRouter = router
     .get("/:id", requireRole(ROLE.ADMIN, ROLE.MANAGER), getTimeSheetById)
     .get("/user/:id", getTimeSheetByUserId)
     .post("/", createTimeSheet)
-    .put("/:id", requireRole(ROLE.ADMIN), updateTimeSheet)
+    .put("/:id", updateTimeSheet)
     .delete("/:id", requireRole(ROLE.ADMIN), deleteTimeSheet);

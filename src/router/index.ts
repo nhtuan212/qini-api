@@ -35,24 +35,23 @@ export const router = (app: Express) => {
     //** Public routes — reachable without a token */
     app.use("/", homeRouter);
     app.use("/login", loginRouter);
-    app.use("/target", targetRouter);
 
     //** Auth Middleware */
     app.use(authMiddleware);
 
-    app.use("/invoice", invoiceRouter);
-
     //** Routes with their own per-role authorization */
+    app.use("/target", targetRouter);
+    app.use("/shift", shiftRouter);
+    app.use("/target-shift", targetShiftRouter);
     app.use("/time-sheet", timeSheetRouter);
+    app.use("/invoice", invoiceRouter);
+    app.use("/salary", salaryRouter);
 
     //** Permission role to call APIs */
     app.use(requireRole(ROLE.ADMIN));
 
     app.use("/user", userRouter);
     app.use("/employee", employeeRouter);
-    app.use("/shift", shiftRouter);
-    app.use("/salary", salaryRouter);
-    app.use("/target-shift", targetShiftRouter);
     app.use("/work-type", workTypeRouter);
     app.use("/work-assignment", workAssignmentRouter);
 };
