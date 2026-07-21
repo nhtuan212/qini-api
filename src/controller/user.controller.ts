@@ -2,6 +2,7 @@ import { Request } from "express";
 import { serviceHandler } from ".";
 import {
     findAllUser,
+    handleResetPassword,
     insertUser,
     removeUserById,
     updateUserById,
@@ -17,6 +18,11 @@ export const updateUser = serviceHandler((req: Request) =>
 );
 export const deleteUser = serviceHandler((req: Request) =>
     removeUserById({
+        id: req.params.id,
+    }),
+);
+export const resetPassword = serviceHandler((req: Request) =>
+    handleResetPassword({
         id: req.params.id,
     }),
 );

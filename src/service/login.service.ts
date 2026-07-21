@@ -6,7 +6,7 @@ import {
     generateCreatePasswordToken,
     hashPassword,
 } from "../utils";
-import { STATUS_CODE } from "../constants";
+import { DEFAULT_PASSWORD, STATUS_CODE } from "../constants";
 
 export const handleLogin = async ({
     username,
@@ -139,6 +139,38 @@ export const handleChangePassword = async ({
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Password changed successfully! Please login again.",
+            };
+        });
+};
+
+export const handleResetPassword = async ({ id }: { id: string }) => {
+    return await db.query.userTable
+        .findFirst({
+            where: eq(userTable.id, id),
+        })
+        .then(async res => {
+            if (!res) {
+                return {
+                    code: STATUS_CODE.NOT_FOUND,
+                    message: "User not found!",
+                };
+            }
+
+            const hashedPassword = await hashPassword(DEFAULT_PASSWORD);
+
+            await db
+                .update(userTable)
+                .set({
+                    password: hashedPassword,
+                    isFirstLogin: true,
+                    updatedAt: new Date().toISOString(),
+                })
+                .where(eq(userTable.id, res.id));
+
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message:
+                    "Password reset successfully! User must set a new password on next login.",
             };
         });
 };

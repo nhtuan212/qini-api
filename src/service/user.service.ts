@@ -1,5 +1,5 @@
 import { db, UserType, userTable } from "../db";
-import { STATUS_CODE } from "../constants";
+import { DEFAULT_PASSWORD, STATUS_CODE } from "../constants";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "../utils";
 
@@ -17,18 +17,11 @@ export const findAllUser = async () => {
 };
 
 export const insertUser = async ({ body }: { body: UserType }) => {
-    if (!body.password) {
-        return {
-            code: STATUS_CODE.BAD_REQUEST,
-            message: "Password is required!",
-        };
-    }
-
     return await db
         .insert(userTable)
         .values({
             ...body,
-            password: await hashPassword(body.password),
+            password: await hashPassword(DEFAULT_PASSWORD),
             isFirstLogin: true,
         })
         .returning()
