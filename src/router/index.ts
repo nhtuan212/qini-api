@@ -41,6 +41,7 @@ export const router = (app: Express) => {
 
     //** Routes with their own per-role authorization */
     app.use("/target", targetRouter);
+    app.use("/employee", employeeRouter);
     app.use("/shift", shiftRouter);
     app.use("/target-shift", targetShiftRouter);
     app.use("/time-sheet", timeSheetRouter);
@@ -51,7 +52,6 @@ export const router = (app: Express) => {
     app.use(requireRole(ROLE.ADMIN));
 
     app.use("/user", userRouter);
-    app.use("/employee", employeeRouter);
     app.use("/work-type", workTypeRouter);
     app.use("/work-assignment", workAssignmentRouter);
 };
