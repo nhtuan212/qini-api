@@ -187,6 +187,18 @@ export const findTimeSheetByUserId = async (
     };
 };
 
+/** Returns the userId that owns a timesheet row, or undefined if not found. */
+export const findTimeSheetOwnerId = async (
+    id: TimeSheetType["id"],
+): Promise<string | undefined> => {
+    const [row] = await db
+        .select({ userId: timeSheetTable.userId })
+        .from(timeSheetTable)
+        .where(eq(timeSheetTable.id, id));
+
+    return row?.userId;
+};
+
 export const insertTimeSheet = async (body: InsertTimeSheetBody) => {
     if (!body?.userId || !body?.targetShiftId) {
         return {
