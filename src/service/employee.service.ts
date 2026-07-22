@@ -1,13 +1,27 @@
-import { asc, eq } from "drizzle-orm";
-import { db, employeeTable, EmployeeType } from "../db";
+import { and, asc, eq, isNull } from "drizzle-orm";
+import { db, employeeTable, EmployeeType, userTable } from "../db";
 import { STATUS_CODE } from "../constants";
+
+const employeeWithStatus = {
+    id: employeeTable.id,
+    userId: employeeTable.userId,
+    name: employeeTable.name,
+    salary: employeeTable.salary,
+    salaryType: employeeTable.salaryType,
+    isTarget: employeeTable.isTarget,
+    isActive: userTable.isActive,
+    createdAt: employeeTable.createdAt,
+    updatedAt: employeeTable.updatedAt,
+};
 
 export const findAllEmployee = async () => {
     return await db
-        .select()
+        .select(employeeWithStatus)
         .from(employeeTable)
+        .innerJoin(userTable, eq(employeeTable.userId, userTable.id))
+        .where(isNull(userTable.deletedAt))
         .orderBy(asc(employeeTable.name))
-        .then((res: EmployeeType[]) => {
+        .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Get Employee successfully!",
@@ -17,15 +31,16 @@ export const findAllEmployee = async () => {
 };
 
 export const findEmployeeById = async ({ id }: { id: string }) => {
-    return await db.query.employeeTable
-        .findFirst({
-            where: eq(employeeTable.id, id),
-        })
+    return await db
+        .select(employeeWithStatus)
+        .from(employeeTable)
+        .innerJoin(userTable, eq(employeeTable.userId, userTable.id))
+        .where(and(eq(employeeTable.id, id), isNull(userTable.deletedAt)))
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Get Employee by Id successfully!",
-                data: res,
+                data: res[0],
             };
         });
 };
@@ -63,35 +78,6 @@ export const updateEmployeeById = async ({
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Update Employee successfully!",
-                data: res[0],
-            };
-        });
-};
-
-export const softDeleteEmployeeById = async ({ id }: { id: string }) => {
-    return await db
-        .update(employeeTable)
-        .set({ isActive: false, updatedAt: new Date().toISOString() })
-        .where(eq(employeeTable.id, id))
-        .returning()
-        .then(res => {
-            return {
-                code: STATUS_CODE.SUCCESS,
-                message: "Soft Delete Employee successfully!",
-                data: res,
-            };
-        });
-};
-
-export const removeEmployeeById = async ({ id }: { id: string }) => {
-    return await db
-        .delete(employeeTable)
-        .where(eq(employeeTable.id, id))
-        .returning()
-        .then((res: EmployeeType[]) => {
-            return {
-                code: STATUS_CODE.SUCCESS,
-                message: "Delete Employee successfully!",
                 data: res[0],
             };
         });

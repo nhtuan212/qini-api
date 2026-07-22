@@ -22,7 +22,6 @@ export const employeeTable = pgTable("employee", {
     salary: integer("salary").notNull().default(0),
     salaryType: salaryTypeEnum("salary_type").notNull().default("HOURLY"),
     isTarget: boolean("is_target").notNull().default(false),
-    isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { precision: 6, mode: "string" })
         .notNull()
         .defaultNow(),
