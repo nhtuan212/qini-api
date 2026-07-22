@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { serviceHandler } from ".";
 import {
+    deactivateUserById,
     findAllUser,
     handleResetPassword,
     insertUser,
@@ -14,6 +15,11 @@ export const updateUser = serviceHandler((req: Request) =>
     updateUserById({
         id: req.params.id,
         body: req.body,
+    }),
+);
+export const deactivateUser = serviceHandler((req: Request) =>
+    deactivateUserById({
+        id: req.params.id,
     }),
 );
 export const deleteUser = serviceHandler((req: Request) =>

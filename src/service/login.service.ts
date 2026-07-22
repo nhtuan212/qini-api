@@ -1,5 +1,5 @@
 import { db, userTable } from "../db";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import {
     comparePassword,
     generateToken,
@@ -17,7 +17,10 @@ export const handleLogin = async ({
 }) => {
     return await db.query.userTable
         .findFirst({
-            where: eq(userTable.username, username),
+            where: and(
+                eq(userTable.username, username),
+                isNull(userTable.deletedAt),
+            ),
         })
         .then(async res => {
             if (!res) {
@@ -96,7 +99,10 @@ export const handleChangePassword = async ({
 
     return await db.query.userTable
         .findFirst({
-            where: eq(userTable.username, username),
+            where: and(
+                eq(userTable.username, username),
+                isNull(userTable.deletedAt),
+            ),
         })
         .then(async res => {
             if (!res) {
@@ -146,7 +152,7 @@ export const handleChangePassword = async ({
 export const handleResetPassword = async ({ id }: { id: string }) => {
     return await db.query.userTable
         .findFirst({
-            where: eq(userTable.id, id),
+            where: and(eq(userTable.id, id), isNull(userTable.deletedAt)),
         })
         .then(async res => {
             if (!res) {
@@ -191,7 +197,7 @@ export const handleCreatePassword = async ({
 
     return await db.query.userTable
         .findFirst({
-            where: eq(userTable.id, id),
+            where: and(eq(userTable.id, id), isNull(userTable.deletedAt)),
         })
         .then(async res => {
             if (!res) {

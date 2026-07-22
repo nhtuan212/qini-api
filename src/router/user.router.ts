@@ -3,6 +3,7 @@ import {
     getUser,
     createUser,
     deleteUser,
+    deactivateUser,
     updateUser,
     resetPassword,
 } from "../controller";
@@ -16,4 +17,5 @@ export const userRouter = router
     .post("/", requireRole(ROLE.ADMIN), createUser)
     .put("/:id", requireRole(ROLE.ADMIN), updateUser)
     .post("/:id/reset-password", requireRole(ROLE.ADMIN), resetPassword)
+    .put("/:id/in-active", requireRole(ROLE.ADMIN), deactivateUser)
     .delete("/:id", requireRole(ROLE.ADMIN), deleteUser);

@@ -19,6 +19,7 @@ export const userTable = pgTable("user", {
         .notNull()
         .defaultNow(),
     updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
+    deletedAt: timestamp("deleted_at", { precision: 6, mode: "string" }),
 });
 
 export type UserType = typeof userTable.$inferSelect;
