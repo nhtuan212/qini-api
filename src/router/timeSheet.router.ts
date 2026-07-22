@@ -15,7 +15,11 @@ const router = express.Router();
 export const timeSheetRouter = router
     .get("/", requireRole(ROLE.ADMIN, ROLE.MANAGER), getTimeSheet)
     .get("/:id", requireRole(ROLE.ADMIN, ROLE.MANAGER), getTimeSheetById)
-    .get("/user/:id", requireSelfOrRole("id", ROLE.ADMIN), getTimeSheetByUserId)
+    .get(
+        "/user/:id",
+        requireSelfOrRole("id", ROLE.ADMIN, ROLE.MANAGER),
+        getTimeSheetByUserId,
+    )
     .post(
         "/",
         requireSelfOrRole(req => req.body?.userId, ROLE.ADMIN),
