@@ -12,8 +12,6 @@ import { targetShiftRouter } from "./targetShift.router";
 import { timeSheetRouter } from "./timeSheet.router";
 import { invoiceRouter } from "./invoice.router";
 import { salaryRouter } from "./salary.router";
-import { workTypeRouter } from "./workType.router";
-import { workAssignmentRouter } from "./workAssignment.router";
 
 export const router = (app: Express) => {
     app.use(
@@ -52,6 +50,4 @@ export const router = (app: Express) => {
     app.use(requireRole(ROLE.ADMIN));
 
     app.use("/user", userRouter);
-    app.use("/work-type", workTypeRouter);
-    app.use("/work-assignment", workAssignmentRouter);
 };
