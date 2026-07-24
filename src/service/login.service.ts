@@ -1,4 +1,4 @@
-import { db, userTable } from "../db";
+import { db, employeeTable, userTable } from "../db";
 import { and, eq, isNull } from "drizzle-orm";
 import {
     comparePassword,
@@ -15,14 +15,20 @@ export const handleLogin = async ({
     username: string;
     password: string;
 }) => {
-    return await db.query.userTable
-        .findFirst({
-            where: and(
-                eq(userTable.username, username),
-                isNull(userTable.deletedAt),
-            ),
+    return await db
+        .select({
+            user: userTable,
+            isTarget: employeeTable.isTarget,
         })
-        .then(async res => {
+        .from(userTable)
+        .leftJoin(employeeTable, eq(employeeTable.userId, userTable.id))
+        .where(
+            and(eq(userTable.username, username), isNull(userTable.deletedAt)),
+        )
+        .then(async rows => {
+            const res = rows[0]?.user;
+            const isTarget = rows[0]?.isTarget ?? false;
+
             if (!res) {
                 return {
                     code: STATUS_CODE.UNAUTHORIZED,
@@ -76,6 +82,7 @@ export const handleLogin = async ({
                 data: {
                     accessToken,
                     ...user,
+                    isTarget,
                 },
             };
         });
