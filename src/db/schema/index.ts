@@ -6,3 +6,4 @@ export * from "./targetShifts.schema";
 export * from "./timeSheets.schema";
 export * from "./salary.schema";
 export * from "./users.schema";
+export * from "./locations.schema";
