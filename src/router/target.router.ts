@@ -6,6 +6,8 @@ import {
     getTargetById,
     updateTarget,
 } from "../controller";
+import { requireRole } from "../middleware";
+import { ROLE } from "../db";
 
 const router = express.Router();
 
@@ -14,4 +16,4 @@ export const targetRouter = router
     .get("/:id", getTargetById)
     .post("/", createTarget)
     .put("/:id", updateTarget)
-    .delete("/:id", deleteTarget);
+    .delete("/:id", requireRole(ROLE.ADMIN), deleteTarget);

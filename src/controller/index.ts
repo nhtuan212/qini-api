@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { STATUS_CODE } from "../constants";
 
 export const serviceHandler = (service: {
     (
@@ -11,15 +12,24 @@ export const serviceHandler = (service: {
     }>;
 }) => {
     return async (req: Request, res: Response) => {
-        return await service(req, res).then(resData => {
+        try {
+            const resData = await service(req, res);
             return res.status(resData.code).json({
                 ...resData,
             });
-        });
+        } catch (error) {
+            return res.status(STATUS_CODE.ERROR).json({
+                code: STATUS_CODE.ERROR,
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Internal Server Error",
+            });
+        }
     };
 };
 
-export * from "./staff.controller";
+export * from "./employee.controller";
 export * from "./home.controller";
 export * from "./shift.controller";
 export * from "./user.controller";
@@ -29,5 +39,4 @@ export * from "./timeSheet.controller";
 export * from "./login.controller";
 export * from "./invoice.controller";
 export * from "./salary.controller";
-export * from "./workType.controller";
-export * from "./workAssignment.controller";
+export * from "./location.controller";

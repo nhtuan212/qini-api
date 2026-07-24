@@ -102,3 +102,9 @@ export { generateRSAKeyPair, decryptPassword } from "./crypto";
 
 // Salary Calculation
 export { calculateTotalSalary } from "./salaryCalculation";
+
+// Working Hours
+export { calculateWorkingHours } from "./workingHours";
+
+// Access token
+export * from "./accessToken";

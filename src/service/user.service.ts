@@ -1,12 +1,13 @@
 import { db, UserType, userTable } from "../db";
-import { STATUS_CODE } from "../constants";
-import { eq } from "drizzle-orm";
+import { DEFAULT_PASSWORD, STATUS_CODE } from "../constants";
+import { and, eq, isNull } from "drizzle-orm";
 import { hashPassword } from "../utils";
 
 export const findAllUser = async () => {
     return await db
         .select()
         .from(userTable)
+        .where(isNull(userTable.deletedAt))
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
@@ -17,25 +18,19 @@ export const findAllUser = async () => {
 };
 
 export const insertUser = async ({ body }: { body: UserType }) => {
-    if (!body.password) {
-        return {
-            code: STATUS_CODE.BAD_REQUEST,
-            message: "Password is required!",
-        };
-    }
-
     return await db
         .insert(userTable)
         .values({
             ...body,
-            password: await hashPassword(body.password),
+            password: await hashPassword(DEFAULT_PASSWORD),
+            isFirstLogin: true,
         })
         .returning()
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Create User successfully!",
-                data: res,
+                data: res.map(({ password: _password, ...user }) => user),
             };
         });
 };
@@ -51,7 +46,9 @@ export const updateUserById = async ({
         .update(userTable)
         .set({
             ...body,
-            password: await hashPassword(body.password),
+            ...(body.password && {
+                password: await hashPassword(body.password),
+            }),
         })
         .where(eq(userTable.id, id))
         .returning()
@@ -59,21 +56,40 @@ export const updateUserById = async ({
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Update User successfully!",
-                data: res,
+                data: res.map(({ password: _password, ...user }) => user),
+            };
+        });
+};
+
+export const deactivateUserById = async ({ id }: { id: string }) => {
+    return await db
+        .update(userTable)
+        .set({ isActive: false, updatedAt: new Date().toISOString() })
+        .where(and(eq(userTable.id, id), isNull(userTable.deletedAt)))
+        .returning()
+        .then(res => {
+            return {
+                code: STATUS_CODE.SUCCESS,
+                message: "Deactivate User successfully!",
+                data: res.map(({ password: _password, ...user }) => user),
             };
         });
 };
 
 export const removeUserById = async ({ id }: { id: string }) => {
     return await db
-        .delete(userTable)
-        .where(eq(userTable.id, id))
+        .update(userTable)
+        .set({
+            deletedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        })
+        .where(and(eq(userTable.id, id), isNull(userTable.deletedAt)))
         .returning()
         .then(res => {
             return {
                 code: STATUS_CODE.SUCCESS,
                 message: "Delete User successfully!",
-                data: res,
+                data: res.map(({ password: _password, ...user }) => user),
             };
         });
 };

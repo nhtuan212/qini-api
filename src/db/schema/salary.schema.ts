@@ -8,13 +8,13 @@ import {
     integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { staffTable } from "./staffs.schema";
+import { userTable } from "./users.schema";
 
 export const salaryTable = pgTable("salary", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
-    staffId: uuid("staff_id")
+    userId: uuid("user_id")
         .notNull()
-        .references(() => staffTable.id, {
+        .references(() => userTable.id, {
             onDelete: "cascade",
         }),
     name: varchar("name", { length: 255 }).notNull(),
@@ -43,11 +43,11 @@ export const salaryTable = pgTable("salary", {
     updatedAt: timestamp("updated_at", { precision: 6, mode: "string" }),
 });
 
-// 🎯 STAFF RELATIONS
+// 🎯 USER RELATIONS
 export const salaryRelations = relations(salaryTable, ({ one }) => ({
-    staff: one(staffTable, {
-        fields: [salaryTable.staffId],
-        references: [staffTable.id],
+    user: one(userTable, {
+        fields: [salaryTable.userId],
+        references: [userTable.id],
     }),
 }));
 

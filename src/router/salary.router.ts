@@ -3,15 +3,17 @@ import {
     createSalary,
     deleteSalary,
     getSalary,
-    getSalaryByStaffId,
+    getSalaryByUserId,
     updateSalary,
 } from "../controller";
+import { requireRole, requireSelfOrRole } from "../middleware";
+import { ROLE } from "../db";
 
 const router = express.Router();
 
 export const salaryRouter = router
     .get("/", getSalary)
-    .get("/staff/:id", getSalaryByStaffId)
-    .post("/", createSalary)
-    .put("/:id", updateSalary)
-    .delete("/:id", deleteSalary);
+    .get("/user/:id", requireSelfOrRole("id", ROLE.ADMIN), getSalaryByUserId)
+    .post("/", requireRole(ROLE.ADMIN), createSalary)
+    .put("/:id", requireRole(ROLE.ADMIN), updateSalary)
+    .delete("/:id", requireRole(ROLE.ADMIN), deleteSalary);
